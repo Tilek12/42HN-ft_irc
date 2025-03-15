@@ -1,0 +1,178 @@
+---------------------
+----- todo list -----
+---------------------
+
+📁 Folder Structure
+Here’s a clean and modular structure to keep your code readable:
+
+ft_irc/
+│── src/
+│   ├── main.cpp               # Entry point of the server
+│   ├── Server.cpp             # Handles server setup and connections
+│   ├── Client.cpp             # Stores client information and state
+│   ├── Command.cpp            # Processes client commands
+│   ├── Channel.cpp            # Manages IRC channels
+│   ├── Utils.cpp              # Utility functions (parsing, logging)
+│── include/
+│   ├── Server.hpp
+│   ├── Client.hpp
+│   ├── Command.hpp
+│   ├── Channel.hpp
+│   ├── Utils.hpp
+│── config/
+│   ├── server.conf            # Configuration file (port, password, etc.)
+│── tests/
+│   ├── test_commands.cpp      # Unit tests for command handling
+│   ├── test_channels.cpp      # Unit tests for channel management
+│── Makefile                   # Build and run the project
+│── README.md                  # Project documentation
+
+
+---------------------------------------------------------------------------
+
+
+📌 Team Task Breakdown (3 Members)
+Each member will focus on specific aspects of the project to ensure efficiency and clarity.
+
+Member		Responsibility								Key Concepts
+Member 1	Server & Networking							Sockets, TCP/IP, poll(), non-blocking I/O
+Member 2	Client Handling & Commands					String parsing, data structures, user authentication
+Member 3	Channel Management & Operator Features		Channel system, user roles, operator commands
+
+
+---------------------------------------------------------------------------
+
+
+🛠️ Member 1: Server & Networking
+
+📌 Goal: Set up the server, handle multiple clients, and manage non-blocking connections.
+
+💡 Tasks
+✅ Set up TCP Server (Use socket(), bind(), listen(), accept()).
+✅ Implement poll() for handling multiple clients simultaneously.
+✅ Use non-blocking I/O (fcntl(fd, F_SETFL, O_NONBLOCK)).
+✅ Handle client connections & disconnections properly.
+✅ Send and receive messages using send()/recv().
+✅ Implement graceful shutdown (handle SIGINT).
+
+🛠️ Concepts to Learn
+Networking Basics: What are sockets? How does TCP/IP work?
+Non-blocking I/O: Why use poll() instead of blocking recv()?
+File Descriptors: How does the OS manage them?
+Concurrency & Polling: How to handle multiple clients without using fork().
+
+📅 Daily Task Breakdown:
+Day			Task							Explanation
+Day 1		Setup the Project				Create a ft_irc/ directory, initialize a Git repository, and add basic files (Makefile, main.cpp).
+Day 2		Learn & Experiment with 		Sockets	Research socket(), bind(), listen(), and accept(). Write a simple server that listens on a port.
+Day 3		Implement Server Class			Start writing Server.cpp to create a socket and wait for client connections.
+Day 4		Handle Multiple Clients			Implement poll() to manage multiple client connections without blocking.
+Day 5		Test Basic Connection Handling	Run multiple terminal instances to test if multiple clients can connect at the same time.
+Day 6		Improve Data Reception			Implement message reception logic (recv()), ensure the server receives data properly.
+Day 7		Send Data to Clients			Implement send() to allow server responses.
+Day 8		Handle Disconnections Properly	Detect if a client disconnects (recv() == 0) and remove them from the list.
+Day 9		Optimize Performance			Implement error handling and optimize polling for efficiency.
+Day 10		Final Review & Testing			Ensure the server runs without crashes, and all networking functionality works as expected.
+Day 11-14	Load Testing & Debugging		Run stress tests, simulate 50+ client connections, fix bugs.
+
+
+---------------------------------------------------------------------------
+
+
+🛠️ Member 2: Client Management & Command Processing
+
+📌 Goal: Process client messages and implement core IRC commands.
+
+💡 Tasks
+✅ Parse and process incoming messages (e.g., "NICK John" should set nickname = "John").
+✅ Implement basic commands:
+		NICK → Set the user's nickname.
+		USER → Set username & user details.
+		PRIVMSG → Send a private message.
+		JOIN → Join a channel.
+✅ Keep track of connected clients (std::unordered_map<int, Client>).
+✅ Handle authentication (check password on connection).
+✅ Format server responses properly.
+
+🛠️ Concepts to Learn
+String Parsing: How to extract words from received messages (std::stringstream, std::getline).
+Data Structures: Use maps (std::unordered_map) to store client info.
+State Management: Track connected users and authentication status.
+Error Handling: What happens if a user enters an invalid command?
+
+📅 Daily Task Breakdown
+Day			Task						Explanation
+Day 1		Learn About IRC Commands	Research IRC command structures (NICK, USER, PRIVMSG).
+Day 2		Implement Client Class		Write Client.cpp, storing nickname, username, and socket details.
+Day 3		Store Connected Clients		Maintain a std::unordered_map<int, Client*> to track users by socket ID.
+Day 4		Implement NICK Command		Allow clients to set their nickname (NICK John).
+Day 5		Implement USER Command		Handle user login (USER John * * :John Doe).
+Day 6		Implement PRIVMSG Command	Enable user-to-user messaging (PRIVMSG John :Hello!).
+Day 7		Handle Command Parsing		Develop CommandHandler.cpp to interpret user input.
+Day 8		Test Input Validations		Check for invalid nicknames, duplicate names, and incorrect syntax.
+Day 9		Improve Error Handling		Detect errors like missing parameters and notify clients.
+Day 10		Optimize Client Storage		Improve std::unordered_map lookups for efficiency.
+Day 11-14	Final Testing & Debugging	Test commands with real IRC clients, fix issues.
+
+
+---------------------------------------------------------------------------
+
+
+🛠️ Member 3: Channel & Operator Commands
+
+📌 Goal: Implement IRC channels, permissions, and operator commands.
+
+💡 Tasks
+✅ Implement the channel system:
+		Users can create/join channels.
+		Each channel has a list of members.
+✅ Implement channel commands:
+		KICK → Remove a user from a channel.
+		INVITE → Invite a user to a channel.
+		TOPIC → Set/view the channel’s topic.
+		MODE → Manage channel permissions (invite-only, topic-lock, etc.).
+✅ Ensure message forwarding:
+		Messages sent in a channel should reach all members.
+✅ Assign operators & privileges.
+
+🛠️ Concepts to Learn
+Object-Oriented Programming (OOP): Use a Channel class to store data.
+Permissions & Roles: How to handle operators vs. normal users?
+Linked Structures: How to store users inside channels? (std::unordered_map<std::string, Channel>)
+Event Handling: What happens when a user leaves a channel?
+
+📅 Daily Task Breakdown
+Day			Task								Explanation
+Day 1		Understand IRC Channels				Learn how JOIN, PART, KICK, and INVITE commands work.
+Day 2		Create the Channel Class			Implement Channel.cpp, storing channel name and user list.
+Day 3		Implement JOIN Command				Allow users to join a channel (JOIN #general).
+Day 4		Implement PART Command				Allow users to leave a channel (PART #general).
+Day 5		Manage Channel Users				Store a list of members (std::vector<Client*>).
+Day 6		Implement KICK Command				Allow operators to remove users from a channel.
+Day 7		Implement INVITE Command			Allow operators to invite users.
+Day 8		Handle Permissions					Ensure only operators can kick/invite.
+Day 9		Test Multiple Channel Management	Ensure clients can join multiple channels.
+Day 10		Optimize Channel Performance		Improve lookup speed using std::unordered_map.
+Day 11-14	Test All Features					Verify command behavior using real IRC clients.
+
+
+---------------------------------------------------------------------------
+
+
+📜 Summary of Team Tasks
+Member								Tasks
+1 (Server & Networking)				Builds the core server, manages sockets and poll() for multiple clients.
+2 (Client Management & Commands)	Handles client storage, nicknames, messaging, and user commands.
+3 (Channel & Operator Commands)		Implements channels, permissions, and operator controls.
+
+
+---------------------------------------------------------------------------
+
+
+🎯 Final Steps (Days 11-14)
+Each team member will:
+✅ Test their own features
+✅ Run the server with real IRC clients (like WeeChat or HexChat)
+✅ Fix last-minute bugs
+✅ Write documentation (README.md)
+✅ Submit the project on time
