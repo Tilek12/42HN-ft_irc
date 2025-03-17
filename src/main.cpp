@@ -7,6 +7,7 @@ main (void) {
 	std::cout << "Hey beautiful Linda" << std::endl;
 	std::cout << "tilek work done " << std::endl;
 	std::cout << "check push to intra and lindagithub with one push" << std::endl;
+	std::cout << "second check push to intra and lindagithub with one push" << std::endl;
 	return 0;
 }
 
