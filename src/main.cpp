@@ -5,6 +5,7 @@ main (void) {
 	std::cout << "Welcome" << std::endl;
 	std::cout << "task 5 done" << std::endl;
 	std::cout << "Hey beautiful Linda" << std::endl;
+	std::cout << "tilek work done " << std::endl;
 	return 0;
 }
 
