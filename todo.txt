@@ -62,18 +62,18 @@ File Descriptors: How does the OS manage them?
 Concurrency & Polling: How to handle multiple clients without using fork().
 
 📅 Daily Task Breakdown:
-Day			Task							Explanation
-Day 1		Setup the Project				Create a ft_irc/ directory, initialize a Git repository, and add basic files (Makefile, main.cpp).
-Day 2		Learn & Experiment with 		Sockets	Research socket(), bind(), listen(), and accept(). Write a simple server that listens on a port.
-Day 3		Implement Server Class			Start writing Server.cpp to create a socket and wait for client connections.
-Day 4		Handle Multiple Clients			Implement poll() to manage multiple client connections without blocking.
-Day 5		Test Basic Connection Handling	Run multiple terminal instances to test if multiple clients can connect at the same time.
-Day 6		Improve Data Reception			Implement message reception logic (recv()), ensure the server receives data properly.
-Day 7		Send Data to Clients			Implement send() to allow server responses.
-Day 8		Handle Disconnections Properly	Detect if a client disconnects (recv() == 0) and remove them from the list.
-Day 9		Optimize Performance			Implement error handling and optimize polling for efficiency.
-Day 10		Final Review & Testing			Ensure the server runs without crashes, and all networking functionality works as expected.
-Day 11-14	Load Testing & Debugging		Run stress tests, simulate 50+ client connections, fix bugs.
+Day			Task								Explanation
+Day 1		Setup the Project					Create a ft_irc/ directory, initialize a Git repository, and add basic files (Makefile, main.cpp).
+Day 2		Learn & Experiment with Sockets		Research socket(), bind(), listen(), and accept(). Write a simple server that listens on a port.
+Day 3		Implement Server Class				Start writing Server.cpp to create a socket and wait for client connections.
+Day 4		Handle Multiple Clients				Implement poll() to manage multiple client connections without blocking.
+Day 5		Test Basic Connection Handling		Run multiple terminal instances to test if multiple clients can connect at the same time.
+Day 6		Improve Data Reception				Implement message reception logic (recv()), ensure the server receives data properly.
+Day 7		Send Data to Clients				Implement send() to allow server responses.
+Day 8		Handle Disconnections Properly		Detect if a client disconnects (recv() == 0) and remove them from the list.
+Day 9		Optimize Performance				Implement error handling and optimize polling for efficiency.
+Day 10		Final Review & Testing				Ensure the server runs without crashes, and all networking functionality works as expected.
+Day 11-14	Load Testing & Debugging			Run stress tests, simulate 50+ client connections, fix bugs.
 
 
 ---------------------------------------------------------------------------
