@@ -12,7 +12,7 @@ int main()
 	// specifying address
 	sockaddr_in serverAddress;
 	serverAddress.sin_family = AF_INET;
-	serverAddress.sin_port = htons(8080);
+	serverAddress.sin_port = htons(6667);
 	serverAddress.sin_addr.s_addr = INADDR_ANY;
 
 	// sending connection request
