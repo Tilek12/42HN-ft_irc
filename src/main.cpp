@@ -1,6 +1,13 @@
 #include <iostream>
 
-main (void) {
+void test_channel()
+{
+
+}
+
+int main (void) {
+	test_channel();
+
 	std::cout << "ft_irc project" << std::endl;
 	std::cout << "Welcome" << std::endl;
 	std::cout << "Hey beautiful Linda" << std::endl;
