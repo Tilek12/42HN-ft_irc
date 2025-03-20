@@ -17,30 +17,29 @@ private:
 	size_t					_userLimit;
 public:
 	Channel();
-	Channel(const std::string name);
+	Channel(const std::string& name);
 	Channel(const Channel& other);
 	Channel& operator=(const Channel& other);
 	~Channel();
 
-	std::string 			getName();
-	std::string 			getTopic();
-	void					setTopic(std::string topic);
-	std::set<std::string> 	getUsers();
-	void 					addUser(std::string user);
-	void 					removeUser(std::string user);
-	std::set<std::string> 	getOperators();
-	void 					addOperator(std::string operator);
-	void 					removeOperator(std::string operator);
-	std::set<std::string> 	getInvitedUsers();
-	void					addInvitedUsers();
-	void					removeInvitedUsers();
-	std::set<std::string> 	getInvitedUsers();
-	bool 					hasPassword();
-	bool 					setHasPassword();
-	bool 					getIsInviteOnly();
-	void 					setIsInviteOnly();
-	size_t					getUserLimit();
-	void					setUserLimit();
+	std::string 			getName() const;
+	std::string 			getTopic() const;
+	void					setTopic(const std::string& topic);
+	std::set<std::string> 	getUsers() const;
+	void 					addUser(const std::string& user);
+	void 					removeUser(const std::string& user);
+	std::set<std::string> 	getOperators() const;
+	void 					addOperator(const std::string& oper);
+	void 					removeOperator(const std::string& oper);
+	std::set<std::string> 	getInvitedUsers() const;
+	void					addInvitedUser(const std::string& user);
+	void					removeInvitedUser(const std::string& user);
+	bool 					getHasPassword() const;
+	void 					setHasPassword(bool hasPassword);
+	bool 					getIsInviteOnly() const;
+	void 					setIsInviteOnly(bool isInviteOnly);
+	size_t					getUserLimit() const;
+	void					setUserLimit(size_t limit);
 };
 
 #endif
