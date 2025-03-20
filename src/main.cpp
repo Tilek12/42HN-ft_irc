@@ -1,17 +1,30 @@
-#include <iostream>
 
-void test_channel()
-{
+#include "../include/Server.hpp"
 
-}
+int main( int argc, char** argv ) {
 
-int main (void) {
-	test_channel();
+	std::cout << YELLOW
+			  << "==============================================" << std::endl
+			  << "==================  TRLnet  ==================" << std::endl
+			  << "==============================================" << std::endl
+			  << RESET;
 
-	std::cout << "ft_irc project" << std::endl;
-	std::cout << "Welcome" << std::endl;
-	std::cout << "Hey beautiful Linda" << std::endl;
-	std::cout << "testing issues feature" << std::endl;
+	if ( argc != 3 ) {
+		std::cerr << RED
+				  << "Usage: ./ircserv <port> <password>"
+				  << RESET << std::endl;
+		return 1;
+	}
+
+	int port = std::atoi( argv[1] );
+	std::string password = argv[2];
+
+	try {
+		Server server( port, password );
+		server.run();
+	} catch ( const std::exception& e ) {
+		std::cerr << RED << e.what() << std::endl;
+	}
+
 	return 0;
 }
-

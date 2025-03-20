@@ -1,38 +1,50 @@
-# **************************************************************************** #
-#                                                                              #
-#                                                         :::      ::::::::    #
-#    Makefile                                           :+:      :+:    :+:    #
-#                                                     +:+ +:+         +:+      #
-#    By: llacsivy <llacsivy@student.42.fr>          +#+  +:+       +#+         #
-#                                                 +#+#+#+#+#+   +#+            #
-#    Created: 2025/03/12 12:44:18 by llacsivy          #+#    #+#              #
-#    Updated: 2025/03/20 10:49:18 by llacsivy         ###   ########.fr        #
-#                                                                              #
-# **************************************************************************** #
 
-NAME			:= ircserv
-CPP				:= c++
-CPPFLAGS		:= -Wextra -Wall -Werror -std=c++17
+# Color codes
+GREEN	= \033[0;32m
+VIOLET	= \033[0;35m
+RESET	= \033[0m
 
-SRCS			:= 	src/main.cpp \
-					src/Channel.cpp
+# Compiler
+CXX = c++
+CXXFLAGS = -Wall -Wextra -Werror -std=c++17
 
-OBJS			:=	${SRCS:.cpp=.o}
+# Directories
+OBJ_DIR = obj
+SRC_DIR = src
 
-all : $(NAME)
+# Variables
+NAME = ircserv
+SRC =	$(SRC_DIR)/main.cpp \
+		$(SRC_DIR)/Server.cpp
+OBJ = $(SRC:$(SRC_DIR)/%.cpp=$(OBJ_DIR)/%.o)
 
-%.o: %.cpp
-	$(CPP) $(CPPFLAGS) -c $< -o $@
+# Compile the executable
+all: $(OBJ_DIR) $(NAME)
 
-$(NAME) : $(OBJS)
-	$(CPP) $(CPPFLAGS) $(OBJS) -o $(NAME)
+$(NAME): $(OBJ)
+	@$(CXX) $(CXXFLAGS) $(OBJ) -o $(NAME) > /dev/null 2>&1
+	@echo "$(GREEN)object files created.$(RESET)"
+	@echo "$(GREEN)$(NAME) created. $(RESET)"
 
+# Compile object files
+$(OBJ_DIR)/%.o: $(SRC_DIR)/%.cpp | $(OBJ_DIR)
+	@$(CXX) $(CXXFLAGS) -c $< -o $@
+
+# Create OBJ_DIR
+$(OBJ_DIR):
+	@mkdir -p $(OBJ_DIR)
+
+# Clean up object files
 clean:
-	rm -f $(OBJS)
+	@rm -rf $(OBJ_DIR) > /dev/null 2>&1
+	@echo "$(VIOLET)object files deleted.$(RESET)"
 
-fclean : clean
-	rm -f $(NAME)
+# Clean up object files and executable file
+fclean: clean
+	@rm -f $(NAME) > /dev/null 2>&1
+	@echo "$(VIOLET)$(NAME) deleted.$(RESET)"
 
-re : fclean all
+# Recompile the project
+re: fclean all
 
 .PHONY: all clean fclean re
