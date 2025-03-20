@@ -17,7 +17,8 @@ private:
 	size_t					_userLimit;
 public:
 	Channel();
-	Channel(const std::string& name);
+	Channel(const std::string& name, const std::string& topic, bool isInviteOnly, \
+		bool hasPassword, size_t userLimit);
 	Channel(const Channel& other);
 	Channel& operator=(const Channel& other);
 	~Channel();

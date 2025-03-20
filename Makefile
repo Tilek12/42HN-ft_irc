@@ -15,7 +15,9 @@ SRC_DIR = src
 # Variables
 NAME = ircserv
 SRC =	$(SRC_DIR)/main.cpp \
-		$(SRC_DIR)/Server.cpp
+		$(SRC_DIR)/Server.cpp \
+		$(SRC_DIR)/Channel.cpp
+		
 OBJ = $(SRC:$(SRC_DIR)/%.cpp=$(OBJ_DIR)/%.o)
 
 # Compile the executable
