@@ -96,7 +96,7 @@ void	Server::_handleData( void ) {
 	char buffer[1024] = { 0 };
 	recv( _clientSocket, buffer, sizeof(buffer), 0 );
 
-	std::cout << GREEN
+	std::cout << BLUE
 			  << "Message from client: "
 			  << RESET
 			  << YELLOW
@@ -121,3 +121,8 @@ void	Server::run( void ) {
 	close(_serverSocket);
 
 }
+
+/*-----------------------*/
+/*  Get Server password  */
+/*-----------------------*/
+std::string	Server::getPassword( void ) { return _password; }

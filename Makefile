@@ -1,4 +1,3 @@
-
 # Color codes
 GREEN	= \033[0;32m
 VIOLET	= \033[0;35m
