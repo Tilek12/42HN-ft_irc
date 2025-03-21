@@ -7,6 +7,9 @@
 class Channel
 {
 private:
+	Channel(const Channel& other) = delete;
+	Channel& operator=(const Channel& other) = delete;
+
 	std::string 			_name;
 	std::string 			_topic;
 	std::set<std::string>	_users;
@@ -16,14 +19,13 @@ private:
 	bool					_hasPassword;
 	std::string				_password;
 	size_t					_userLimit;
+	
 	bool					_isValidName(const std::string name);
 	bool					_isValidPassword(const std::string password);
 public:
 	Channel();
 	Channel(const std::string& name, const std::string& topic, bool isInviteOnly, \
 		bool hasPassword, std::string password, size_t userLimit);
-	Channel(const Channel& other);
-	Channel& operator=(const Channel& other);
 	~Channel();
 
 	std::string 			getName() const;
