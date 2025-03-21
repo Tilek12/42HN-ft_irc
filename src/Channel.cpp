@@ -72,7 +72,7 @@ std::set<std::string> Channel::getOperators() const
 
 void Channel::addOperator(const std::string& oper)
 {
-	if (_operators.find(oper) != _operators.end())
+	if (_operators.find(oper) == _operators.end())
 	{
 		_operators.insert(oper);
 	}

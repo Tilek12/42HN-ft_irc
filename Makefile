@@ -11,12 +11,14 @@ CXXFLAGS = -Wall -Wextra -Werror -std=c++17
 # Directories
 OBJ_DIR = obj
 SRC_DIR = src
+TEST_DIR = tests
 
 # Variables
 NAME = ircserv
-SRC =	$(SRC_DIR)/main.cpp \
-		$(SRC_DIR)/Server.cpp \
+TEST_NAME = test_ircserv
+SRC =	$(SRC_DIR)/Server.cpp \
 		$(SRC_DIR)/Channel.cpp
+# $(SRC_DIR)/main.cpp \
 		
 OBJ = $(SRC:$(SRC_DIR)/%.cpp=$(OBJ_DIR)/%.o)
 
@@ -24,7 +26,7 @@ OBJ = $(SRC:$(SRC_DIR)/%.cpp=$(OBJ_DIR)/%.o)
 all: $(OBJ_DIR) $(NAME)
 
 $(NAME): $(OBJ)
-	@$(CXX) $(CXXFLAGS) $(OBJ) -o $(NAME) > /dev/null 2>&1
+	@$(CXX) $(CXXFLAGS) $(OBJ) $(SRC_DIR)/main.cpp -o $(NAME) > /dev/null 2>&1
 	@echo "$(GREEN)object files created.$(RESET)"
 	@echo "$(GREEN)$(NAME) created. $(RESET)"
 
@@ -48,5 +50,14 @@ fclean: clean
 
 # Recompile the project
 re: fclean all
+
+# Run tests
+test: $(OBJ) $(TEST_NAME)
+	@./$(TEST_NAME)
+	@echo "$(GREEN)Tests ran successfully.$(RESET)"
+
+# Compile the test executable
+$(TEST_NAME): $(OBJ) $(TEST_DIR)/test_channel.cpp
+	@$(CXX) $(CXXFLAGS) $(OBJ) $(TEST_DIR)/test_channel.cpp -o $(TEST_NAME)
 
 .PHONY: all clean fclean re
