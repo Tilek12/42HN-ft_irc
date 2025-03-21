@@ -14,11 +14,14 @@ private:
 	std::set<std::string>	_invitedUsers;
 	bool					_isInviteOnly;
 	bool					_hasPassword;
+	std::string				_password;
 	size_t					_userLimit;
+	bool					_isValidName(const std::string name);
+	bool					_isValidPassword(const std::string password);
 public:
 	Channel();
 	Channel(const std::string& name, const std::string& topic, bool isInviteOnly, \
-		bool hasPassword, size_t userLimit);
+		bool hasPassword, std::string password, size_t userLimit);
 	Channel(const Channel& other);
 	Channel& operator=(const Channel& other);
 	~Channel();
@@ -41,6 +44,8 @@ public:
 	void 					setIsInviteOnly(bool isInviteOnly);
 	size_t					getUserLimit() const;
 	void					setUserLimit(size_t limit);
+	std::string				getPassword() const;
+	void					setPassword(const std::string& password);
 };
 
 #endif

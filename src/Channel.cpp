@@ -2,15 +2,24 @@
 
 Channel::Channel()
 	:	_name(""), _topic(""), _isInviteOnly(false), \
-		_hasPassword(false), _userLimit(0)
+		_hasPassword(false), _userLimit(0), _password("")
 {
 }
 
 Channel::Channel(const std::string& name, const std::string& topic, \
-	bool isInviteOnly, bool hasPassword, size_t userLimit)
-	:	_name(name), _topic(topic), _isInviteOnly(isInviteOnly), \
+	bool isInviteOnly, bool hasPassword, std::string password, size_t userLimit)
+	:	_topic(topic), _isInviteOnly(isInviteOnly), \
 		_hasPassword(hasPassword), _userLimit(userLimit)
 {
+	if (_isValidName(name))
+		_name = name;
+	else
+		std::cerr << "Invalid channel name: " << name << std::endl;
+	if (_hasPassword)
+	{
+		if (!_isValidPassword(password))
+			std::cerr << "Invalid password for channel: " << name << std::endl;
+	}
 }
 
 Channel::Channel(const Channel& other)
@@ -60,7 +69,16 @@ std::set<std::string> Channel::getUsers() const
 
 void Channel::addUser(const std::string& user)
 {
-	_users.insert(user);
+	if (_isInviteOnly && _invitedUsers.find(user) == _invitedUsers.end())
+    {
+        std::cerr << "User " << user << " is not invited to join " << _name << std::endl;
+        return;
+    }
+
+	if (_userLimit == 0 || _users.size() < _userLimit)
+        _users.insert(user);
+    else
+        std::cerr << "User limit reached, cannot add " << user << " to channel " << _name << std::endl;
 }
 
 void Channel::removeUser(const std::string& user)
@@ -75,7 +93,11 @@ std::set<std::string> Channel::getOperators() const
 
 void Channel::addOperator(const std::string& oper)
 {
-	_operators.insert(oper);
+	if (_operators.find(oper) != _operators.end())
+	{
+		_operators.insert(oper);
+	}
+	
 }
 
 void Channel::removeOperator(const std::string&oper)
@@ -90,7 +112,7 @@ std::set<std::string> Channel::getInvitedUsers() const
 
 void Channel::addInvitedUser(const std::string& user)
 {
-	_users.insert(user);
+	_invitedUsers.insert(user);
 }
 
 void Channel::removeInvitedUser(const std::string& user)
@@ -126,4 +148,42 @@ size_t Channel::getUserLimit() const
 void Channel::setUserLimit(size_t userLimit)
 {
 	_userLimit = userLimit;
+}
+
+bool Channel::_isValidName(const std::string name)
+{
+	if (name.size() > 50 || name.empty())
+	{
+		return false;
+	}
+	if (name[0] != '#' && name[0] != '&' && name[0] != '+' && name[0] != '!')
+	{
+		return false;
+	}
+	for (size_t i = 0; i < name.size(); i++)
+	{
+		if (name[i] == ' ' || name[i] == ',' || name[i] == 7)
+		{
+			return false;
+		}
+	}
+	return true;
+}
+
+bool Channel::_isValidPassword(const std::string password)
+{
+	if (_password == password)
+		return true;
+	else
+		return false;
+}
+
+std::string Channel::getPassword() const
+{
+	return _password;
+}
+
+void	 Channel::setPassword(const std::string& password)
+{
+	_password = password;
 }
