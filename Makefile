@@ -15,7 +15,8 @@ TEST_DIR = tests
 
 # Variables
 NAME = ircserv
-TEST_NAME = test_ircserv
+TEST_CHANNEL = test_channel
+TEST_TILEK = test_tilek
 SRC =	$(SRC_DIR)/Server.cpp \
 		$(SRC_DIR)/Channel.cpp
 # $(SRC_DIR)/main.cpp \
@@ -49,15 +50,19 @@ fclean: clean
 	@echo "$(VIOLET)$(NAME) deleted.$(RESET)"
 
 # Recompile the project
-re: fclean all
+re: fclean all test
 
 # Run tests
-test: $(OBJ) $(TEST_NAME)
-	@./$(TEST_NAME)
+test: $(OBJ) $(TEST_CHANNEL) $(TEST_TILEK)
+	@./$(TEST_CHANNEL)
+	@./$(TEST_TILEK)
 	@echo "$(GREEN)Tests ran successfully.$(RESET)"
 
 # Compile the test executable
-$(TEST_NAME): $(OBJ) $(TEST_DIR)/test_channel.cpp
-	@$(CXX) $(CXXFLAGS) $(OBJ) $(TEST_DIR)/test_channel.cpp -o $(TEST_NAME)
+$(TEST_CHANNEL): $(OBJ) $(TEST_DIR)/test_channel.cpp
+	@$(CXX) $(CXXFLAGS) $(OBJ) $(TEST_DIR)/test_channel.cpp -o $(TEST_CHANNEL) 
 
-.PHONY: all clean fclean re
+$(TEST_TILEK): $(TEST_DIR)/test_tilek.cpp
+	@$(CXX) $(CXXFLAGS) $(OBJ) $(TEST_DIR)/test_tilek.cpp -o $(TEST_TILEK) 
+
+.PHONY: all clean fclean re test
