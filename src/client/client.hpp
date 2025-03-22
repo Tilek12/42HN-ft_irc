@@ -6,15 +6,16 @@
 /*   By: ryusupov <ryusupov@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/19 14:03:06 by ryusupov          #+#    #+#             */
-/*   Updated: 2025/03/19 18:43:35 by ryusupov         ###   ########.fr       */
+/*   Updated: 2025/03/22 14:24:01 by ryusupov         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef CLIENT_HPP
 #define CLINET_HPP
+#include "IClient.hpp"
 #include <iostream>
 
-class Client {
+class Client : public IClient {
 
 	private:
 		int socket_fd;			//file descriptor of client socket connection
@@ -43,6 +44,7 @@ class Client {
 			void	setRealname(std::string &realname);
 			void	setHostname(std::string &hostname);
 			void	setIsRegistered(bool status);
+
 
 			/*Destructor*/
 			~Client();
