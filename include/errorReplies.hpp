@@ -1,0 +1,7 @@
+#ifndef ERRORREPLIES_HPP
+#define ERRORREPLIES_HPP
+
+#define ERR_NEEDMOREPARAMS "461"
+#define ERR_BADCHANMASK "476"
+
+#endif

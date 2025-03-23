@@ -1,4 +1,5 @@
 #include "../include/Channel.hpp"
+#include "../include/errorReplies.hpp"
 
 Channel::Channel()
 	:	_name(""), _topic(""), _isInviteOnly(false), \
@@ -11,10 +12,11 @@ Channel::Channel(const std::string& name, const std::string& topic, \
 	:	_topic(topic), _isInviteOnly(isInviteOnly), \
 		_hasPassword(hasPassword), _userLimit(userLimit)
 {
-	if (_isValidName(name))
+	if (isValidChannelName(name))
 		_name = name;
 	else
-		std::cerr << "Invalid channel name: " << name << std::endl;
+		std::cerr << "Error code " << ERR_BADCHANMASK << ": bad channel mask. \
+			Invalid channel name: " << name << std::endl;
 	if (_hasPassword)
 	{
 		if (!_isValidPassword(password))
@@ -129,7 +131,7 @@ void Channel::setUserLimit(size_t userLimit)
 	_userLimit = userLimit;
 }
 
-bool Channel::_isValidName(const std::string name)
+static bool isValidChannelName(const std::string& name)
 {
 	if (name.size() > 50 || name.empty())
 	{

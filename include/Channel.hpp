@@ -20,7 +20,6 @@ private:
 	std::string				_password;
 	size_t					_userLimit;
 	
-	bool					_isValidName(const std::string name);
 	bool					_isValidPassword(const std::string password);
 public:
 	Channel();
@@ -48,6 +47,8 @@ public:
 	void					setUserLimit(size_t limit);
 	std::string				getPassword() const;
 	void					setPassword(const std::string& password);
+	
+	static bool				isValidChannelName(const std::string& name);
 };
 
 #endif
