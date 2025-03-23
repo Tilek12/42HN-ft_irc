@@ -6,7 +6,7 @@
 /*   By: ryusupov <ryusupov@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/22 16:21:57 by ryusupov          #+#    #+#             */
-/*   Updated: 2025/03/22 16:39:36 by ryusupov         ###   ########.fr       */
+/*   Updated: 2025/03/23 18:58:43 by ryusupov         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,6 +27,7 @@ class CommandHandler {
 		bool NickNameTaken(std::string &nickname);
 		void SendMessage(Client *client, const std::string &msg);
 		void SendError(Client *client, const std::string &msg);
+		Client *findClient(std::string &nickname);
 };
 
 #endif
