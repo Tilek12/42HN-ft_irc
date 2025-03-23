@@ -104,7 +104,7 @@ Error Handling: What happens if a user enters an invalid command?
 Day			Task						Explanation
 Day 1		Learn About IRC Commands	Research IRC command structures (NICK, USER, PRIVMSG).
 Day 2		Implement Client Class		Write Client.cpp, storing nickname, username, and socket details.
-Day 3		Store Connected Clients		Maintain a std::unordered_map<int, Client*> to track users by socket ID.
+Day 3		Store Connected Clients		Maintain a std::unordered_map<int, Client*> to track users by socket ID. //should be in server class
 Day 4		Implement NICK Command		Allow clients to set their nickname (NICK John).
 Day 5		Implement USER Command		Handle user login (USER John * * :John Doe).
 Day 6		Implement PRIVMSG Command	Enable user-to-user messaging (PRIVMSG John :Hello!).
