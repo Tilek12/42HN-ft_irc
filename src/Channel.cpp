@@ -131,7 +131,7 @@ void Channel::setUserLimit(size_t userLimit)
 	_userLimit = userLimit;
 }
 
-static bool isValidChannelName(const std::string& name)
+bool Channel::isValidChannelName(const std::string& name)
 {
 	if (name.size() > 50 || name.empty())
 	{

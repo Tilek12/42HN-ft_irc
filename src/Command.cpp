@@ -4,16 +4,16 @@
 #include "../include/errorReplies.hpp"
 #include "../include/Channel.hpp"
 #include "../include/Command.hpp"
+#include "../include/commandHelperFtcs.hpp"
 
-#include "../include/IClient.hpp"
+#include "IClient.hpp"
 #include "../include/IServer.hpp"
 
 static void joinChannelCmd(IClient& client, IServer& server, std::vector<std::string>& joinParams)
-{	
+{
 	Channel* channel;
-	std::string channelName;
-	std::string password;
-	vector<std::string> passwords;
+	std::vector<std::string> channelNames;
+	std::vector<std::string> passwords;
 
 	if (joinParams.empty())
 	{
@@ -22,31 +22,38 @@ static void joinChannelCmd(IClient& client, IServer& server, std::vector<std::st
 		return ;
 	}
 
-	
-	std::stringstream ssChannels(joinParams[0]);
-	std::stringstream ssPasswords(joinParams[1]);
+	channelNames = parseCommaString(joinParams[0]);
 	if (joinParams.size() > 1)
+		passwords = parseCommaString(joinParams[1]);
+	for (size_t i = 0; i < channelNames.size(); ++i)
 	{
-		while (getline(ssPasswords, password, ','))
+		if (isValidChannelName(channelNames[i]))
 		{
-			passwords.push_back(password)
-		}
-	}
-
-	while (getline(ssChannels, channelName, ','))
-	{
-		if (isValidChannelName(channelName))
-			channel = server.getChannel(channelName;)
-			if (channel._hasPassword && channel._password == password)
+			channel = server.getChannel(channelNames[i]);
+			if (!channel)
 			{
-				/* code */
+				channel = server.createChannel(channelName[i]);
+				channel->addOperator(client.getNickname());
 			}
-			
-		if (!channel)
-			channel = server.createChannel(channelName);
-		
+		}
+		if (channel->getHasPassword() && channel->getPassword() != passwords[i])
+		{
+			client.SendMessage("Error code " << ERR_BADCHANNELKEY << ": invalid password.");
+			continue;
+		}
+		if (channel->getIsInviteOnly() && \
+			channel->getInvitedUsers().find(client.getNickname) == channel->getInvitedUsers().end())
+		{
+			client.SendMessage("Error code " << ERR_INVITEONLYCHAN << ":Cannot join. Channel is invite only");
+			continue;
+		}
+		if (channel->getUserLimit() > 0 && channel->getUsers().size() >= channel->getUserLimit())
+		{
+			client.SendMessage("Error code " << ERR_CHANNELISFULL << ":Cannot join. Channel is full");
+			continue;
+		}
+		channel->addUser(client.getNickname());
+		client.sendMessage("JOIN " + channelName[i]);
 	}
-
-	
 
 }

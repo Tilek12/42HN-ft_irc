@@ -1,9 +1,12 @@
 #include <vector>
 #include <iostream>
+#include <sstream>
 
-vector<std::string> parseCommaString(std::string commaStr)
+#include "../include/commandHelperFtcs.hpp"
+
+std::vector<std::string> parseCommaString(std::string commaStr)
 {
-	vector<std::string> vec;
+	std::vector<std::string> vec;
 	std::string word;
 	std::stringstream ss(commaStr);
 	while (getline(ss, word, ','))

@@ -22,6 +22,8 @@ class IClient {
 			virtual void	setRealname(std::string &realname) = 0;
 			virtual void	setHostname(std::string &hostname) = 0;
 			virtual void	setIsRegistered(bool status) = 0;
+
+			virtual void	SendMessage(Client *client, const std::string &msg) = 0;
 			
 			/*Destructor*/
 			virtual ~IClient();
