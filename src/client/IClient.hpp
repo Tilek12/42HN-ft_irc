@@ -1,6 +1,6 @@
 
 #ifndef CLIENT_HPP
-#define CLINET_HPP
+#define CLIENT_HPP
 #include <iostream>
 
 class IClient {
@@ -23,7 +23,7 @@ class IClient {
 			virtual void	setHostname(std::string &hostname) = 0;
 			virtual void	setIsRegistered(bool status) = 0;
 
-			virtual void	SendMessage(Client *client, const std::string &msg) = 0;
+			virtual void	SendMessage(IClient *client, const std::string &msg) = 0;
 			
 			/*Destructor*/
 			virtual ~IClient();

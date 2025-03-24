@@ -4,7 +4,7 @@
 #include <vector>
 
 #include "IServer.hpp"
-#include "IClient.hpp"
+#include "../src/client/IClient.hpp"
 
 class Command
 {
