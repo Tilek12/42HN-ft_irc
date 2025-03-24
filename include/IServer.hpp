@@ -12,6 +12,7 @@ public:
 
 	virtual IChannel* getChannel(const std::string& channelName) = 0;
 	virtual IChannel* createChannel(const std::string& channelName) = 0;
+	virtual IChannel* removeChannel(const std::string& channelName) = 0;
 };
 
 #endif

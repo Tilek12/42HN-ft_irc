@@ -55,7 +55,43 @@ static void joinChannelCmd(IClient& client, IServer& server, std::vector<std::st
 			continue;
 		}
 		channel->addUser(client.getNickname());
-		client.SendMessage(&client, "JOIN " + channelNames[i]);
+		client.SendMessage(&client, client.getNickname() + "JOIN " + channelNames[i]);
 	}
+}
 
+static void partChannelCmd(IClient& client, IServer& server, std::vector<std::string>& partParams)
+{
+	IChannel* channel;
+	std::vector<std::string> channelNames;
+	std::string reason = "";
+	if (partParams.empty())
+	{
+		std::cerr << "Error code " << ERR_NEEDMOREPARAMS << \
+			" PART: not enough partParams" << std::endl;
+		return ;
+	}
+	channelNames = parseCommaString(partParams[0]);
+	if (partParams.size() == 2)
+		reason = partParams[1];
+	for (size_t i = 0; i < channelNames.size(); ++i)
+	{
+		channel = server.getChannel(channelNames[i]);
+		if (!channel)
+		{
+			client.SendMessage(&client, "Error code " + std::string(ERR_NOSUCHCHANNEL) + " :non existing channel " + channelNames[i]);
+			continue;
+		}
+		if (channel->getUsers().find(client.getNickname()) == channel->getUsers().end())
+		{
+			client.SendMessage(&client, "Error code " + std::string(ERR_NOTONCHANNEL) + " :you are not on channel " + channelNames[i]);
+			continue;
+		}
+		channel->removeUser(client.getNickname());
+		if (reason.empty())
+			client.SendMessage(&client, client.getNickname() + "PART " + channelNames[i]);
+		else
+			client.SendMessage(&client, client.getNickname() + "PART " + channelNames[i] + ":" + reason);
+		if (channel->getUsers().size() == 0)
+			server.removeChannel(channelNames[i]);
+	}
 }
