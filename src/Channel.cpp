@@ -6,6 +6,12 @@ Channel::Channel()
 		_hasPassword(false), _password(""), _userLimit(0)
 {
 }
+Channel::Channel(const std::string& name)
+	:	_name(name),  _topic(""), _isInviteOnly(false), \
+	_hasPassword(false), _password(""), _userLimit(0)
+{
+
+}
 
 Channel::Channel(const std::string& name, const std::string& topic, \
 	bool isInviteOnly, bool hasPassword, std::string password, size_t userLimit)
