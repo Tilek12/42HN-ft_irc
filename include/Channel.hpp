@@ -23,6 +23,7 @@ private:
 	bool					_isValidPassword(const std::string password);
 public:
 	Channel();
+	Channel(const std::string& name);
 	Channel(const std::string& name, const std::string& topic, bool isInviteOnly, \
 		bool hasPassword, std::string password, size_t userLimit);
 	~Channel();

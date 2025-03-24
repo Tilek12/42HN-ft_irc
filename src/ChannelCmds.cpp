@@ -4,8 +4,8 @@
 
 #include "../include/errorReplies.hpp"
 #include "../include/Channel.hpp"
-#include "../include/Command.hpp"
-#include "../include/commandHelperFtcs.hpp"
+#include "../include/ChannelCmds.hpp"
+#include "../include/channelHelperFcts.hpp"
 
 #include "../include/IServer.hpp"
 #include "../include/IChannel.hpp"

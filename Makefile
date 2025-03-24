@@ -20,7 +20,7 @@ TEST_CHANNEL = test_channel
 TEST_TILEK = test_tilek
 SRC =	$(SRC_DIR)/Server.cpp \
 		$(SRC_DIR)/Channel.cpp \
-		$(SRC_DIR)/Command.cpp
+		$(SRC_DIR)/ChannelCmds.cpp
 		
 OBJ = $(SRC:$(SRC_DIR)/%.cpp=$(OBJ_DIR)/%.o)
 

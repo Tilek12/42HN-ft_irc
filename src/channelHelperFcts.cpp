@@ -2,7 +2,7 @@
 #include <iostream>
 #include <sstream>
 
-#include "../include/commandHelperFtcs.hpp"
+#include "../include/channelHelperFcts.hpp"
 
 std::vector<std::string> parseCommaString(std::string commaStr)
 {
