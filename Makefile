@@ -7,6 +7,7 @@ RESET	= \033[0m
 # Compiler
 CXX = c++
 CXXFLAGS = -Wall -Wextra -Werror -std=c++17
+# CXXFLAGS = -std=c++17
 
 # Directories
 OBJ_DIR = obj
