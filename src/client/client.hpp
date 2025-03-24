@@ -6,16 +6,17 @@
 /*   By: ryusupov <ryusupov@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/19 14:03:06 by ryusupov          #+#    #+#             */
-/*   Updated: 2025/03/22 14:24:01 by ryusupov         ###   ########.fr       */
+/*   Updated: 2025/03/24 19:57:19 by ryusupov         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef CLIENT_HPP
-#define CLINET_HPP
+#define CLIENT_HPP
 #include "IClient.hpp"
 #include <iostream>
+#include <map>
 
-class Client : public IClient {
+class Client{
 
 	private:
 		int socket_fd;			//file descriptor of client socket connection
@@ -51,5 +52,31 @@ class Client : public IClient {
 
 };
 
+class Server {
+    public:
+        std::map<std::string, Client*> clients; // Map by nickname instead of int
+
+		void addClient(Client* client) {
+			if (!client->getNickname().empty()) {
+				clients[client->getNickname()] = client;
+			}
+		}
+
+		void printClients() {
+			std::cout << "Current Clients in Server:" << std::endl;
+			for (auto& c : clients) {
+				std::cout << "Nickname: " << c.first << " -> FD: " << c.second->getSockedFd() << std::endl;
+			}
+		}
+
+        Client* findClient(const std::string& nickname) {
+			for (auto &nick : clients) {
+				if (nick.second->getNickname() == nickname) {
+					return nick.second;
+				}
+			}
+			return (nullptr);
+        }
+    };
 
 #endif

@@ -1,17 +1,17 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   command_handler.hpp                                :+:      :+:    :+:   */
+/*   client_c_h.hpp                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: ryusupov <ryusupov@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/22 16:21:57 by ryusupov          #+#    #+#             */
-/*   Updated: 2025/03/23 18:58:43 by ryusupov         ###   ########.fr       */
+/*   Updated: 2025/03/24 17:59:48 by ryusupov         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef COMMAND_HANDLER_HPP
-#define COMMAND_HANDLER_HPP
+#ifndef CLIENT_C_H_HPP
+#define CLIENT_C_H_HPP
 #include <iostream>
 #include <unordered_map>
 #include <sstream>
@@ -20,10 +20,11 @@
 class CommandHandler {
 
 	private:
-		std::unordered_map<int, Client*> clients;
+		Server &server;
 
 	public:
-		void Handle_command(Client *client, const std::string &command);
+		CommandHandler(Server& srv);
+		void Handle_client_command(Client *client, const std::string &command);
 		bool NickNameTaken(std::string &nickname);
 		void SendMessage(Client *client, const std::string &msg);
 		void SendError(Client *client, const std::string &msg);
