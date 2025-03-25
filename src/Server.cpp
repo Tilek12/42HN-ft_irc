@@ -1,6 +1,10 @@
 
 #include "../include/Server.hpp"
 
+////////////////////////////////////////////////////////////////////////////////
+// ========================  Orthodox Canonical Form  ======================= //
+////////////////////////////////////////////////////////////////////////////////
+
 /*----------------------------*/
 /*  Server Class constructor  */
 /*----------------------------*/
@@ -23,11 +27,11 @@ Server::Server( int port, const std::string& password ) {
 /*---------------------------*/
 /*  Server Class destructor  */
 /*---------------------------*/
-Server::~Server( void ) {
+Server::~Server( void ) { stop(); }
 
-	stop();
-
-}
+////////////////////////////////////////////////////////////////////////////////
+// ========================  Core server operations  ======================== //
+////////////////////////////////////////////////////////////////////////////////
 
 /*----------------*/
 /*  Setup Server  */
@@ -112,6 +116,9 @@ void	Server::_acceptNewConnection( void ) {
 
 }
 
+/*-------------------------------------*/
+/*  Disconnect Client from the Server  */
+/*-------------------------------------*/
 void	Server::_disconnectClient( int fd, const std::string& reason ) {
 
 	Client* client = getClient( fd );
@@ -145,6 +152,9 @@ void	Server::_disconnectClient( int fd, const std::string& reason ) {
 
 }
 
+/*--------------------------------------*/
+/*  Define processInputBuffer fucntion  */
+/*--------------------------------------*/
 void	Server::_processInputBuffer( Client* client ) {
 
 	std::string& buffer = client->getBuffer();
@@ -164,9 +174,9 @@ void	Server::_processInputBuffer( Client* client ) {
 
 }
 
-/*-----------------------*/
-/*  Handle Client data   */
-/*-----------------------*/
+/*----------------------*/
+/*  Handle Client data  */
+/*----------------------*/
 void	Server::_handleClientData( int fd ) {
 
 	// Recieving data
@@ -197,6 +207,9 @@ void	Server::_handleClientData( int fd ) {
 
 }
 
+/*------------------------------------*/
+/*  Handle connections to the Server  */
+/*------------------------------------*/
 void	Server::_handleConnections( void ) {
 
 	if ( poll( &_pollFDs[0], _pollFDs.size(), -1 ) < 0 ) {
@@ -263,6 +276,13 @@ void	Server::stop( void ) {
 /*-----------------------*/
 const std::string&	Server::getPassword( void ) const { return _password; }
 
+////////////////////////////////////////////////////////////////////////////////
+// ===========================  Client management  ========================== //
+////////////////////////////////////////////////////////////////////////////////
+
+/*-----------------------------*/
+/*  Define getClient function  */
+/*-----------------------------*/
 Client*	Server::getClient( int fd ) const {
 
 	std::map<int, Client*>::const_iterator it = _clientsFD.find( fd );
@@ -270,6 +290,9 @@ Client*	Server::getClient( int fd ) const {
 
 }
 
+/*-----------------------------*/
+/*  Define getClient function  */
+/*-----------------------------*/
 Client*	Server::getClient( const std::string& nickname ) const {
 
 	std::map<std::string, Client*>::const_iterator it = _clientsNick.find( nickname );
@@ -277,13 +300,23 @@ Client*	Server::getClient( const std::string& nickname ) const {
 
 }
 
+////////////////////////////////////////////////////////////////////////////////
+// ==========================  Channel management  ========================== //
+////////////////////////////////////////////////////////////////////////////////
+
+/*------------------------------*/
+/*  Define getChannel function  */
+/*------------------------------*/
 Channel*	Server::getChannel( const std::string& name ) const {
 
-	std::map<std::string, Channel*>::const_iterator it = _channels.find( fd );
+	std::map<std::string, Channel*>::const_iterator it = _channels.find( name );
 	return it != _channels.end() & it->second : NULL;
 
 }
 
+/*---------------------------------*/
+/*  Define createChannel function  */
+/*---------------------------------*/
 Channel*	Server::createChannel( const std::string& name, Client* creator, const std::string& key ) {
 
 	Channel* channel = new Channel( name, creator, key );
@@ -292,4 +325,19 @@ Channel*	Server::createChannel( const std::string& name, Client* creator, const 
 
 }
 
+/*---------------------------------*/
+/*  Define removeChannel function  */
+/*---------------------------------*/
+void	Server::removeChannel( const std::string& name ) {
+
+	std::map<std::string, Channel*>::const_iterator it = _channels.find( name );
+
+	if ( it != _channels.end() )
+		_channels.erase( it );
+
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// ===============================  Messaging  ============================== //
+////////////////////////////////////////////////////////////////////////////////
 
