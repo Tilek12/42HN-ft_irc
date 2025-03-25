@@ -11,7 +11,6 @@
 #include <fcntl.h>
 #include <poll.h>
 #include <vector>
-#include <unordered_map>
 #include <map>
 #include <netinet/in.h>
 #include "colors.hpp"
@@ -32,13 +31,13 @@ class Server : public IServer {
 
 private:
 
-	std::string							_password;		// Password for Server
-	int									_serverFD;		// file descriptor for Server socket
-	struct sockaddr_in					_serverAddress;	// Server socket address
-	std::vector<pollfd>					_pollFDs;		// List of file descriptors to monitor
-	std::unordered_map<int, Client*>	_clientsFD;		// Map of client FDs to Client pointers
-	std::map<std::string, Client*>		_clientsNick;	// Map of client Nickname to Client
-	std::map<std::string, Channel*>		_channels;		// Map of channel names to Channel pointers
+	std::string						_password;		// Password for Server
+	int								_serverFD;		// file descriptor for Server socket
+	struct sockaddr_in				_serverAddress;	// Server socket address
+	std::vector<pollfd>				_pollFDs;		// List of file descriptors to monitor
+	std::map<int, Client*>			_clientsFD;		// Map of client FDs to Client pointers
+	std::map<std::string, Client*>	_clientsNick;	// Map of client Nickname to Client
+	std::map<std::string, Channel*>	_channels;		// Map of channel names to Channel pointers
 
 	void	_setupServer( void );
 	void	_handleConnections( void );

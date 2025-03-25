@@ -241,8 +241,20 @@ void	Server::stop( void ) {
 			  << "Server shutdown..."
 			  << RESET << std::endl;
 
-	// Close the socket
-	close(_serverFD);
+	// Disconnect all clients
+	for ( std::map<int, Client*>::iterator it = _clientsFD.begin(); it != _clientsFD.end(); ++it )
+		_disconnectClient( it->first, "Server shutdown" );
+
+	// Cleanup channels
+	for ( std::map<std::string, Channel*>::iterator it = _channels.begin(); it != _channels.end(); ++it )
+		delete it->second;
+	_channels.clear();
+
+	// Close the Server socket
+	if ( _serverFD != -1 ) {
+		close(_serverFD);
+		serverFD = -1;
+	}
 
 }
 
@@ -274,6 +286,10 @@ Channel*	Server::getChannel( const std::string& name ) const {
 
 Channel*	Server::createChannel( const std::string& name, Client* creator, const std::string& key ) {
 
-
+	Channel* channel = new Channel( name, creator, key );
+	_channels[name] = channel;
+	return channel;
 
 }
+
+
