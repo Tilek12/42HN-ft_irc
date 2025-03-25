@@ -15,6 +15,7 @@ Server::Server( int port, const std::string& password ) {
 		throw std::runtime_error( "ERROR: Password must contain no less than 3 characters." );
 
 	_password = password;
+	_serverFD = -1;
 	_setupServer();
 
 }
@@ -24,9 +25,7 @@ Server::Server( int port, const std::string& password ) {
 /*---------------------------*/
 Server::~Server( void ) {
 
-	std::cout << PURPLE
-			  << "Server shutdown..."
-			  << RESET << std::endl;
+	stop();
 
 }
 
@@ -40,49 +39,53 @@ void	Server::_setupServer( void ) {
 			  << RESET << std::endl;
 
 	// Creating socket
-	_serverSocket = socket( AF_INET, SOCK_STREAM, 0 );
-	if ( _serverSocket < 0 )
-		throw std::runtime_error( "Error creating socket" );
+	_serverFD = socket( AF_INET, SOCK_STREAM, 0 );
+	if ( _serverFD < 0 )
+		throw std::runtime_error( "Failed to create socket" );
+
+	// Set socket options
+	int opt = 1;
+	if ( setsockopt( _serverFD, SOL_SOCKET, SO_REUSEADDR | SO_REUSEPORT, &opt, sizeof( opt ) ) )
+		throw std::runtime_error( "Failed to set socket options" );
 
 	// Setting the address
-	sockaddr_in serverAddress;
-	serverAddress.sin_family = AF_INET;
-	serverAddress.sin_port = htons( IRCport );
-	serverAddress.sin_addr.s_addr = INADDR_ANY;
+	struct sockaddr_in	address;
+	address.sin_family = AF_INET;
+	address.sin_port = htons( IRCport );
+	address.sin_addr.s_addr = INADDR_ANY;
 
 	// Binding socket
-	if ( bind( _serverSocket, ( struct sockaddr* )&serverAddress, sizeof( serverAddress ) ) < 0 ) {
-		close( _serverSocket );
-		throw std::runtime_error( "Error binding socket" );
-	}
+	if ( bind( _serverFD, ( struct sockaddr* )&address, sizeof( address ) ) < 0 )
+		throw std::runtime_error( "Failed to bind socket" );
 
 	// Listening to the assigned socket
-	if ( listen( _serverSocket, 5 ) < 0 ) {
-		close( _serverSocket );
-		throw std::runtime_error( "Error listening on socket" );
-	}
+	if ( listen( _serverFD, SOMAXCONN ) < 0 )
+		throw std::runtime_error( "Failed to listen on socket" );
 
-	std::cout << BLUE
-			  << "Server is ready and listening on port: "
-			  << RESET
-			  << CYAN
-			  << IRCport << "..."
-			  << RESET << std::endl;
+	// Set non-blocking mode
+	if ( fcntl( _serverFD, F_SETFL, O_NONBLOCK ) < 0 )
+		throw std::runtime_error( "Failed to set non-blocking mode" );
+
+	// Setup Poll
+	pollfd serverPollFD;
+	serverPollFD.fd = _serverFD;
+	serverPollFD.events = POLLIN;
+	_fds.push_back( serverPollFD );
 
 }
 
 /*------------------------------------*/
 /*  Handle connections to the Server  */
 /*------------------------------------*/
-void	Server::_handleConnection( void ) {
+void	Server::_handleConnections( void ) {
 
 	// Accepting connection request
-	_clientSocket = accept( _serverSocket, nullptr, nullptr );
+	_clientSocket = accept( _serverFD, nullptr, nullptr );
 	if ( _clientSocket < 0 )
 		throw std::runtime_error( "Error accepting connection" );
 
 	std::cout << GREEN
-			  << "New client connected"
+			  << "New client connected..."
 			  << RESET << std::endl;
 
 }
@@ -105,20 +108,30 @@ void	Server::_handleData( void ) {
 
 }
 
-/*------------------*/
-/*  Run the Server  */
-/*------------------*/
-void	Server::run( void ) {
+/*--------------------*/
+/*  Start the Server  */
+/*--------------------*/
+void	Server::start( void ) {
 
 	std::cout << BLUE
-			  << "Server is running..."
+			  << "Server started on port: " << IRCport
 			  << RESET << std::endl;
 
-	_handleConnection();
-	_handleData();
+	while ( true ) { _handleConnections(); }
+
+}
+
+/*------------------*/
+/*  Stop the Server  */
+/*------------------*/
+void	Server::stop( void ) {
+
+	std::cout << BLUE
+			  << "Server shutdown..."
+			  << RESET << std::endl;
 
 	// Close the socket
-	close(_serverSocket);
+	close(_serverFD);
 
 }
 

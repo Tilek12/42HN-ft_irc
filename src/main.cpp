@@ -5,7 +5,7 @@ int main( int argc, char** argv ) {
 
 	std::cout << YELLOW
 			  << "==============================================" << std::endl
-			  << "==================  TRLnet  ==================" << std::endl
+			  << "===========  TRLnet - IRC Network  ===========" << std::endl
 			  << "==============================================" << std::endl
 			  << RESET;
 
@@ -18,7 +18,7 @@ int main( int argc, char** argv ) {
 
 	try {
 		Server server( std::atoi( argv[1] ), argv[2] );
-		server.run();
+		server.start();
 	} catch ( const std::exception& e ) {
 		std::cerr << RED << e.what() << std::endl;
 	}
