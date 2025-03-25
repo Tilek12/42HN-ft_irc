@@ -74,10 +74,10 @@ void	Server::_setupServer( void ) {
 
 }
 
-/*------------------------------------*/
-/*  Handle connections to the Server  */
-/*------------------------------------*/
-void	Server::_handleConnections( void ) {
+/*----------------------------------------------*/
+/*  Accept new Client connection to the Server  */
+/*----------------------------------------------*/
+void	Server::_acceptNewConnection( void ) {
 
 	// Accepting connection request
 	_clientSocket = accept( _serverFD, nullptr, nullptr );
@@ -90,10 +90,10 @@ void	Server::_handleConnections( void ) {
 
 }
 
-/*----------------------------------*/
-/*  Handle data sent to the Server  */
-/*----------------------------------*/
-void	Server::_handleData( void ) {
+/*-----------------------*/
+/*  Handle Client data   */
+/*-----------------------*/
+void	Server::_handleClientData( int clientFD ) {
 
 	// Recieving data
 	char buffer[1024] = { 0 };
@@ -105,6 +105,28 @@ void	Server::_handleData( void ) {
 			  << YELLOW
 			  << buffer
 			  << RESET << std::endl;
+
+}
+
+void	Server::_handleConnections( void ) {
+
+	if ( poll( &_fds[0], _fds.size(), -1 ) < 0 ) {
+		if ( errno != EINTR )
+			throw std::runtime_error( "Poll error!" );
+		return;
+	}
+
+	for ( size_t i = 0; i < _fds.size(); i++ ) {
+		if ( _fds[i].revents & POLLIN ) {
+			if ( _fds[i].fd == _serverFD )
+				_acceptNewConnection();
+			else
+				_handleClientData( _fds[i].fd );
+		}
+	}
+
+	if ( _fds[i].revents & ( POLLHUP | POLLERR | POLLNVAL ) )
+		_disconnectClient( _fds[i].fd, "Connection error" );
 
 }
 
