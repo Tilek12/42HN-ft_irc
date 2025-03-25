@@ -195,7 +195,7 @@ void	Server::_handleClientData( int fd ) {
 	processInputBuffer( client );
 
 	////////////////////////////////////////////////////////////////////////
-	// for debugging ////////-------- delete after debugging -------////////
+	// for debugging /////// -------- delete after debugging ------- ///////
 	////////////////////////////////////////////////////////////////////////
 	std::cout << BLUE
 			  << "Message from client: "
@@ -341,3 +341,24 @@ void	Server::removeChannel( const std::string& name ) {
 // ===============================  Messaging  ============================== //
 ////////////////////////////////////////////////////////////////////////////////
 
+/*--------------------------------*/
+/*  Define sendToClient function  */
+/*--------------------------------*/
+void	Server::sendToClient( int fd, const std::string& message ) {
+
+	if ( send( fd, message.c_str(), message.length(), 0 ) < 0 )
+		_disconnectClient( fd, "Send error" );
+
+}
+
+/*------------------------------------*/
+/*  Define broadcastMessage function  */
+/*------------------------------------*/
+void	Server::broadcastMessage( const std::string& channel, const std::string& message ) {
+
+	const std::map<int, Client*>& members = channel->getClients();
+
+	for (std::map<int, Client*>::const_iterator it = members.begin(); it != members.end(); ++it )
+		sendToClient( it->first, message );
+
+}
