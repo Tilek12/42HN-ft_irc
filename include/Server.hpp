@@ -32,6 +32,7 @@ private:
 
 	std::string							_password;	// Password for Server
 	int									_serverFD;	// file descriptor for Server socket
+	struct sockaddr_in					_serverAddress;
 	std::vector<pollfd>					_fds;		// List of file descriptors to monitor
 	std::unordered_map<int, Client*>	_clients;	// Map of client FDs to Client objects
 	std::map<std::string, Channel*>		_channels;	// Map of channel names to Channel objects

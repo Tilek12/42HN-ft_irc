@@ -49,10 +49,9 @@ void	Server::_setupServer( void ) {
 		throw std::runtime_error( "Failed to set socket options" );
 
 	// Setting the address
-	struct sockaddr_in	address;
-	address.sin_family = AF_INET;
-	address.sin_port = htons( IRCport );
-	address.sin_addr.s_addr = INADDR_ANY;
+	_serverAddress.sin_family = AF_INET;
+	_serverAddress.sin_port = htons( IRCport );
+	_serverAddress.sin_addr.s_addr = INADDR_ANY;
 
 	// Binding socket
 	if ( bind( _serverFD, ( struct sockaddr* )&address, sizeof( address ) ) < 0 )
@@ -80,12 +79,35 @@ void	Server::_setupServer( void ) {
 void	Server::_acceptNewConnection( void ) {
 
 	// Accepting connection request
-	_clientSocket = accept( _serverFD, nullptr, nullptr );
-	if ( _clientSocket < 0 )
-		throw std::runtime_error( "Error accepting connection" );
+	sockaddr_in clientAddress;
+	socklen_t clientLen = sizeof( clientAddress );
+	int clientFD = accept( _serverFD, ( struct sockaddr* )&clientAddress, &clientLen );
+
+	if ( clientFD < 0 ) {
+		std::cerr << RED
+				  << "Failed to accept connection"
+				  << RESET << std::endl;
+		return;
+	}
+
+	if ( fcntl( clientFD, F_SETFL, O_NONBLOCK ) < 0 ) {
+		close( clientFD );
+		std::cerr << RED
+				  << "Failed to set client non-blocking"
+				  << RERSET << std::endl;
+	}
+
+	Client* newClient = new Client( clientFD, inet_ntoa( clientAddress.sin_addr ) );
+	_clients[clientFD] = newClient;
+
+	pollfd newPollfd;
+	newPollfd.fd = clientFD;
+	newPollfd.events = POLLIN;
+	_fds.push_back( newPollfd );
 
 	std::cout << GREEN
-			  << "New client connected..."
+			  << "New connection from " << newClient->getHostname()
+			  << " (fd: " << clientFD << ")"
 			  << RESET << std::endl;
 
 }
