@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   command_handler.hpp                                :+:      :+:    :+:   */
+/*   Command_handler.hpp                                :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: llacsivy <llacsivy@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/22 16:21:57 by ryusupov          #+#    #+#             */
-/*   Updated: 2025/03/25 14:37:32 by llacsivy         ###   ########.fr       */
+/*   Updated: 2025/03/25 16:23:45 by llacsivy         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,7 +16,8 @@
 #include <unordered_map>
 #include <sstream>
 
-class Client;
+#include "Client.hpp"
+#include "IClient.hpp"
 
 class CommandHandler{
 

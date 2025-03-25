@@ -1,6 +1,6 @@
 
-#ifndef CLIENT_HPP
-#define CLIENT_HPP
+#ifndef ICLIENT_HPP
+#define ICLIENT_HPP
 #include <iostream>
 
 class IClient {

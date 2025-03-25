@@ -3,8 +3,8 @@
 
 #include "../include/Channel.hpp"
 #include "../include/Server.hpp"
-#include "../src/client/Client.hpp"
-#include "../src/client/command_handler.hpp"
+#include "../include/Client.hpp"
+#include "../include/Command_handler.hpp"
 #include "../include/ChannelCmds.hpp"
 
 void test_channel_class()
@@ -54,19 +54,19 @@ void test_channel_commands()
     
     // Test Join Channel without params
     std::vector<std::string> joinParams;
-    joinChannelCmd(client, server, joinParams);
+    ChannelCmds::joinChannelCmd(*client, *server, joinParams);
     
     // Test Part Channel without params
     std::vector<std::string> partParams;
-    partChannelCmd(client, server, partParams);
+    ChannelCmds::partChannelCmd(*client, *server, partParams);
     
     // Test Joining a new channel
     joinParams.push_back("#TestChannel");
-    joinChannelCmd(client, server, joinParams);
+    ChannelCmds:: joinChannelCmd(*client, *server, joinParams);
     
     // Test Leaving a channel
     partParams.push_back("#TestChannel");
-    partChannelCmd(client, server, partParams);
+    ChannelCmds::partChannelCmd(*client, *server, partParams);
 }
 
 int main()

@@ -6,11 +6,11 @@
 /*   By: llacsivy <llacsivy@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/19 17:44:20 by ryusupov          #+#    #+#             */
-/*   Updated: 2025/03/25 14:01:42 by llacsivy         ###   ########.fr       */
+/*   Updated: 2025/03/25 15:12:03 by llacsivy         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "Client.hpp"
+#include "../include/Client.hpp"
 
 Client::Client(int fd, std::string host) : socket_fd(fd), hostname(host), isRegistered(false) {
 	//intializing values

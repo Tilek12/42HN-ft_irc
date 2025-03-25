@@ -4,7 +4,7 @@
 #include <vector>
 
 #include "IServer.hpp"
-#include "../src/client/IClient.hpp"
+#include "../include/IClient.hpp"
 
 class ChannelCmds
 {

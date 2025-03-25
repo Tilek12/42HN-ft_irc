@@ -1,16 +1,16 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   command_handler.cpp                                :+:      :+:    :+:   */
+/*   Command_handler.cpp                                :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: llacsivy <llacsivy@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/22 16:37:19 by ryusupov          #+#    #+#             */
-/*   Updated: 2025/03/25 14:39:26 by llacsivy         ###   ########.fr       */
+/*   Updated: 2025/03/25 16:25:26 by llacsivy         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "command_handler.hpp"
+#include "../include/Command_handler.hpp"
 
 void CommandHandler::Handle_command(Client *clinet, const std::string &command){
 
@@ -40,7 +40,7 @@ void CommandHandler::Handle_command(Client *clinet, const std::string &command){
 	}
 }
 
-static void CommandHandler::SendMessage(IClient *client, const std::string &msg){
+void CommandHandler::SendMessage(IClient *client, const std::string &msg){
 	std::cout << "New message: " << msg << std::endl;
 }
 
@@ -57,4 +57,5 @@ bool CommandHandler::NickNameTaken(std::string &nickname) {
 			return (false);
 		}
 	}
+	return (true);
 }

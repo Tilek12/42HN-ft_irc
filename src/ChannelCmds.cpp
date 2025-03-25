@@ -9,9 +9,9 @@
 
 #include "../include/IServer.hpp"
 #include "../include/IChannel.hpp"
-#include "client/IClient.hpp"
-#include "client/Client.hpp"
-#include "client/Command_handler.hpp"
+#include "../include/IClient.hpp"
+#include "../include/Client.hpp"
+#include "../include/Command_handler.hpp"
 
 static void joinChannelCmd(IClient& client, IServer& server, std::vector<std::string>& joinParams)
 {
