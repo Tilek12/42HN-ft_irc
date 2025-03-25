@@ -58,7 +58,7 @@ void	Server::_setupServer( void ) {
 	_serverAddress.sin_addr.s_addr = INADDR_ANY;
 
 	// Binding socket
-	if ( bind( _serverFD, ( struct sockaddr* )&address, sizeof( address ) ) < 0 )
+	if ( bind( _serverFD, ( struct sockaddr* )&_serverAddress, sizeof( _serverAddress ) ) < 0 )
 		throw std::runtime_error( "Failed to bind socket" );
 
 	// Listening to the assigned socket
@@ -266,7 +266,7 @@ void	Server::stop( void ) {
 	// Close the Server socket
 	if ( _serverFD != -1 ) {
 		close(_serverFD);
-		serverFD = -1;
+		_serverFD = -1;
 	}
 
 }

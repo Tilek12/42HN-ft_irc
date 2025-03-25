@@ -22,4 +22,7 @@ public:
 	virtual Channel*			createChannel( const std::string& name, Client* creator, const std::string& key = "" ) = 0;
 	void						removeChannel( const std::string& name ) = 0;
 
+	// Messaging
+	virtual void	sendToClient( int fd, const std::string& message ) = 0;
+	virtual void	broadcastMessage( const std::string& channel, const std::string& message ) = 0;
 };

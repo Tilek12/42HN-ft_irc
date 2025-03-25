@@ -70,7 +70,7 @@ public:
 	void		removeChannel( const std::string& name ) override;
 
 	// Messaging
-	void	sendToClient( int fd, const std::string& message );
-	void	broadcastMessage( const std::string& channel, const std::string& message );
+	void	sendToClient( int fd, const std::string& message ) override;
+	void	broadcastMessage( const std::string& channel, const std::string& message ) override;
 
 };
