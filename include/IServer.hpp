@@ -20,7 +20,7 @@ public:
 	// Channel management
 	virtual Channel*			getChannel( const std::string& name ) const = 0 ;
 	virtual Channel*			createChannel( const std::string& name, Client* creator, const std::string& key = "" ) = 0;
-	void						removeChannel( const std::string& name ) = 0;
+	virtual void				removeChannel( const std::string& name ) = 0;
 
 	// Messaging
 	virtual void	sendToClient( int fd, const std::string& message ) = 0;
