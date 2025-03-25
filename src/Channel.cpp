@@ -13,22 +13,22 @@ Channel::Channel(const std::string& name)
 
 }
 
-Channel::Channel(const std::string& name, const std::string& topic, \
-	bool isInviteOnly, bool hasPassword, std::string password, size_t userLimit)
-	:	_topic(topic), _isInviteOnly(isInviteOnly), \
-		_hasPassword(hasPassword), _userLimit(userLimit)
-{
-	if (isValidChannelName(name))
-		_name = name;
-	else
-		std::cerr << "Error code " << ERR_BADCHANMASK << ": bad channel mask. \
-			Invalid channel name: " << name << std::endl;
-	if (_hasPassword)
-	{
-		if (!_isValidPassword(password))
-			std::cerr << "Invalid password for channel: " << name << std::endl;
-	}
-}
+// Channel::Channel(const std::string& name, const std::string& topic, \
+// 	bool isInviteOnly, bool hasPassword, std::string password, size_t userLimit)
+// 	:	_topic(topic), _isInviteOnly(isInviteOnly), \
+// 		_hasPassword(hasPassword), _userLimit(userLimit)
+// {
+// 	if (isValidChannelName(name))
+// 		_name = name;
+// 	else
+// 		std::cerr << "Error code " << ERR_BADCHANMASK << ": bad channel mask. \
+// 			Invalid channel name: " << name << std::endl;
+// 	if (_hasPassword)
+// 	{
+// 		if (!_isValidPassword(password))
+// 			std::cerr << "Invalid password for channel: " << name << std::endl;
+// 	}
+// }
 
 Channel::~Channel()
 {
@@ -84,7 +84,7 @@ void Channel::addOperator(const std::string& oper)
 	{
 		_operators.insert(oper);
 	}
-	
+
 }
 
 void Channel::removeOperator(const std::string&oper)

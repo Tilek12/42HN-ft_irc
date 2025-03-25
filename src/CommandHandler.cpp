@@ -3,16 +3,16 @@
 /*                                                        :::      ::::::::   */
 /*   Command_handler.cpp                                :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: llacsivy <llacsivy@student.42.fr>          +#+  +:+       +#+        */
+/*   By: tkubanyc <tkubanyc@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/22 16:37:19 by ryusupov          #+#    #+#             */
-/*   Updated: 2025/03/25 16:25:26 by llacsivy         ###   ########.fr       */
+/*   Updated: 2025/03/25 17:20:57 by tkubanyc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../include/Command_handler.hpp"
+#include "../include/CommandHandler.hpp"
 
-void CommandHandler::Handle_command(Client *clinet, const std::string &command){
+void CommandHandler::handleCommand(Client *clinet, const std::string &command){
 
 	std::stringstream ss(command);
 	std::string parsed_command;

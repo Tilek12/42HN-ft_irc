@@ -1,5 +1,6 @@
 
 #include "../include/Server.hpp"
+#include <arpa/inet.h>
 
 ////////////////////////////////////////////////////////////////////////////////
 // ========================  Orthodox Canonical Form  ======================= //
@@ -98,7 +99,7 @@ void	Server::_acceptNewConnection( void ) {
 		close( clientFD );
 		std::cerr << RED
 				  << "Failed to set client non-blocking"
-				  << RERSET << std::endl;
+				  << RESET << std::endl;
 	}
 
 	Client* newClient = new Client( clientFD, inet_ntoa( clientAddress.sin_addr ) );
@@ -125,11 +126,15 @@ void	Server::_disconnectClient( int fd, const std::string& reason ) {
 	if ( !client ) return ;
 
 	// Remove from all channels
-	for ( std::map<std::string, Channel*>::iterator it = _channels.begin(); it != _channels.end(); ++it )
-		it->second->removeClient( client );
+	for ( std::map<std::string, Channel*>::iterator it = _channels.begin(); it != _channels.end(); ++it ) {
+		std::set<std::string> users = it->second->getUsers();
+		if (users.find(client->getNickname()) != users.end())
+			it->second->removeUser( client->getNickname() );
+
+	}
 
 	// Remove from nickname map
-	if ( client->isRegistered() )
+	if ( client->getIsResgistered() )
 		_clientsNick.erase( client->getNickname() );
 
 	// Cleanup
@@ -152,23 +157,23 @@ void	Server::_disconnectClient( int fd, const std::string& reason ) {
 
 }
 
-/*--------------------------------------*/
-/*  Define processInputBuffer fucntion  */
-/*--------------------------------------*/
-void	Server::_processInputBuffer( Client* client ) {
+/*---------------------------------------*/
+/*  Define processClientBuffer fucntion  */
+/*---------------------------------------*/
+void	Server::_processClientBuffer( Client* client ) {
 
 	std::string& buffer = client->getBuffer();
 	size_t	pos;
 
 	while ( ( pos = buffer.find("\r\n") ) != std::string::npos ) {
-		std::string command = buffer.substr( 0, pos );
-		buffer.erase( 0, pos + 2 );
+		std::string message = buffer.substr( 0, pos );
+		buffer.erase( 0, pos + 2 ); // Remove processed message
 
-		if ( !command.empty() ) {
+		if ( !message.empty() ) {
 			std::cout << YELLOW
-					  << "CMD [" << client->getFd() << "]: " << command
+					  << "CMD [" << client->getSocketFd() << "]: " << message
 					  << RESET << std::endl;
-			commandHandler->handleCommand( client, command );
+			_commandHandler->handleCommand( client, message );
 		}
 	}
 
@@ -190,9 +195,9 @@ void	Server::_handleClientData( int fd ) {
 
 	buffer[bytesRead] = '\0';
 	Client* client = getClient( fd );
-	client->appendToBuffer( buffer );
+	client->appendToBuffer( buffer, bytesRead );
 
-	processInputBuffer( client );
+	_processClientBuffer( client ); // Handle complete messages
 
 	////////////////////////////////////////////////////////////////////////
 	// for debugging /////// -------- delete after debugging ------- ///////
@@ -225,10 +230,10 @@ void	Server::_handleConnections( void ) {
 			else
 				_handleClientData( _pollFDs[i].fd );
 		}
-	}
 
-	if ( _pollFDs[i].revents & ( POLLHUP | POLLERR | POLLNVAL ) )
-		_disconnectClient( _pollFDs[i].fd, "Connection error" );
+		if ( _pollFDs[i].revents & ( POLLHUP | POLLERR | POLLNVAL ) )
+			_disconnectClient( _pollFDs[i].fd, "Connection error" );
+	}
 
 }
 
@@ -286,7 +291,7 @@ const std::string&	Server::getPassword( void ) const { return _password; }
 Client*	Server::getClient( int fd ) const {
 
 	std::map<int, Client*>::const_iterator it = _clientsFD.find( fd );
-	return it != _clientsFD.end() & it->second : NULL;
+	return it != _clientsFD.end() ? it->second : NULL;
 
 }
 
@@ -296,7 +301,7 @@ Client*	Server::getClient( int fd ) const {
 Client*	Server::getClient( const std::string& nickname ) const {
 
 	std::map<std::string, Client*>::const_iterator it = _clientsNick.find( nickname );
-	return it != _clientsNick.end() & it->second : NULL;
+	return it != _clientsNick.end() ? it->second : NULL;
 
 }
 
@@ -310,16 +315,16 @@ Client*	Server::getClient( const std::string& nickname ) const {
 Channel*	Server::getChannel( const std::string& name ) const {
 
 	std::map<std::string, Channel*>::const_iterator it = _channels.find( name );
-	return it != _channels.end() & it->second : NULL;
+	return it != _channels.end() ? it->second : NULL;
 
 }
 
 /*---------------------------------*/
 /*  Define createChannel function  */
 /*---------------------------------*/
-Channel*	Server::createChannel( const std::string& name, Client* creator, const std::string& key ) {
+Channel*	Server::createChannel( const std::string& name ) {
 
-	Channel* channel = new Channel( name, creator, key );
+	Channel* channel = new Channel( name );
 	_channels[name] = channel;
 	return channel;
 
@@ -354,11 +359,11 @@ void	Server::sendToClient( int fd, const std::string& message ) {
 /*------------------------------------*/
 /*  Define broadcastMessage function  */
 /*------------------------------------*/
-void	Server::broadcastMessage( const std::string& channel, const std::string& message ) {
+// void	Server::broadcastMessage( const std::string& channel, const std::string& message ) {
 
-	const std::map<int, Client*>& members = channel->getClients();
+// 	const std::map<int, Client*>& members = channel->getClients();
 
-	for (std::map<int, Client*>::const_iterator it = members.begin(); it != members.end(); ++it )
-		sendToClient( it->first, message );
+// 	for (std::map<int, Client*>::const_iterator it = members.begin(); it != members.end(); ++it )
+// 		sendToClient( it->first, message );
 
-}
+// }

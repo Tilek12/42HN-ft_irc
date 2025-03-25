@@ -43,9 +43,10 @@ private:
 	void	_handleConnections( void );
 	void	_acceptNewConnection( void );
 	void	_handleClientData( int fd );
-	void	_disconnectClient( int fd, const std::string& reason = "" );
+	void	_processClientBuffer( Client* client );
+	void	_disconnectClient( int fd, const std::string& reason );
 
-	CommandHandler*	commandHandler;
+	CommandHandler*	_commandHandler;
 
 public:
 
@@ -66,11 +67,11 @@ public:
 
 	// Channel management
 	Channel*	getChannel( const std::string& name ) const override;
-	Channel*	createChannel( const std::string& name, Client* creator, const std::string& key = "" ) override;
+	Channel*	createChannel( const std::string& name ) override;
 	void		removeChannel( const std::string& name ) override;
 
 	// Messaging
 	void	sendToClient( int fd, const std::string& message ) override;
-	void	broadcastMessage( const std::string& channel, const std::string& message ) override;
+	// void	broadcastMessage( const std::string& channel, const std::string& message ) override;
 
 };

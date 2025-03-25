@@ -21,9 +21,9 @@ SRC =	$(SRC_DIR)/Server.cpp \
 		$(SRC_DIR)/Channel.cpp \
 		$(SRC_DIR)/ChannelCmds.cpp \
 		$(SRC_DIR)/Client.cpp \
-		$(SRC_DIR)/Command_handler.cpp \
+		$(SRC_DIR)/CommandHandler.cpp \
 		$(SRC_DIR)/channelHelperFcts.cpp
-		
+
 OBJ = $(SRC:$(SRC_DIR)/%.cpp=$(OBJ_DIR)/%.o)
 
 # Compile the executable
@@ -63,9 +63,9 @@ test: $(OBJ) $(TEST_CHANNEL) $(TEST_TILEK)
 
 # Compile the test executable
 $(TEST_CHANNEL): $(OBJ) $(TEST_DIR)/test_channel.cpp
-	@$(CXX) $(CXXFLAGS) $(OBJ) $(TEST_DIR)/test_channel.cpp -o $(TEST_CHANNEL) 
+	@$(CXX) $(CXXFLAGS) $(OBJ) $(TEST_DIR)/test_channel.cpp -o $(TEST_CHANNEL)
 
 $(TEST_TILEK): $(TEST_DIR)/test_tilek.cpp
-	@$(CXX) $(CXXFLAGS) $(OBJ) $(TEST_DIR)/test_tilek.cpp -o $(TEST_TILEK) 
+	@$(CXX) $(CXXFLAGS) $(OBJ) $(TEST_DIR)/test_tilek.cpp -o $(TEST_TILEK)
 
 .PHONY: all clean fclean re test

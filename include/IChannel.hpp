@@ -7,7 +7,7 @@
 class IChannel
 {
 public:
-	virtual ~IChannel();
+	virtual ~IChannel() {}
 
 	virtual void addOperator(const std::string& oper) = 0;
 	virtual bool getHasPassword() const = 0;
