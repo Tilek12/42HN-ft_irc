@@ -5,7 +5,7 @@ int main( int argc, char** argv ) {
 
 	std::cout << YELLOW
 			  << "==============================================" << std::endl
-			  << "==================  TRLnet  ==================" << std::endl
+			  << "===========  TRLnet - IRC Network  ===========" << std::endl
 			  << "==============================================" << std::endl
 			  << RESET;
 
@@ -16,15 +16,13 @@ int main( int argc, char** argv ) {
 		return 1;
 	}
 
-	int port = std::atoi( argv[1] );
-	std::string password = argv[2];
-
 	try {
-		Server server( port, password );
-		server.run();
+		Server server( std::atoi( argv[1] ), argv[2] );
+		server.start();
 	} catch ( const std::exception& e ) {
 		std::cerr << RED << e.what() << std::endl;
 	}
 
 	return 0;
+
 }
