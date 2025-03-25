@@ -265,3 +265,15 @@ Client*	Server::getClient( const std::string& nickname ) const {
 
 }
 
+Channel*	Server::getChannel( const std::string& name ) const {
+
+	std::map<std::string, Channel*>::const_iterator it = _channels.find( fd );
+	return it != _channels.end() & it->second : NULL;
+
+}
+
+Channel*	Server::createChannel( const std::string& name, Client* creator, const std::string& key ) {
+
+
+
+}
