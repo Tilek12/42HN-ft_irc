@@ -9,6 +9,7 @@
 #include <unistd.h>
 #include <stdexcept>
 #include "colors.hpp"
+#include "IServer.hpp"
 
 /*-------------------*/
 /*  Define IRC port  */
@@ -18,7 +19,7 @@ const int IRCport = 6667;
 /*-----------------------*/
 /*  Define Server class  */
 /*-----------------------*/
-class Server {
+class Server : public IServer {
 
 private:
 

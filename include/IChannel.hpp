@@ -2,6 +2,7 @@
 #define ICHANNEL_HPP
 
 #include <iostream>
+#include <set>
 
 class IChannel
 {

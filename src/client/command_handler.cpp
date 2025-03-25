@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   command_handler.cpp                                :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ryusupov <ryusupov@student.42.fr>          +#+  +:+       +#+        */
+/*   By: llacsivy <llacsivy@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/22 16:37:19 by ryusupov          #+#    #+#             */
-/*   Updated: 2025/03/22 18:50:34 by ryusupov         ###   ########.fr       */
+/*   Updated: 2025/03/25 14:39:26 by llacsivy         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,7 +40,7 @@ void CommandHandler::Handle_command(Client *clinet, const std::string &command){
 	}
 }
 
-void CommandHandler::SendMessage(Client *client, const std::string &msg){
+static void CommandHandler::SendMessage(IClient *client, const std::string &msg){
 	std::cout << "New message: " << msg << std::endl;
 }
 

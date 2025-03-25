@@ -10,6 +10,8 @@
 #include "../include/IServer.hpp"
 #include "../include/IChannel.hpp"
 #include "client/IClient.hpp"
+#include "client/Client.hpp"
+#include "client/Command_handler.hpp"
 
 static void joinChannelCmd(IClient& client, IServer& server, std::vector<std::string>& joinParams)
 {
@@ -40,22 +42,22 @@ static void joinChannelCmd(IClient& client, IServer& server, std::vector<std::st
 		}
 		if (channel->getHasPassword() && channel->getPassword() != passwords[i])
 		{
-			client.SendMessage(&client, "Error code " + std::string(ERR_BADCHANNELKEY) + ": invalid password.");
+			CommandHandler::SendMessage(&client, "Error code " + std::string(ERR_BADCHANNELKEY) + ": invalid password.");
 			continue;
 		}
 		if (channel->getIsInviteOnly() && \
 			channel->getInvitedUsers().find(client.getNickname()) == channel->getInvitedUsers().end())
 		{
-			client.SendMessage(&client, "Error code " + std::string(ERR_INVITEONLYCHAN) + ":Cannot join. Channel is invite only");
+			 CommandHandler::SendMessage(&client, "Error code " + std::string(ERR_INVITEONLYCHAN) + ":Cannot join. Channel is invite only");
 			continue;
 		}
 		if (channel->getUserLimit() > 0 && channel->getUsers().size() >= channel->getUserLimit())
 		{
-			client.SendMessage(&client, "Error code " + std::string(ERR_CHANNELISFULL) + ":Cannot join. Channel is full");
+			 CommandHandler::SendMessage(&client, "Error code " + std::string(ERR_CHANNELISFULL) + ":Cannot join. Channel is full");
 			continue;
 		}
 		channel->addUser(client.getNickname());
-		client.SendMessage(&client, client.getNickname() + "JOIN " + channelNames[i]);
+		 CommandHandler::SendMessage(&client, client.getNickname() + "JOIN " + channelNames[i]);
 	}
 }
 
@@ -78,19 +80,19 @@ static void partChannelCmd(IClient& client, IServer& server, std::vector<std::st
 		channel = server.getChannel(channelNames[i]);
 		if (!channel)
 		{
-			client.SendMessage(&client, "Error code " + std::string(ERR_NOSUCHCHANNEL) + " :non existing channel " + channelNames[i]);
+			CommandHandler::SendMessage(&client, "Error code " + std::string(ERR_NOSUCHCHANNEL) + " :non existing channel " + channelNames[i]);
 			continue;
 		}
 		if (channel->getUsers().find(client.getNickname()) == channel->getUsers().end())
 		{
-			client.SendMessage(&client, "Error code " + std::string(ERR_NOTONCHANNEL) + " :you are not on channel " + channelNames[i]);
+			CommandHandler::SendMessage(&client, "Error code " + std::string(ERR_NOTONCHANNEL) + " :you are not on channel " + channelNames[i]);
 			continue;
 		}
 		channel->removeUser(client.getNickname());
 		if (reason.empty())
-			client.SendMessage(&client, client.getNickname() + "PART " + channelNames[i]);
+			CommandHandler::SendMessage(&client, client.getNickname() + "PART " + channelNames[i]);
 		else
-			client.SendMessage(&client, client.getNickname() + "PART " + channelNames[i] + ":" + reason);
+			CommandHandler::SendMessage(&client, client.getNickname() + "PART " + channelNames[i] + ":" + reason);
 		if (channel->getUsers().size() == 0)
 			server.removeChannel(channelNames[i]);
 	}

@@ -4,7 +4,9 @@
 #include <iostream>
 #include <set>
 
-class Channel
+#include "IChannel.hpp"
+
+class Channel : public IChannel
 {
 private:
 	Channel(const Channel& other) = delete;
