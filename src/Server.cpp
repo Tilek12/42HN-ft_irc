@@ -112,6 +112,39 @@ void	Server::_acceptNewConnection( void ) {
 
 }
 
+void	Server::_disconnectClient( int fd, const std::string& reason ) {
+
+	Client* client = getClient( fd );
+	if ( !client ) return ;
+
+	// Remove from all channels
+	for ( std::map<std::string, Channel*>::iterator it = _channels.begin(); it != _channels.end(); ++it )
+		it->second->removeClient( client );
+
+	// Remove from nickname map
+	if ( client->isRegistered() )
+		_clientsNick.erase( client->getNickname() );
+
+	// Cleanup
+	close( fd );
+	_clientsFD.erase( fd );
+	delete client;
+
+	// Remove from poll list
+	for ( std::vector<pollfd>::iterator it = _pollFDs.begin(); it != _pollFDs.end(); ++it ) {
+		if ( it->fd == fd ) {
+			_pollFDs.erase( it );
+			break;
+		}
+	}
+
+	std::cout << PURPLE
+			  << "Client disconnected (fd: " << fd << ")";
+	if ( !reason.empty() ) std::cout << " - Reason: " << reason;
+	std::cout << RESET << std::endl;
+
+}
+
 void	Server::_processInputBuffer( Client* client ) {
 
 	std::string& buffer = client->getBuffer();
@@ -216,4 +249,4 @@ void	Server::stop( void ) {
 /*-----------------------*/
 /*  Get Server password  */
 /*-----------------------*/
-std::string	Server::getPassword( void ) { return _password; }
+const std::string&	Server::getPassword( void ) const { return _password; }

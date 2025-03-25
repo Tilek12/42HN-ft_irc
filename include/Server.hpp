@@ -46,16 +46,28 @@ private:
 	void	_handleClientData( int fd );
 	void	_disconnectClient( int fd, const std::string& reason = "" );
 
+	CommandHandler*	commandHandler;
+
 public:
 
+	// OCF
 	Server( int port, const std::string& password );
 	~Server( void );
 	Server( const Server& other ) = delete;
 	Server& operator=( const Server&  other ) = delete;
 
-	void		start( void ) override;
-	void		stop( void ) override;
-	std::string	getPassword( void ) override;
+	// Core server operations
+	void				start( void ) override;
+	void				stop( void ) override;
+	const std::string&	getPassword( void ) const override;
+
+	// Client management
+
+
+	// Channel management
+
+
+	// Messaging
 	// void		broadcastMessage( const std::string& channel, const std::string& message );
 
 };
