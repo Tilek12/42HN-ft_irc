@@ -69,7 +69,7 @@ void	Server::_setupServer( void ) {
 	pollfd serverPollFD;
 	serverPollFD.fd = _serverFD;
 	serverPollFD.events = POLLIN;
-	_fds.push_back( serverPollFD );
+	_pollFDs.push_back( serverPollFD );
 
 }
 
@@ -98,12 +98,12 @@ void	Server::_acceptNewConnection( void ) {
 	}
 
 	Client* newClient = new Client( clientFD, inet_ntoa( clientAddress.sin_addr ) );
-	_clients[clientFD] = newClient;
+	_clientsFD[clientFD] = newClient;
 
 	pollfd newPollfd;
 	newPollfd.fd = clientFD;
 	newPollfd.events = POLLIN;
-	_fds.push_back( newPollfd );
+	_pollFDs.push_back( newPollfd );
 
 	std::cout << GREEN
 			  << "New connection from " << newClient->getHostname()
@@ -112,43 +112,77 @@ void	Server::_acceptNewConnection( void ) {
 
 }
 
+void	Server::_processInputBuffer( Client* client ) {
+
+	std::string& buffer = client->getBuffer();
+	size_t	pos;
+
+	while ( ( pos = buffer.find("\r\n") ) != std::string::npos ) {
+		std::string command = buffer.substr( 0, pos );
+		buffer.erase( 0, pos + 2 );
+
+		if ( !command.empty() ) {
+			std::cout << YELLOW
+					  << "CMD [" << client->getFd() << "]: " << command
+					  << RESET << std::endl;
+			commandHandler->handleCommand( client, command );
+		}
+	}
+
+}
+
 /*-----------------------*/
 /*  Handle Client data   */
 /*-----------------------*/
-void	Server::_handleClientData( int clientFD ) {
+void	Server::_handleClientData( int fd ) {
 
 	// Recieving data
-	char buffer[1024] = { 0 };
-	recv( _clientSocket, buffer, sizeof(buffer), 0 );
+	char buffer[1024];
+	ssize_t bytesRead = recv( fd, buffer, sizeof(buffer) - 1, 0 );
 
+	if ( bytesRead <= 0 ) {
+		_disconnectClient( fd, bytesRead == 0 ? "Client disconnected" : "Read error" );
+		return;
+	}
+
+	buffer[bytesRead] = '\0';
+	Client* client = getClient( fd );
+	client->appendToBuffer( buffer );
+
+	processInputBuffer( client );
+
+	////////////////////////////////////////////////////////////////////////
+	// for debugging ////////-------- delete after debugging -------////////
+	////////////////////////////////////////////////////////////////////////
 	std::cout << BLUE
 			  << "Message from client: "
 			  << RESET
 			  << YELLOW
 			  << buffer
 			  << RESET << std::endl;
+	////////////////////////////////////////////////////////////////////////
 
 }
 
 void	Server::_handleConnections( void ) {
 
-	if ( poll( &_fds[0], _fds.size(), -1 ) < 0 ) {
+	if ( poll( &_pollFDs[0], _pollFDs.size(), -1 ) < 0 ) {
 		if ( errno != EINTR )
 			throw std::runtime_error( "Poll error!" );
 		return;
 	}
 
-	for ( size_t i = 0; i < _fds.size(); i++ ) {
-		if ( _fds[i].revents & POLLIN ) {
-			if ( _fds[i].fd == _serverFD )
+	for ( size_t i = 0; i < _pollFDs.size(); i++ ) {
+		if ( _pollFDs[i].revents & POLLIN ) {
+			if ( _pollFDs[i].fd == _serverFD )
 				_acceptNewConnection();
 			else
-				_handleClientData( _fds[i].fd );
+				_handleClientData( _pollFDs[i].fd );
 		}
 	}
 
-	if ( _fds[i].revents & ( POLLHUP | POLLERR | POLLNVAL ) )
-		_disconnectClient( _fds[i].fd, "Connection error" );
+	if ( _pollFDs[i].revents & ( POLLHUP | POLLERR | POLLNVAL ) )
+		_disconnectClient( _pollFDs[i].fd, "Connection error" );
 
 }
 
@@ -165,9 +199,9 @@ void	Server::start( void ) {
 
 }
 
-/*------------------*/
+/*-------------------*/
 /*  Stop the Server  */
-/*------------------*/
+/*-------------------*/
 void	Server::stop( void ) {
 
 	std::cout << BLUE

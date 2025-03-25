@@ -13,10 +13,12 @@
 #include <vector>
 #include <unordered_map>
 #include <map>
+#include <netinet/in.h>
 #include "colors.hpp"
 #include "IServer.hpp"
 #include "Client.hpp"
 #include "Channel.hpp"
+#include "CommandHandler.hpp"
 
 /*-------------------*/
 /*  Define IRC port  */
@@ -30,18 +32,19 @@ class Server : public IServer {
 
 private:
 
-	std::string							_password;	// Password for Server
-	int									_serverFD;	// file descriptor for Server socket
-	struct sockaddr_in					_serverAddress;
-	std::vector<pollfd>					_fds;		// List of file descriptors to monitor
-	std::unordered_map<int, Client*>	_clients;	// Map of client FDs to Client objects
-	std::map<std::string, Channel*>		_channels;	// Map of channel names to Channel objects
+	std::string							_password;		// Password for Server
+	int									_serverFD;		// file descriptor for Server socket
+	struct sockaddr_in					_serverAddress;	// Server socket address
+	std::vector<pollfd>					_pollFDs;		// List of file descriptors to monitor
+	std::unordered_map<int, Client*>	_clientsFD;		// Map of client FDs to Client pointers
+	std::map<std::string, Client*>		_clientsNick;	// Map of client Nickname to Client
+	std::map<std::string, Channel*>		_channels;		// Map of channel names to Channel pointers
 
 	void	_setupServer( void );
 	void	_handleConnections( void );
 	void	_acceptNewConnection( void );
-	void	_handleClientData( int clientFD );
-	void	_disconnectClient( int clientFD, const std::string& reason = "" );
+	void	_handleClientData( int fd );
+	void	_disconnectClient( int fd, const std::string& reason = "" );
 
 public:
 
