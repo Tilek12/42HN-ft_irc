@@ -250,3 +250,18 @@ void	Server::stop( void ) {
 /*  Get Server password  */
 /*-----------------------*/
 const std::string&	Server::getPassword( void ) const { return _password; }
+
+Client*	Server::getClient( int fd ) const {
+
+	std::map<int, Client*>::const_iterator it = _clientsFD.find( fd );
+	return it != _clientsFD.end() & it->second : NULL;
+
+}
+
+Client*	Server::getClient( const std::string& nickname ) const {
+
+	std::map<std::string, Client*>::const_iterator it = _clientsNick.find( nickname );
+	return it != _clientsNick.end() & it->second : NULL;
+
+}
+

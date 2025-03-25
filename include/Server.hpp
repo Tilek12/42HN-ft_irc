@@ -62,12 +62,16 @@ public:
 	const std::string&	getPassword( void ) const override;
 
 	// Client management
-
+	Client*	getClient( int fd ) const override;
+	Client*	getClient( const std::string& nickname ) const override;
 
 	// Channel management
-
+	Channel*	getChannel( const std::string& name ) const override;
+	Channel*	createChannel( const std::string& name, Client* creator, const std::string& key = "" ) override;
+	void		removeChannel( const std::string& name ) override;
 
 	// Messaging
+	// void	sendToClient( int fd, const std::string& message );
 	// void		broadcastMessage( const std::string& channel, const std::string& message );
 
 };
