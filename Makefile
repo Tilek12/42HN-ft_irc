@@ -53,7 +53,7 @@ fclean: clean
 	@echo "$(VIOLET)$(NAME) deleted.$(RESET)"
 
 # Recompile the project
-re: fclean all test
+re: fclean all
 
 # Run tests
 test: $(OBJ) $(TEST_CHANNEL) $(TEST_TILEK)

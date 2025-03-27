@@ -50,7 +50,7 @@ void	Server::_setupServer( void ) {
 
 	// Set socket options
 	int opt = 1;
-	if ( setsockopt( _serverFD, SOL_SOCKET, SO_REUSEADDR | SO_REUSEPORT, &opt, sizeof( opt ) ) )
+	if ( setsockopt( _serverFD, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof( opt ) ) )
 		throw std::runtime_error( "Failed to set socket options" );
 
 	// Setting the address
