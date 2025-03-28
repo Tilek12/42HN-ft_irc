@@ -16,6 +16,7 @@ private:
 public:
 	static void joinChannelCmd(IClient& client, IServer& server, std::vector<std::string>& joinParams);
 	static void partChannelCmd(IClient& client, IServer& server, std::vector<std::string>& partParams);
+	static void kickUserCmd(IClient& client, IServer& server, std::vector<std::string>& kickParams);
 };
 
 #endif

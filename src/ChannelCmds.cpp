@@ -13,7 +13,7 @@
 #include "../include/Client.hpp"
 #include "../include/CommandHandler.hpp"
 
-static void joinChannelCmd(IClient& client, IServer& server, std::vector<std::string>& joinParams)
+void ChannelCmds::joinChannelCmd(IClient& client, IServer& server, std::vector<std::string>& joinParams)
 {
 	IChannel* channel;
 	std::vector<std::string> channelNames;
@@ -61,7 +61,7 @@ static void joinChannelCmd(IClient& client, IServer& server, std::vector<std::st
 	}
 }
 
-static void partChannelCmd(IClient& client, IServer& server, std::vector<std::string>& partParams)
+void ChannelCmds::partChannelCmd(IClient& client, IServer& server, std::vector<std::string>& partParams)
 {
 	IChannel* channel;
 	std::vector<std::string> channelNames;
@@ -96,4 +96,8 @@ static void partChannelCmd(IClient& client, IServer& server, std::vector<std::st
 		if (channel->getUsers().size() == 0)
 			server.removeChannel(channelNames[i]);
 	}
+}
+void ChannelCmds::kickUserCmd(IClient& client, IServer& server, std::vector<std::string>& kickParams)
+{
+	
 }

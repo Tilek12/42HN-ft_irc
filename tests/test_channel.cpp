@@ -62,7 +62,7 @@ void test_channel_commands()
 
     // Test Joining a new channel
     joinParams.push_back("#TestChannel");
-    ChannelCmds:: joinChannelCmd(*client, *server, joinParams);
+    ChannelCmds::joinChannelCmd(*client, *server, joinParams);
 
     // Test Leaving a channel
     partParams.push_back("#TestChannel");
@@ -73,6 +73,6 @@ int main()
 {
     test_channel_class();
     test_channel_commands();
-    std::cout << "All tests passed successfully!" << std::endl;
+    // std::cout << GREEN << "All tests passed successfully!" << RESET << std::endl;
     return 0;
 }
