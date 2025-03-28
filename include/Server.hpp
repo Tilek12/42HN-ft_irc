@@ -3,17 +3,16 @@
 
 #include <string>
 #include <iostream>
-#include <cstring>
+#include <vector>
+#include <map>
 #include <netinet/in.h>
-// #include <arpa/inet.h>
+#include <arpa/inet.h>
 #include <sys/socket.h>
 #include <unistd.h>
 #include <stdexcept>
 #include <fcntl.h>
 #include <poll.h>
-#include <vector>
-#include <map>
-#include <netinet/in.h>
+#include <csignal>
 #include "colors.hpp"
 #include "IServer.hpp"
 #include "Client.hpp"
@@ -39,6 +38,8 @@ private:
 	std::map<int, Client*>			_clientsFD;		// Map of client FDs to Client pointers
 	std::map<std::string, Client*>	_clientsNick;	// Map of client Nickname to Client
 	std::map<std::string, Channel*>	_channels;		// Map of channel names to Channel pointers
+	bool							_isRunning;
+	CommandHandler*					_commandHandler;
 
 	void	_setupServer( void );
 	void	_handleConnections( void );
@@ -47,7 +48,6 @@ private:
 	void	_processClientBuffer( Client* client );
 	void	_disconnectClient( int fd, const std::string& reason );
 
-	CommandHandler*	_commandHandler;
 
 public:
 
@@ -61,6 +61,8 @@ public:
 	void				start( void ) override;
 	void				stop( void ) override;
 	const std::string&	getPassword( void ) const override;
+	bool				getIsRunning( void );
+	void				setIsRunning( bool value );
 
 	// Client management
 	Client*	getClient( int fd ) const override;

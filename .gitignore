@@ -6,3 +6,5 @@ a.out
 test_channel
 test_tilek
 /obj
+/logs
+/logs/*.txt

@@ -1,6 +1,15 @@
 
 #include "../include/Server.hpp"
 
+Server*	globalServer = nullptr;
+
+void	signalHandler( int ) {
+
+	if ( globalServer )
+		globalServer->setIsRunning( false );
+
+}
+
 int main( int argc, char** argv ) {
 
 	std::cout << YELLOW
@@ -16,12 +25,14 @@ int main( int argc, char** argv ) {
 		return 1;
 	}
 
-	int port = std::atoi( argv[1] );
-	const std::string password = argv[2];
-
 	try {
-		Server* server = new Server( port, password );
-		server->start();
+		Server server( std::atoi( argv[1] ), argv[2] );
+		globalServer = &server;
+
+		std::signal( SIGINT, signalHandler );
+		std::signal( SIGTERM, signalHandler );
+
+		server.start();
 	} catch ( const std::exception& e ) {
 		std::cerr << RED << e.what() << std::endl;
 	}

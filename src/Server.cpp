@@ -1,15 +1,18 @@
 
 #include "../include/Server.hpp"
-#include <arpa/inet.h>
 
 ////////////////////////////////////////////////////////////////////////////////
-// ========================  Orthodox Canonical Form  ======================= //
+// ====================  Class constructor and destructor  ================== //
 ////////////////////////////////////////////////////////////////////////////////
 
 /*----------------------------*/
 /*  Server Class constructor  */
 /*----------------------------*/
-Server::Server( int port, const std::string& password ) {
+Server::Server( int port, const std::string& password ) :
+	_password( password),
+	_serverFD( -1 ),
+	_isRunning( false ),
+	_commandHandler( new CommandHandler() ) {
 
 	// Check port
 	if ( port != IRCport )
@@ -19,8 +22,6 @@ Server::Server( int port, const std::string& password ) {
 	if ( password.empty() || password.size() < 3 )
 		throw std::runtime_error( "ERROR: Password must contain no less than 3 characters." );
 
-	_password = password;
-	_serverFD = -1;
 	_setupServer();
 
 }
@@ -28,7 +29,12 @@ Server::Server( int port, const std::string& password ) {
 /*---------------------------*/
 /*  Server Class destructor  */
 /*---------------------------*/
-Server::~Server( void ) { stop(); }
+Server::~Server( void ) {
+
+	stop();
+	delete _commandHandler;
+
+}
 
 ////////////////////////////////////////////////////////////////////////////////
 // ========================  Core server operations  ======================== //
@@ -246,7 +252,9 @@ void	Server::start( void ) {
 			  << "Server started on port: " << IRCport
 			  << RESET << std::endl;
 
-	while ( true ) { _handleConnections(); }
+	_isRunning = true;
+
+	while ( _isRunning ) { _handleConnections(); }
 
 }
 
@@ -280,6 +288,10 @@ void	Server::stop( void ) {
 /*  Get Server password  */
 /*-----------------------*/
 const std::string&	Server::getPassword( void ) const { return _password; }
+
+bool	Server::getIsRunning( void ) { return _isRunning; }
+
+void	Server::setIsRunning( bool value ) { _isRunning = value; }
 
 ////////////////////////////////////////////////////////////////////////////////
 // ===========================  Client management  ========================== //
