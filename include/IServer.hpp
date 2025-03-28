@@ -28,5 +28,4 @@ public:
 	// Messaging
 	virtual void	sendToClient( int fd, const std::string& message ) = 0;
 	// virtual void	broadcastMessage( const std::string& channel, const std::string& message ) = 0;
-
 };

@@ -23,6 +23,7 @@ class IClient {
 			virtual void	setHostname(std::string &hostname) = 0;
 			virtual void	setIsRegistered(bool status) = 0;
 
+
 			/*Destructor*/
 			virtual ~IClient() {}
 
