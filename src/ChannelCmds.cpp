@@ -11,7 +11,7 @@
 #include "../include/IChannel.hpp"
 #include "../include/IClient.hpp"
 #include "../include/Client.hpp"
-#include "../include/CommandHandler.hpp"
+#include "../include/client_c_h.hpp"
 
 void ChannelCmds::joinChannelCmd(IClient& client, IServer& server, std::vector<std::string>& joinParams)
 {

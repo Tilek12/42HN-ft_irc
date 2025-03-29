@@ -21,8 +21,8 @@ SRC =	$(SRC_DIR)/Server.cpp \
 		$(SRC_DIR)/Channel.cpp \
 		$(SRC_DIR)/ChannelCmds.cpp \
 		$(SRC_DIR)/Client.cpp \
-		$(SRC_DIR)/CommandHandler.cpp \
-		$(SRC_DIR)/channelHelperFcts.cpp
+		$(SRC_DIR)/channelHelperFcts.cpp \
+		$(SRC_DIR)/client_c_h.cpp
 
 OBJ = $(SRC:$(SRC_DIR)/%.cpp=$(OBJ_DIR)/%.o)
 
@@ -30,7 +30,8 @@ OBJ = $(SRC:$(SRC_DIR)/%.cpp=$(OBJ_DIR)/%.o)
 all: $(OBJ_DIR) $(NAME)
 
 $(NAME): $(OBJ)
-	@$(CXX) $(CXXFLAGS) $(OBJ) $(SRC_DIR)/main.cpp -o $(NAME) > /dev/null 2>&1
+	@$(CXX) $(CXXFLAGS) $(OBJ) $(SRC_DIR)/main.cpp -o $(NAME)
+#> /dev/null 2>&1
 	@echo "$(GREEN)object files created.$(RESET)"
 	@echo "$(GREEN)$(NAME) created. $(RESET)"
 

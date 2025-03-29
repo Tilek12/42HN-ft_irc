@@ -3,19 +3,21 @@
 /*                                                        :::      ::::::::   */
 /*   Client.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tkubanyc <tkubanyc@student.42.fr>          +#+  +:+       +#+        */
+/*   By: ryusupov <ryusupov@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/19 14:03:06 by ryusupov          #+#    #+#             */
-/*   Updated: 2025/03/25 21:11:44 by tkubanyc         ###   ########.fr       */
+/*   Updated: 2025/03/28 15:14:33 by ryusupov         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef CLIENT_HPP
 #define CLIENT_HPP
+#define CLIENT_HPP
 #include "IClient.hpp"
 #include <iostream>
+#include <map>
 
-class Client : public IClient {
+class Client : public IClient{
 
 	private:
 		int socket_fd;			//file descriptor of client socket connection
@@ -29,9 +31,6 @@ class Client : public IClient {
 		std::string sendBuffer;	// Buffer for output message
 
 		public:
-			/*Destructor*/
-			~Client();
-
 			/*Costructor to initialize*/
 			Client(int fd, std::string host);
 
@@ -61,6 +60,35 @@ class Client : public IClient {
 			std::string		getNextMessage() override;
 
 
+			/*Destructor*/
+			~Client();
 };
+
+// class Server {
+//     public:
+//         std::map<std::string, Client*> clients; // Map by nickname instead of int
+
+// 		void addClient(Client* client) {
+// 			if (!client->getNickname().empty()) {
+// 				clients[client->getNickname()] = client;
+// 			}
+// 		}
+
+// 		void printClients() {
+// 			std::cout << "Current Clients in Server:" << std::endl;
+// 			for (auto& c : clients) {
+// 				std::cout << "Nickname: " << c.first << " -> FD: " << c.second->getSockedFd() << std::endl;
+// 			}
+// 		}
+
+//         Client* findClient(const std::string& nickname) {
+// 			for (auto &nick : clients) {
+// 				if (nick.second->getNickname() == nickname) {
+// 					return nick.second;
+// 				}
+// 			}
+// 			return (nullptr);
+//         }
+//     };
 
 #endif
