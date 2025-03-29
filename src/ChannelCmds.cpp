@@ -11,7 +11,7 @@
 #include "../include/IChannel.hpp"
 #include "../include/IClient.hpp"
 #include "../include/Client.hpp"
-#include "../include/CommandHandler.hpp"
+#include "../include/client_c_h.hpp"
 
 void ChannelCmds::joinChannelCmd(IClient& client, IServer& server, std::vector<std::string>& joinParams)
 {
@@ -99,5 +99,22 @@ void ChannelCmds::partChannelCmd(IClient& client, IServer& server, std::vector<s
 }
 void ChannelCmds::kickUserCmd(IClient& client, IServer& server, std::vector<std::string>& kickParams)
 {
+	IChannel* channel;
+	std::vector<std::string> channelNames;
+	std::vector<std::string> userNames;
+	std::string reason = "";
+
+	if (kickParams.size() < 2)
+	{
+		std::cerr << "Error code " << ERR_NEEDMOREPARAMS << \
+			" KICK: not enough kickParams" << std::endl;
+		return ;
+	}
+	channelNames = parseCommaString(kickParams[0]);
+	userNames = parseCommaString(kickParams[1]);
+	for (size_t i = 0; i < channelNames.size(); i++)
+	{
+		/* code */
+	}
 	
 }

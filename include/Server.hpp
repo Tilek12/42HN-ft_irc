@@ -17,7 +17,7 @@
 #include "IServer.hpp"
 #include "Client.hpp"
 #include "Channel.hpp"
-#include "CommandHandler.hpp"
+#include "client_c_h.hpp"
 
 /*-------------------*/
 /*  Define IRC port  */
@@ -27,6 +27,8 @@ const int IRCport = 6667;
 /*-----------------------*/
 /*  Define Server class  */
 /*-----------------------*/
+class CommandHandler;
+
 class Server : public IServer {
 
 private:
@@ -54,7 +56,7 @@ public:
 	// OCF
 	Server( int port, const std::string& password );
 	~Server( void );
-	Server( const Server& other ) = delete;
+	// Server( const Server& other ) = delete;
 	Server& operator=( const Server&  other ) = delete;
 
 	// Core server operations
@@ -76,5 +78,7 @@ public:
 	// Messaging
 	void	sendToClient( int fd, const std::string& message ) override;
 	// void	broadcastMessage( const std::string& channel, const std::string& message ) override;
+
+	void addClient(Client* client);
 
 };
