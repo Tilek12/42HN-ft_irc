@@ -12,7 +12,7 @@ Server::Server( int port, const std::string& password ) :
 	_password( password),
 	_serverFD( -1 ),
 	_isRunning( false ),
-	_commandHandler( new CommandHandler() ) {
+	_commandHandler( new CommandHandler(*this) ) {
 
 	// Check port
 	if ( port != IRCport )
@@ -366,6 +366,14 @@ void	Server::sendToClient( int fd, const std::string& message ) {
 	if ( send( fd, message.c_str(), message.length(), 0 ) < 0 )
 		_disconnectClient( fd, "Send error" );
 
+}
+
+
+
+void Server::addClient(Client* client) {
+	if (!client->getNickname().empty()) {
+		_clientsNick[client->getNickname()] = client;
+	}
 }
 
 /*------------------------------------*/
