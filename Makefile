@@ -57,7 +57,7 @@ re: fclean all
 
 # Run tests
 test: $(OBJ) $(TEST_CHANNEL) $(TEST_TILEK)
-	@./$(TEST_CHANNEL) || echo "$(TEST_CHANNEL) failed"
+	@./$(TEST_CHANNEL) || echo "$(VIOLET)$(TEST_CHANNEL) failed$(RESET)"
 	@./$(TEST_TILEK) || echo "$(VIOLET)$(TEST_TILEK) failed$(RESET)"
 	@echo "$(GREEN)Tests ran successfully.$(RESET)"
 

@@ -21,8 +21,7 @@ void ChannelCmds::joinChannelCmd(IClient& client, IServer& server, std::vector<s
 
 	if (joinParams.empty())
 	{
-		std::cerr << "Error code " << ERR_NEEDMOREPARAMS << \
-			" JOIN: not enough joinParams" << std::endl;
+		std::cerr << "Error code " << ERR_NEEDMOREPARAMS << " JOIN: not enough joinParams" << std::endl;
 		return ;
 	}
 
@@ -68,8 +67,7 @@ void ChannelCmds::partChannelCmd(IClient& client, IServer& server, std::vector<s
 	std::string reason = "";
 	if (partParams.empty())
 	{
-		std::cerr << "Error code " << ERR_NEEDMOREPARAMS << \
-			" PART: not enough partParams" << std::endl;
+		std::cerr << "Error code " << ERR_NEEDMOREPARAMS << " PART: not enough partParams" << std::endl;
 		return ;
 	}
 	channelNames = parseCommaString(partParams[0]);
@@ -106,15 +104,40 @@ void ChannelCmds::kickUserCmd(IClient& client, IServer& server, std::vector<std:
 
 	if (kickParams.size() < 2)
 	{
-		std::cerr << "Error code " << ERR_NEEDMOREPARAMS << \
-			" KICK: not enough kickParams" << std::endl;
+		std::cerr << "Error code " << ERR_NEEDMOREPARAMS << " KICK: not enough kickParams" << std::endl;
 		return ;
 	}
+	
 	channelNames = parseCommaString(kickParams[0]);
 	userNames = parseCommaString(kickParams[1]);
+	if (kickParams.size() == 3)
+		reason = kickParams[2];
+	
 	for (size_t i = 0; i < channelNames.size(); i++)
 	{
-		/* code */
+		channel = server.getChannel(channelNames[i]);
+		if (!channel)
+		{
+			CommandHandler::SendMessage(&client, "Error code " + std::string(ERR_NOSUCHCHANNEL) + " :non existing channel " + channelNames[i]);
+			continue;
+		}
+		if (channel->getOperators().find(client.getNickname()) == channel->getOperators().end())
+		{
+			CommandHandler::SendMessage(&client, "Error code " + std::string(ERR_CHANOPRIVSNEEDED) + " :you are not a channel operator of " + channelNames[i]);
+			continue;
+		}
+		if (channel->getUsers().find(userNames[i]) == channel->getUsers().end())
+		{
+			CommandHandler::SendMessage(&client, "Error code " + std::string(ERR_USERNOTINCHANNEL) + " :user " + userNames[i] + " is not in channel " + channelNames[i]);
+			continue;
+		}
+		CommandHandler::SendMessage(&client, "Error code " + std::string(ERR_NOTONCHANNEL) + " :you are not on channel " + channelNames[i]);
+		if (reason.empty())
+			CommandHandler::SendMessage(&client, client.getNickname() + "KICK " + channelNames[i]);
+		else
+			CommandHandler::SendMessage(&client, client.getNickname() + "KICK " + channelNames[i] + ":" + reason);
+		
+		
 	}
 	
 }

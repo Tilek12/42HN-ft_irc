@@ -18,6 +18,7 @@ public:
 	virtual bool getIsInviteOnly() const = 0;
 	virtual std::set<std::string> getUsers() const = 0;
 	virtual void removeUser(const std::string& user) = 0;
+	virtual std::set<std::string> getOperators() const = 0;
 };
 
 #endif
