@@ -6,7 +6,7 @@
 /*   By: llacsivy <llacsivy@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/22 16:37:19 by ryusupov          #+#    #+#             */
-/*   Updated: 2025/03/30 19:56:55 by llacsivy         ###   ########.fr       */
+/*   Updated: 2025/03/30 20:24:49 by llacsivy         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -90,6 +90,17 @@ void CommandHandler::handleCommand(Client *client, const std::string &command){
 		std::vector<std::string> joinParams;
 		joinParams.push_back("#channel");
 		ChannelCmds::joinChannelCmd(*client, server, joinParams);
+	} else if (parsed_command == "PART") {
+		std::vector<std::string> partParams;
+		partParams.push_back("#channel");
+		partParams.push_back("because not interested anymore");
+		ChannelCmds::partChannelCmd(*client, server, partParams);
+	} else if (parsed_command == "KICK") {
+		std::vector<std::string> kickParams;
+		kickParams.push_back("#channel");
+		kickParams.push_back("user1");
+		kickParams.push_back("unpolite user");
+		ChannelCmds::kickUserCmd(*client, server, kickParams);
 	} else {
 		SendError (client, "Unknown command!");
 	}
