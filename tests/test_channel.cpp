@@ -4,8 +4,10 @@
 #include "../include/Channel.hpp"
 #include "../include/Server.hpp"
 #include "../include/Client.hpp"
-#include "../include/CommandHandler.hpp"
+#include "../include/client_c_h.hpp"
 #include "../include/ChannelCmds.hpp"
+#include "../include/client_c_h.hpp"
+#include "../include/channelHelperFcts.hpp"
 
 void test_channel_class()
 {
@@ -49,30 +51,62 @@ void test_channel_class()
 
 void test_channel_commands()
 {
-    IClient* client = new Client(1, "host");
-    IServer* server = new Server(6667, "123");
+    Server* server = new Server(6667, "123");
+    Client client1(1, "host1");
+    Client client2(2, "host2");
+    Client client3(3, "host3");
 
-    // Test Join Channel without params
+    CommandHandler *handler = new CommandHandler(*server);
+    handler->handleCommand(&client1, "NICK user1");
+    handler->handleCommand(&client2, "NICK user2");
+    handler->handleCommand(&client3, "NICK user3");
+
+    // Test Join Channel without params => error expected
     std::vector<std::string> joinParams;
-    ChannelCmds::joinChannelCmd(*client, *server, joinParams);
+    ChannelCmds::joinChannelCmd(client1, *server, joinParams);
 
-    // Test Part Channel without params
+    // Test Part Channel without params => error expected
     std::vector<std::string> partParams;
-    ChannelCmds::partChannelCmd(*client, *server, partParams);
+    ChannelCmds::partChannelCmd(client1, *server, partParams);
 
-    // Test Joining a new channel
-    joinParams.push_back("#TestChannel");
-    ChannelCmds::joinChannelCmd(*client, *server, joinParams);
+    // Test Kicking a user without params => error expected
+    std::vector<std::string> kickParams;
+    ChannelCmds::kickUserCmd(client1, *server, kickParams);
+
+    // Test Joining multiple channels
+    joinParams.push_back("#Channel1");
+    ChannelCmds::joinChannelCmd(client1, *server, joinParams);
+std::cout << client1.getNickname() << " joined " << joinParams[0] <<  " and is operator" << std::endl;
+    ChannelCmds::joinChannelCmd(client2, *server, joinParams);
+    ChannelCmds::joinChannelCmd(client3, *server, joinParams);
+
+    joinParams[0] = "#Channel2";
+    ChannelCmds::joinChannelCmd(client1, *server, joinParams);
+std::cout << client1.getNickname() << " joined " << joinParams[0] <<  " and is operator" << std::endl;
+    ChannelCmds::joinChannelCmd(client3, *server, joinParams);
 
     // Test Leaving a channel
-    partParams.push_back("#TestChannel");
-    ChannelCmds::partChannelCmd(*client, *server, partParams);
+    partParams.push_back("#Channel1");
+    ChannelCmds::partChannelCmd(client2, *server, partParams);
+
+    // Test Kicking a user with a reason
+    kickParams.push_back("#Channel2");
+    kickParams.push_back("user3");
+    kickParams.push_back("Spamming the chat");
+    ChannelCmds::kickUserCmd(client1, *server, kickParams);
+
+    // Test Kicking a user from a single channel
+    joinParams[0] = "#Channel2";
+    ChannelCmds::joinChannelCmd(client3, *server, joinParams);
+    kickParams[0] = "#Channel1,#Channel2";
+    kickParams[1] = "user99,user3";
+    ChannelCmds::kickUserCmd(client1, *server, kickParams);
+ 
 }
 
 int main()
 {
     test_channel_class();
     test_channel_commands();
-    // std::cout << GREEN << "All tests passed successfully!" << RESET << std::endl;
     return 0;
 }

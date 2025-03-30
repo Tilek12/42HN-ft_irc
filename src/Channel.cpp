@@ -1,5 +1,6 @@
 #include "../include/Channel.hpp"
 #include "../include/errorReplies.hpp"
+#include "../include/channelHelperFcts.hpp"
 
 Channel::Channel()
 	:	_name(""), _topic(""), _isInviteOnly(false), \
@@ -49,62 +50,72 @@ void Channel::setTopic(const std::string& topic)
 	_topic = topic;
 }
 
-std::set<std::string> Channel::getUsers() const
+std::vector<std::string> Channel::getUsers() const
 {
 	return _users;
 }
 
 void Channel::addUser(const std::string& user)
 {
-	if (_isInviteOnly && _invitedUsers.find(user) == _invitedUsers.end())
+	auto it = std::find(_invitedUsers.begin(), _invitedUsers.end(), user);
+	if (_isInviteOnly && it == _invitedUsers.end())
     {
         std::cerr << "User " << user << " is not invited to join " << _name << std::endl;
         return;
     }
-
 	if (_userLimit == 0 || _users.size() < _userLimit)
-        _users.insert(user);
+        _users.push_back(user);
     else
         std::cerr << "User limit reached, cannot add " << user << " to channel " << _name << std::endl;
 }
 
 void Channel::removeUser(const std::string& user)
 {
-	_users.erase(user);
+	// if (_operators.find(user) != _operators.end())
+	// {
+	// 	_operators.erase(user);
+	// }
+	// _users.erase(user);
+	removeEntryFromVec(_users, user);
+	removeEntryFromVec(_operators, user);
 }
 
-std::set<std::string> Channel::getOperators() const
+std::vector<std::string> Channel::getOperators() const
 {
 	return _operators;
 }
 
 void Channel::addOperator(const std::string& oper)
 {
-	if (_operators.find(oper) == _operators.end())
-	{
-		_operators.insert(oper);
-	}
-
+	// if (_operators.find(oper) == _operators.end())
+	// {
+	// 	_operators.push_back(oper);
+	// }
+	auto it = std::find(_operators.begin(), _operators.end(), oper);
+	if (it == _operators.end())
+		_operators.push_back(oper);
 }
 
 void Channel::removeOperator(const std::string&oper)
 {
-	_operators.erase(oper);
+	// _operators.erase(oper);
+	removeEntryFromVec(_operators, oper);
 }
 
-std::set<std::string> Channel::getInvitedUsers() const
+std::vector<std::string> Channel::getInvitedUsers() const
 {
 	return _invitedUsers;
 }
 
 void Channel::addInvitedUser(const std::string& user)
 {
-	_invitedUsers.insert(user);
+	_invitedUsers.push_back(user);
 }
 
 void Channel::removeInvitedUser(const std::string& user)
 {
-	_invitedUsers.erase(user);
+	// _invitedUsers.erase(user);
+	removeEntryFromVec(_invitedUsers, user);
 }
 
 bool Channel::getHasPassword() const

@@ -133,8 +133,8 @@ void	Server::_disconnectClient( int fd, const std::string& reason ) {
 
 	// Remove from all channels
 	for ( std::map<std::string, Channel*>::iterator it = _channels.begin(); it != _channels.end(); ++it ) {
-		std::set<std::string> users = it->second->getUsers();
-		if (users.find(client->getNickname()) != users.end())
+		std::vector<std::string> users = it->second->getUsers();
+		if (std::find(users.begin(), users.end(), client->getNickname()) != users.end())
 			it->second->removeUser( client->getNickname() );
 
 	}
@@ -170,15 +170,13 @@ void	Server::_processClientBuffer( Client* client ) {
 
 	std::string& buffer = client->getBuffer();
 	size_t	pos;
-
 	while ( ( pos = buffer.find("\r\n") ) != std::string::npos ) {
 		std::string message = buffer.substr( 0, pos );
 		buffer.erase( 0, pos + 2 ); // Remove processed message
-
 		if ( !message.empty() ) {
 			std::cout << YELLOW
-					  << "CMD [" << client->getSocketFd() << "]: " << message
-					  << RESET << std::endl;
+			<< "CMD [" << client->getSocketFd() << "]: " << message
+			<< RESET << std::endl;
 			_commandHandler->handleCommand( client, message );
 		}
 	}

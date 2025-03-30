@@ -3,15 +3,16 @@
 /*                                                        :::      ::::::::   */
 /*   client_c_h.cpp                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tkubanyc <tkubanyc@student.42.fr>          +#+  +:+       +#+        */
+/*   By: llacsivy <llacsivy@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/22 16:37:19 by ryusupov          #+#    #+#             */
-/*   Updated: 2025/03/29 14:07:44 by tkubanyc         ###   ########.fr       */
+/*   Updated: 2025/03/30 19:56:55 by llacsivy         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../include/client_c_h.hpp"
 #include "../include/Client.hpp"
+#include "../include/ChannelCmds.hpp"
 
 CommandHandler::CommandHandler(Server& srv) : server(srv) {
 	//
@@ -38,7 +39,7 @@ void CommandHandler::handleCommand(Client *client, const std::string &command){
 		}
 
 		client->setNickname(nickname);
-
+		server.addClient(client);
 		SendMessage(client, "Your nickname is now " + nickname);
 	} else if (parsed_command == "USER") {
 		std::string username, mode, unused, realname;
@@ -83,8 +84,12 @@ void CommandHandler::handleCommand(Client *client, const std::string &command){
 			SendError(client, "Reciever with the " + recipent + " nickname was not found!");
 			return ;
 		}
-
-		SendMessage(reciever, "Message from: " + client->getNickname() + ": " + msg);
+		server.addClient(client);
+		SendMessage(reciever, "Message from: " + std::to_string(client->getSocketFd()) + " " + client->getNickname() + ": " + msg);
+	} else if (parsed_command == "JOIN") {
+		std::vector<std::string> joinParams;
+		joinParams.push_back("#channel");
+		ChannelCmds::joinChannelCmd(*client, server, joinParams);
 	} else {
 		SendError (client, "Unknown command!");
 	}
