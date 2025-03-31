@@ -39,6 +39,11 @@ void ChannelCmds::joinChannelCmd(IClient& client, IServer& server, std::vector<s
                 channel->addOperator(client.getNickname());
             }
         }
+        else
+        {
+            std::cerr << "Error code " << ERR_BADCHANMASK << ": bad channel mask. Invalid channel name: " << channelNames[i] << std::endl;
+            continue;
+        }
         if (channel->getHasPassword() && channel->getPassword() != passwords[i])
         {
             CommandHandler::SendMessage(&client, "Error code " + std::string(ERR_BADCHANNELKEY) + ": invalid password.");

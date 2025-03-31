@@ -76,13 +76,11 @@ void test_channel_commands()
     // Test Joining multiple channels
     joinParams.push_back("#Channel1");
     ChannelCmds::joinChannelCmd(client1, *server, joinParams);
-std::cout << client1.getNickname() << " joined " << joinParams[0] <<  " and is operator" << std::endl;
     ChannelCmds::joinChannelCmd(client2, *server, joinParams);
     ChannelCmds::joinChannelCmd(client3, *server, joinParams);
 
     joinParams[0] = "#Channel2";
     ChannelCmds::joinChannelCmd(client1, *server, joinParams);
-std::cout << client1.getNickname() << " joined " << joinParams[0] <<  " and is operator" << std::endl;
     ChannelCmds::joinChannelCmd(client3, *server, joinParams);
 
     // Test Leaving a channel

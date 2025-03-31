@@ -71,11 +71,6 @@ void Channel::addUser(const std::string& user)
 
 void Channel::removeUser(const std::string& user)
 {
-	// if (_operators.find(user) != _operators.end())
-	// {
-	// 	_operators.erase(user);
-	// }
-	// _users.erase(user);
 	removeEntryFromVec(_users, user);
 	removeEntryFromVec(_operators, user);
 }
@@ -87,10 +82,6 @@ std::vector<std::string> Channel::getOperators() const
 
 void Channel::addOperator(const std::string& oper)
 {
-	// if (_operators.find(oper) == _operators.end())
-	// {
-	// 	_operators.push_back(oper);
-	// }
 	auto it = std::find(_operators.begin(), _operators.end(), oper);
 	if (it == _operators.end())
 		_operators.push_back(oper);
@@ -98,7 +89,6 @@ void Channel::addOperator(const std::string& oper)
 
 void Channel::removeOperator(const std::string&oper)
 {
-	// _operators.erase(oper);
 	removeEntryFromVec(_operators, oper);
 }
 
@@ -114,7 +104,6 @@ void Channel::addInvitedUser(const std::string& user)
 
 void Channel::removeInvitedUser(const std::string& user)
 {
-	// _invitedUsers.erase(user);
 	removeEntryFromVec(_invitedUsers, user);
 }
 

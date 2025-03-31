@@ -203,17 +203,6 @@ void	Server::_handleClientData( int fd ) {
 
 	_processClientBuffer( client ); // Handle complete messages
 
-	////////////////////////////////////////////////////////////////////////
-	// for debugging /////// -------- delete after debugging ------- ///////
-	////////////////////////////////////////////////////////////////////////
-	std::cout << BLUE
-			  << "Message from client: "
-			  << RESET
-			  << YELLOW
-			  << buffer
-			  << RESET << std::endl;
-	////////////////////////////////////////////////////////////////////////
-
 }
 
 /*------------------------------------*/
