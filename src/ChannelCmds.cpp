@@ -156,3 +156,46 @@ void ChannelCmds::kickUserCmd(IClient& client, IServer& server, std::vector<std:
             CommandHandler::SendMessage(&client, client.getNickname() + " KICK " + userNames[i] + " from " + channelNames[i] + " :" + reason);
     }
 }
+
+void ChannelCmds::inviteUserCmd(IClient& client, IServer& server, std::vector<std::string>& inviteParams)
+{
+    if (inviteParams.size() < 2)
+    {
+        std::cerr << "Error code " << ERR_NEEDMOREPARAMS << " INVITE: not enough inviteParams" << std::endl;
+        return;
+    }
+    std::string user = inviteParams[0];
+    std::string channelName = inviteParams[1];
+    Channel* channel = server.getChannel(channelName);
+    if (!channel)
+    {
+        CommandHandler::SendMessage(&client, "Error code " + std::string(ERR_NOSUCHCHANNEL) + " :non existing channel " + channelName);
+        return;
+    }
+    if (!(channel->getIsInviteOnly()))
+    {
+        CommandHandler::SendMessage(&client, "Error: no isInvitedOnly channel " + channelName);
+        return;
+    }
+    auto itOps = std::find(channel->getOperators().begin(), channel->getOperators().end(), client.getNickname());
+    auto itUser = std::find(channel->getUsers().begin(), channel->getUsers().end(), user);
+    auto itInvUser = std::find(channel->getInvitedUsers().begin(), channel->getInvitedUsers().end(), user);
+    if (itOps == channel->getOperators().end())
+    {
+        CommandHandler::SendMessage(&client, "Error code " + std::string(ERR_CHANOPRIVSNEEDED) + ": you are not a channel operator of " + channelName);
+        return;
+    }
+    if (itUser != channel->getUsers().end())
+    {
+        CommandHandler::SendMessage(&client, "Error code " + std::string(ERR_USERONCHANNEL) + ": user already on channel " + channelName);
+        return;
+    }
+    if (itInvUser != channel->getInvitedUsers().end())
+    {
+std::cout << "debug user: " << user << std::endl;
+        CommandHandler::SendMessage(&client, "Error code " + std::string(ERR_USERONCHANNEL) + ": user already in invitedUsers on channel " + channelName);
+        return;
+    }
+    channel->addInvitedUser(user);
+    CommandHandler::SendMessage(&client, client.getNickname() + " INVITE " + user + " to " + channelName);
+}
