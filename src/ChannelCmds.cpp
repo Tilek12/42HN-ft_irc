@@ -177,23 +177,17 @@ void ChannelCmds::inviteUserCmd(IClient& client, IServer& server, std::vector<st
         CommandHandler::SendMessage(&client, "Error: no isInvitedOnly channel " + channelName);
         return;
     }
-    std::vector<std::string> operators = channel->getOperators();
-    bool isOperator = std::find(operators.begin(), operators.end(), client.getNickname()) != operators.end();
-    if (!isOperator || operators.empty())
+    if (!channel->isOperator(client.getNickname()) || channel->getOperators().empty())
     {
         CommandHandler::SendMessage(&client, "Error code " + std::string(ERR_CHANOPRIVSNEEDED) + ": can not invite. you are not a channel operator of " + channelName);
         return;
     }
-    std::vector<std::string> usersInChannel = channel->getUsers();
-    bool isUser = std::find(usersInChannel.begin(), usersInChannel.end(), user) != usersInChannel.end();
-    if (isUser)
+    if (channel->isUser(user))
     {
         CommandHandler::SendMessage(&client, "Error code " + std::string(ERR_USERONCHANNEL) + ": user " + user + " already on channel " + channelName);
         return;
     }
-    std::vector<std::string> invitedUsers = channel->getInvitedUsers();
-    bool isInvUser = std::find(invitedUsers.begin(), invitedUsers.end(), user) != invitedUsers.end();
-    if (isInvUser)
+    if (channel->isInvitedUser(user))
     {
         CommandHandler::SendMessage(&client, "Error code " + std::string(ERR_USERONCHANNEL) +  ": user " + user +  " already in invitedUsers on channel " + channelName);
         return;

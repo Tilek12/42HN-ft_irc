@@ -1,4 +1,5 @@
 #include "../include/Channel.hpp"
+#include "../include/IChannel.hpp"
 #include "../include/errorReplies.hpp"
 #include "../include/channelHelperFcts.hpp"
 
@@ -170,7 +171,20 @@ std::string Channel::getPassword() const
 	return _password;
 }
 
-void	 Channel::setPassword(const std::string& password)
+void Channel::setPassword(const std::string& password)
 {
 	_password = password;
+}
+
+bool Channel::isUser(const std::string& user)
+{
+	return std::find(_users.begin(), _users.end(), user) != _users.end();
+}
+bool  Channel::isOperator(const std::string& user)
+{
+	return std::find(_operators.begin(), _operators.end(), user) != _operators.end();
+}
+bool  Channel::isInvitedUser(const std::string& user)
+{
+	return std::find(_invitedUsers.begin(), _invitedUsers.end(), user) != _invitedUsers.end();
 }

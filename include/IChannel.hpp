@@ -19,9 +19,9 @@ public:
 	virtual std::vector<std::string> getUsers() const = 0;
 	virtual void removeUser(const std::string& user) = 0;
 	virtual std::vector<std::string> getOperators() const = 0;
-	virtual	bool isUser(const std::string& user);
-	virtual	bool isOperator(const std::string& user);
-	virtual	bool isInvitedUser(const std::string& user);
+	virtual	bool isUser(const std::string& user) = 0;
+	virtual	bool isOperator(const std::string& user) = 0;
+	virtual	bool isInvitedUser(const std::string& user) = 0;
 };
 
 #endif

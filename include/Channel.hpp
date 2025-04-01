@@ -22,7 +22,7 @@ private:
 	std::string					_password;
 	size_t						_userLimit;
 
-	bool					_isValidPassword(const std::string password);
+	bool						_isValidPassword(const std::string password);
 public:
 	Channel();
 	Channel(const std::string& name);
@@ -52,9 +52,9 @@ public:
 	void						setPassword(const std::string& password);
 
 	static bool					isValidChannelName(const std::string& name);
-	virtual	bool 				isUser(const std::string& user) override;
-	virtual	bool 				isOperator(const std::string& user) override;
-	virtual	bool 				isInvitedUser(const std::string& user) override;
+	bool 						isUser(const std::string& user) override;
+	bool 						isOperator(const std::string& user) override;
+	bool 						isInvitedUser(const std::string& user) override;
 };
 
 #endif
