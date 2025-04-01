@@ -6,7 +6,7 @@
 /*   By: ryusupov <ryusupov@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: Invalid date        by                   #+#    #+#             */
-/*   Updated: 2025/03/28 17:20:54 by ryusupov         ###   ########.fr       */
+/*   Updated: 2025/04/01 17:02:32 by ryusupov         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,6 +15,7 @@
 #include <iostream>
 #include <unordered_map>
 #include <sstream>
+#include <unordered_set>
 
 #include "Client.hpp"
 #include "IClient.hpp"
@@ -32,6 +33,9 @@ class CommandHandler{
 		bool NickNameTaken(std::string &nickname);
 		static void SendMessage(IClient *client, const std::string &msg);
 		void SendError(Client *client, const std::string &msg);
+
+		static std::vector<std::string> parseCommand(const std::string &command);
+		static std::vector<std::string> parseSpecialCommands(const std::string &command);
 };
 
 #endif

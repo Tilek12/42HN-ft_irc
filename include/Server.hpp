@@ -40,6 +40,7 @@ private:
 	std::map<int, Client*>			_clientsFD;		// Map of client FDs to Client pointers
 	std::map<std::string, Client*>	_clientsNick;	// Map of client Nickname to Client
 	std::map<std::string, Channel*>	_channels;		// Map of channel names to Channel pointers
+	std::vector<std::string>		_arguments;		//vector of parsed commands
 	bool							_isRunning;
 	CommandHandler*					_commandHandler;
 

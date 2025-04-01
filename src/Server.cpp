@@ -179,7 +179,8 @@ void	Server::_processClientBuffer( Client* client ) {
 			std::cout << YELLOW
 					  << "CMD [" << client->getSocketFd() << "]: " << message
 					  << RESET << std::endl;
-			_commandHandler->handleCommand( client, message );
+			_arguments = _commandHandler->parseCommand(message);
+			std::cout << "size: " << _arguments.size() << std::endl;
 		}
 	}
 

@@ -53,7 +53,7 @@ void ChannelCmds::joinChannelCmd(IClient& client, IServer& server, std::vector<s
 		}
 		if (channel->getUserLimit() > 0 && channel->getUsers().size() >= channel->getUserLimit())
 		{
-			 CommandHandler::SendMessage(&client, "Error code " + std::string(ERR_CHANNELISFULL) + ":Cannot join. Channel is full");
+			CommandHandler::SendMessage(&client, "Error code " + std::string(ERR_CHANNELISFULL) + ":Cannot join. Channel is full");
 			continue;
 		}
 		channel->addUser(client.getNickname());

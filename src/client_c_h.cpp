@@ -6,12 +6,15 @@
 /*   By: ryusupov <ryusupov@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/22 16:37:19 by ryusupov          #+#    #+#             */
-/*   Updated: 2025/03/28 17:21:36 by ryusupov         ###   ########.fr       */
+/*   Updated: 2025/03/29 16:57:15 by ryusupov         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
+#include <vector>
+
 #include "../include/client_c_h.hpp"
 #include "../include/Client.hpp"
+#include "../include/ChannelCmds.hpp"
 
 CommandHandler::CommandHandler(Server& srv) : server(srv) {
 	//
@@ -40,6 +43,7 @@ void CommandHandler::handleCommand(Client *client, const std::string &command){
 		client->setNickname(nickname);
 
 		SendMessage(client, "Your nickname is now " + nickname);
+		server.addClient(client);
 	} else if (parsed_command == "USER") {
 		std::string username, mode, unused, realname;
 		ss >> username >> mode >> unused;
@@ -85,7 +89,7 @@ void CommandHandler::handleCommand(Client *client, const std::string &command){
 		}
 
 		SendMessage(reciever, "Message from: " + client->getNickname() + ": " + msg);
-	} else {
+	}else {
 		SendError (client, "Unknown command!");
 	}
 }
