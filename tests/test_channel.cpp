@@ -85,7 +85,8 @@ void test_channel_commands()
     ChannelCmds::joinChannelCmd(client2, *server, joinParams);
     ChannelCmds::joinChannelCmd(client3, *server, joinParams);
 
-    joinParams[0] = "#Channel2";
+    joinParams.clear();
+    joinParams.push_back("#Channel2");
     ChannelCmds::joinChannelCmd(client1, *server, joinParams);
     ChannelCmds::joinChannelCmd(client3, *server, joinParams);
 
@@ -99,11 +100,13 @@ void test_channel_commands()
     kickParams.push_back("Spamming the chat");
     ChannelCmds::kickUserCmd(client1, *server, kickParams);
 
-    // Test Kicking a user from a single channel
-    joinParams[0] = "#Channel2";
+    // Test Kicking a user from a multiple channels
+    joinParams.clear();
+    joinParams.push_back("#Channel2");
     ChannelCmds::joinChannelCmd(client3, *server, joinParams);
-    kickParams[0] = "#Channel1,#Channel2";
-    kickParams[1] = "user99,user3";
+    kickParams.clear();
+    kickParams.push_back("#Channel1,#Channel2");
+    kickParams.push_back("user99,user3");
     ChannelCmds::kickUserCmd(client1, *server, kickParams);
 
     // Test inviting a user to a not isInvitedOnly channel => error
@@ -111,23 +114,24 @@ void test_channel_commands()
     inviteParams.push_back("#Channel1");
     ChannelCmds::inviteUserCmd(client1, *server, inviteParams);
 
-     // Test inviting a user to a channel
+    // Test inviting a user to a channel
     Channel* channel = server->getChannel("#Channel1");
     channel->setIsInviteOnly(true);
     inviteParams.push_back("user4");
     inviteParams.push_back("#Channel1");
     ChannelCmds::inviteUserCmd(client1, *server, inviteParams);
 
-    // Test inviting a non-existent user => error
+    // Test inviting a user already in _invitedUsers
+    ChannelCmds::inviteUserCmd(client1, *server, inviteParams);
+
+    // Test user3 is no operator, so he can not invite a user to a channel => error
+    ChannelCmds::inviteUserCmd(client3, *server, inviteParams);
+    
+    // Test inviting a user
     inviteParams.clear(); 
     inviteParams.push_back("user42");
     inviteParams.push_back("#Channel1");
     ChannelCmds::inviteUserCmd(client1, *server, inviteParams);
-
-    // // Test inviting a user already in the channel => error expected
-    // inviteParams[0] = "user3";
-    // ChannelCmds::inviteUserCmd(client1, *server, inviteParams);
- 
 }
 
 int main()

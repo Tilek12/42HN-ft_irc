@@ -52,6 +52,9 @@ public:
 	void						setPassword(const std::string& password);
 
 	static bool					isValidChannelName(const std::string& name);
+	virtual	bool 				isUser(const std::string& user) override;
+	virtual	bool 				isOperator(const std::string& user) override;
+	virtual	bool 				isInvitedUser(const std::string& user) override;
 };
 
 #endif

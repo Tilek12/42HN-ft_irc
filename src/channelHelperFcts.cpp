@@ -26,6 +26,14 @@ void printVec(const std::vector<std::string>& vec)
     }
 }
 
+// void printVec(const std::vector<std::string>& vec) {
+//     std::cout << "Invited Users List: { ";
+//     for (const auto& user : vec) {
+//         std::cout << "[" << user << "] ";
+//     }
+//     std::cout << "}" << std::endl;
+// }
+
 void removeEntryFromVec(std::vector<std::string>& users, const std::string& userToRemove)
 {
 	auto it = std::find(users.begin(), users.end(), userToRemove);
