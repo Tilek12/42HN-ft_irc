@@ -34,7 +34,8 @@ int main( int argc, char** argv ) {
 
 		server.start();
 	} catch ( const std::exception& e ) {
-		std::cerr << RED << e.what() << std::endl;
+		std::cerr << RED << e.what() << RESET << std::endl;
+		return 1;
 	}
 
 	return 0;

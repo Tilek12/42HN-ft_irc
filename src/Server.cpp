@@ -2,17 +2,17 @@
 #include "../include/Server.hpp"
 
 ////////////////////////////////////////////////////////////////////////////////
-// ====================  Class constructor and destructor  ================== //
+// ====================  Class Constructor and Destructor  ================== //
 ////////////////////////////////////////////////////////////////////////////////
 
 /*----------------------------*/
 /*  Server Class constructor  */
 /*----------------------------*/
 Server::Server( int port, const std::string& password ) :
-	_password( password),
+	_password( password ),
 	_serverFD( -1 ),
 	_isRunning( false ),
-	_commandHandler( new CommandHandler(*this) ) {
+	_commandHandler( new CommandHandler( *this ) ) {
 
 	// Check port
 	if ( port != IRCport )
@@ -22,6 +22,7 @@ Server::Server( int port, const std::string& password ) :
 	if ( password.empty() || password.size() < 3 )
 		throw std::runtime_error( "ERROR: Password must contain no less than 3 characters." );
 
+	// Setup settings and run Server
 	_setupServer();
 
 }
@@ -31,13 +32,14 @@ Server::Server( int port, const std::string& password ) :
 /*---------------------------*/
 Server::~Server( void ) {
 
+	// Gracefully stop Server
 	stop();
 	delete _commandHandler;
 
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-// ========================  Core server operations  ======================== //
+// ========================  Core Server operations  ======================== //
 ////////////////////////////////////////////////////////////////////////////////
 
 /*----------------*/
@@ -45,6 +47,7 @@ Server::~Server( void ) {
 /*----------------*/
 void	Server::_setupServer( void ) {
 
+	// Print setup message
 	std::cout << BLUE
 			  << "Setup Server..."
 			  << RESET << std::endl;
@@ -92,33 +95,37 @@ void	Server::_acceptNewConnection( void ) {
 	// Accepting connection request
 	sockaddr_in clientAddress;
 	socklen_t clientLen = sizeof( clientAddress );
-	int clientFD = accept( _serverFD, ( struct sockaddr* )&clientAddress, &clientLen );
-
-	if ( clientFD < 0 ) {
+	int fd = accept( _serverFD, ( struct sockaddr* )&clientAddress, &clientLen );
+	if ( fd < 0 ) {
 		std::cerr << RED
 				  << "Failed to accept connection"
 				  << RESET << std::endl;
 		return;
 	}
 
-	if ( fcntl( clientFD, F_SETFL, O_NONBLOCK ) < 0 ) {
-		close( clientFD );
+	// Set non-blocking mode
+	if ( fcntl( fd, F_SETFL, O_NONBLOCK ) < 0 ) {
+		close( fd );
 		std::cerr << RED
 				  << "Failed to set client non-blocking"
 				  << RESET << std::endl;
 	}
 
-	Client* newClient = new Client( clientFD, inet_ntoa( clientAddress.sin_addr ) );
-	_clientsFD[clientFD] = newClient;
+	// Create new Client
+	Client* newClient = new Client( fd, inet_ntoa( clientAddress.sin_addr ) );
+	newClient->setSocketFd( fd );
+	_clients[fd] = newClient;
 
+	// Setup Poll
 	pollfd newPollfd;
-	newPollfd.fd = clientFD;
+	newPollfd.fd = fd;
 	newPollfd.events = POLLIN;
 	_pollFDs.push_back( newPollfd );
 
+	// Print new connection message
 	std::cout << GREEN
 			  << "New connection from " << newClient->getHostname()
-			  << " (fd: " << clientFD << ")"
+			  << " (fd: " << fd << ")"
 			  << RESET << std::endl;
 
 }
@@ -128,43 +135,49 @@ void	Server::_acceptNewConnection( void ) {
 /*-------------------------------------*/
 void	Server::_disconnectClient( int fd, const std::string& reason ) {
 
+	// Check for Client existance
+	if ( !isClientExist( fd ) )
+		return;
+
+	// Temp values
 	Client* client = getClient( fd );
-	if ( !client ) return ;
+	std::string nickname = client->getNickname();
 
-	// Remove from all channels
-	for ( std::map<std::string, Channel*>::iterator it = _channels.begin(); it != _channels.end(); ++it ) {
-		std::set<std::string> users = it->second->getUsers();
-		if (users.find(client->getNickname()) != users.end())
-			it->second->removeUser( client->getNickname() );
+	// Remove Client from all channels
+	// auto channelsCopy = _channels;
+	// for ( const auto& [name, channel] : channelsCopy ) {
+	// 	if ( channel->isUser( nickname ) )
+	// 		channel->removeUser( nickname );
 
-	}
+	// 	if ( channel->isOperator( nickname ) )
+	// 		channel->removeOperator( nickname );
 
-	// Remove from nickname map
-	if ( client->getIsResgistered() )
-		_clientsNick.erase( client->getNickname() );
-
-	// Cleanup
-	close( fd );
-	_clientsFD.erase( fd );
-	delete client;
+	// 	if ( channel->isInvited( nickname ) )
+	// 		channel->removeInvitedUser( nickname );
+	// }
 
 	// Remove from poll list
-	for ( std::vector<pollfd>::iterator it = _pollFDs.begin(); it != _pollFDs.end(); ++it ) {
+	for ( auto it = _pollFDs.begin(); it != _pollFDs.end(); ++it ) {
 		if ( it->fd == fd ) {
 			_pollFDs.erase( it );
 			break;
 		}
 	}
 
-	std::cout << PURPLE
-			  << "Client disconnected (fd: " << fd << ")";
+	// Delete Client
+	close( fd );
+	_clients.erase( fd );
+	delete client;
+
+	// Print disconnection message
+	std::cout << PURPLE << "Client disconnected (fd: " << fd << ")";
 	if ( !reason.empty() ) std::cout << " - Reason: " << reason;
 	std::cout << RESET << std::endl;
 
 }
 
 /*---------------------------------------*/
-/*  Define processClientBuffer fucntion  */
+/*  Define processClientBuffer function  */
 /*---------------------------------------*/
 void	Server::_processClientBuffer( Client* client ) {
 
@@ -181,6 +194,13 @@ void	Server::_processClientBuffer( Client* client ) {
 					  << RESET << std::endl;
 			_commandHandler->handleCommand( client, message );
 		}
+
+		if ( message == "CAP LS")
+			sendToClient( client->getSocketFd(), "CAP * LS :multi-prefix sasl away-notify extended-join\r\n" );
+		else if ( message == "PING :127.0.0.1")
+			sendToClient( client->getSocketFd(), "PONG :127.0.0.1\r\n" );
+		else if ( message == "CAP REQ :multi-prefix away-notify extended-join" )
+			sendToClient( client->getSocketFd(), "CAP * ACK :multi-prefix away-notify extended-join\r\n" );
 	}
 
 }
@@ -192,10 +212,10 @@ void	Server::_handleClientData( int fd ) {
 
 	// Recieving data
 	char buffer[1024];
-	ssize_t bytesRead = recv( fd, buffer, sizeof(buffer) - 1, 0 );
+	ssize_t bytesRead = recv( fd, buffer, sizeof( buffer ) - 1, 0 );
 
 	if ( bytesRead <= 0 ) {
-		_disconnectClient( fd, bytesRead == 0 ? "Client disconnected" : "Read error" );
+		_disconnectClient( fd, bytesRead == 0 ? "" : "Read error" );
 		return;
 	}
 
@@ -204,17 +224,6 @@ void	Server::_handleClientData( int fd ) {
 	client->appendToBuffer( buffer, bytesRead );
 
 	_processClientBuffer( client ); // Handle complete messages
-
-	////////////////////////////////////////////////////////////////////////
-	// for debugging /////// -------- delete after debugging ------- ///////
-	////////////////////////////////////////////////////////////////////////
-	std::cout << BLUE
-			  << "Message from client: "
-			  << RESET
-			  << YELLOW
-			  << buffer
-			  << RESET << std::endl;
-	////////////////////////////////////////////////////////////////////////
 
 }
 
@@ -248,13 +257,15 @@ void	Server::_handleConnections( void ) {
 /*--------------------*/
 void	Server::start( void ) {
 
+	// Print start message
 	std::cout << BLUE
 			  << "Server started on port: " << IRCport
 			  << RESET << std::endl;
 
+	// Start Server
 	_isRunning = true;
-
-	while ( _isRunning ) { _handleConnections(); }
+	while ( _isRunning )
+		_handleConnections();
 
 }
 
@@ -263,24 +274,30 @@ void	Server::start( void ) {
 /*-------------------*/
 void	Server::stop( void ) {
 
+	// Print shutdoen message
 	std::cout << BLUE
 			  << "Server shutdown..."
 			  << RESET << std::endl;
 
 	// Disconnect all clients
-	for ( std::map<int, Client*>::iterator it = _clientsFD.begin(); it != _clientsFD.end(); ++it )
-		_disconnectClient( it->first, "Server shutdown" );
+	auto clientsCopy = _clients;
+	for ( const auto& [fd, client] : clientsCopy )
+		_disconnectClient( fd, "Server shutdown" );
 
 	// Cleanup channels
-	for ( std::map<std::string, Channel*>::iterator it = _channels.begin(); it != _channels.end(); ++it )
-		delete it->second;
+	auto channelsCopy = _channels;
+	for ( const auto& [name, channel] : channelsCopy )
+		delete channel;
 	_channels.clear();
 
 	// Close the Server socket
 	if ( _serverFD != -1 ) {
-		close(_serverFD);
+		close( _serverFD );
 		_serverFD = -1;
 	}
+
+	// Clear poll fds
+	_pollFDs.clear();
 
 }
 
@@ -289,31 +306,75 @@ void	Server::stop( void ) {
 /*-----------------------*/
 const std::string&	Server::getPassword( void ) const { return _password; }
 
+/*-----------------------*/
+/*  Get isRunning value  */
+/*-----------------------*/
 bool	Server::getIsRunning( void ) { return _isRunning; }
 
+/*-----------------------*/
+/*  Set isRunning value  */
+/*-----------------------*/
 void	Server::setIsRunning( bool value ) { _isRunning = value; }
 
 ////////////////////////////////////////////////////////////////////////////////
 // ===========================  Client management  ========================== //
 ////////////////////////////////////////////////////////////////////////////////
 
-/*-----------------------------*/
-/*  Define getClient function  */
-/*-----------------------------*/
-Client*	Server::getClient( int fd ) const {
+/*------------------*/
+/*  Add new Client  */
+/*------------------*/
+void	Server::addClient( Client* client ) {
 
-	std::map<int, Client*>::const_iterator it = _clientsFD.find( fd );
-	return it != _clientsFD.end() ? it->second : NULL;
+	if ( !isClientExist( client->getSocketFd() ) )
+		_clients[client->getSocketFd()] = client;
 
 }
 
-/*-----------------------------*/
-/*  Define getClient function  */
-/*-----------------------------*/
+/*--------------------*/
+/*  Get Client by fd  */
+/*--------------------*/
+Client*	Server::getClient( int fd ) const {
+
+	if ( _clients.empty() )
+		return nullptr;
+
+	auto it = _clients.find( fd );
+	return it != _clients.end() ? it->second : nullptr;
+
+}
+
+/*--------------------------*/
+/*  Get Client by nickname  */
+/*--------------------------*/
 Client*	Server::getClient( const std::string& nickname ) const {
 
-	std::map<std::string, Client*>::const_iterator it = _clientsNick.find( nickname );
-	return it != _clientsNick.end() ? it->second : NULL;
+	if ( _clients.empty() )
+		return nullptr;
+
+	for ( const auto& [fd, client] : _clients ) {
+		if ( client->getNickname() == nickname )
+			return client;
+	}
+
+	return nullptr;
+
+}
+
+/*--------------------------------------*/
+/*  Check by nickname if Client exists  */
+/*--------------------------------------*/
+bool	Server::isClientExist( const std::string& nickname ) {
+
+	return getClient( nickname ) != nullptr;
+
+}
+
+/*--------------------------------*/
+/*  Check by fd if Client exists  */
+/*--------------------------------*/
+bool	Server::isClientExist( int fd ) {
+
+	return getClient( fd ) != nullptr;
 
 }
 
@@ -321,19 +382,29 @@ Client*	Server::getClient( const std::string& nickname ) const {
 // ==========================  Channel management  ========================== //
 ////////////////////////////////////////////////////////////////////////////////
 
-/*------------------------------*/
-/*  Define getChannel function  */
-/*------------------------------*/
-Channel*	Server::getChannel( const std::string& name ) const {
+/*-------------------*/
+/*  Add new Channel  */
+/*-------------------*/
+void	Server::addChannel( Channel* channel ) {
 
-	std::map<std::string, Channel*>::const_iterator it = _channels.find( name );
-	return it != _channels.end() ? it->second : NULL;
+	if ( !isChannelExist( channel->getName() ) )
+		_channels[channel->getName()] = channel;
 
 }
 
-/*---------------------------------*/
-/*  Define createChannel function  */
-/*---------------------------------*/
+/*---------------*/
+/*  Get Channel  */
+/*---------------*/
+Channel*	Server::getChannel( const std::string& name ) const {
+
+	auto it = _channels.find( name );
+	return it != _channels.end() ? it->second : nullptr;
+
+}
+
+/*----------------------*/
+/*  Create new Channel  */
+/*----------------------*/
 Channel*	Server::createChannel( const std::string& name ) {
 
 	Channel* channel = new Channel( name );
@@ -342,15 +413,28 @@ Channel*	Server::createChannel( const std::string& name ) {
 
 }
 
-/*---------------------------------*/
-/*  Define removeChannel function  */
-/*---------------------------------*/
+/*------------------*/
+/*  Remove Channel  */
+/*------------------*/
 void	Server::removeChannel( const std::string& name ) {
 
-	std::map<std::string, Channel*>::const_iterator it = _channels.find( name );
+	// Check for Channel existance
+	if ( !isChannelExist( name ) )
+		return;
 
-	if ( it != _channels.end() )
-		_channels.erase( it );
+	// Delete Channel
+	_channels.erase( name );
+	Channel* channel = getChannel( name );
+	delete channel;
+
+}
+
+/*---------------------------*/
+/*  Check if Channel exists  */
+/*---------------------------*/
+bool	Server::isChannelExist( const std::string& name ) {
+
+	return getChannel( name ) != nullptr;
 
 }
 
@@ -358,32 +442,53 @@ void	Server::removeChannel( const std::string& name ) {
 // ===============================  Messaging  ============================== //
 ////////////////////////////////////////////////////////////////////////////////
 
-/*--------------------------------*/
-/*  Define sendToClient function  */
-/*--------------------------------*/
+/*----------------------------------------*/
+/*  Send message to Client defined by fd  */
+/*----------------------------------------*/
 void	Server::sendToClient( int fd, const std::string& message ) {
+
+	if ( !isClientExist( fd ) )
+		return;
 
 	if ( send( fd, message.c_str(), message.length(), 0 ) < 0 )
 		_disconnectClient( fd, "Send error" );
 
 }
 
+/*----------------------------------------------*/
+/*  Send message to Client defined by nickname  */
+/*----------------------------------------------*/
+void	Server::sendToClient( const std::string& nickname, const std::string& message ) {
 
+	if ( !isClientExist( nickname ) )
+		return;
 
-void Server::addClient(Client* client) {
-	if (!client->getNickname().empty()) {
-		_clientsNick[client->getNickname()] = client;
-	}
+	Client* client = getClient( nickname );
+
+	sendToClient( client->getSocketFd(), message );
+
 }
 
-/*------------------------------------*/
-/*  Define broadcastMessage function  */
-/*------------------------------------*/
-// void	Server::broadcastMessage( const std::string& channel, const std::string& message ) {
+/*--------------------------------*/
+/*  Broadcast message in Channel  */
+/*--------------------------------*/
+void	Server::broadcastMessage( const std::string& channelName, const std::string& message ) {
 
-// 	const std::map<int, Client*>& members = channel->getClients();
+	Channel* channel = getChannel( channelName );
+	if ( !channel ) return;
 
-// 	for (std::map<int, Client*>::const_iterator it = members.begin(); it != members.end(); ++it )
-// 		sendToClient( it->first, message );
+	std::unordered_set<std::string> recipients;
 
-// }
+	for ( const auto& group : { channel->getUsers(),
+								channel->getOperators(),
+								channel->getInvitedUsers() } )
+	{
+		recipients.insert( group.begin(), group.end() );
+	}
+
+	for ( const auto& [fd, client] : _clients ) {
+		if ( recipients.count( client->getNickname() ) )
+			sendToClient( fd, message );
+	}
+
+}
