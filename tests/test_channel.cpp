@@ -75,9 +75,13 @@ void test_channel_commands()
     std::vector<std::string> kickParams;
     ChannelCmds::kickUserCmd(client1, *server, kickParams);
 
-     // Test Invite without parameters => error expected
-     std::vector<std::string> inviteParams;
-     ChannelCmds::inviteUserCmd(client1, *server, inviteParams);
+    // Test Invite without parameters => error expected
+    std::vector<std::string> inviteParams;
+    ChannelCmds::inviteUserCmd(client1, *server, inviteParams);
+    
+    // Test Topic without parameters => error expected
+    std::vector<std::string> topicParams;
+    ChannelCmds::topicUserCmd(client1, *server, inviteParams);
 
     // Test Joining multiple channels
     joinParams.push_back("#Channel1");
@@ -127,7 +131,6 @@ void test_channel_commands()
     ChannelCmds::inviteUserCmd(client1, *server, inviteParams);
     assert(server->getChannel("#Channel1")->getInvitedUsers().size() == 1);
 
-
     // Test inviting a user already in _invitedUsers
     ChannelCmds::inviteUserCmd(client1, *server, inviteParams);
     assert(server->getChannel("#Channel1")->getInvitedUsers().size() == 1);
@@ -142,6 +145,28 @@ void test_channel_commands()
     inviteParams.push_back("#Channel1");
     ChannelCmds::inviteUserCmd(client1, *server, inviteParams);
     assert(server->getChannel("#Channel1")->getInvitedUsers().size() == 2);
+
+    // Test changing topic
+    topicParams.push_back("#Channel1");
+    topicParams.push_back(":my changed topic");
+    // error expected, only operator can changed topic
+    ChannelCmds::topicUserCmd(client3, *server, topicParams);
+    // change topic
+    ChannelCmds::topicUserCmd(client1, *server, topicParams); 
+    assert(channel->getTopic() == "my changed topic");
+    
+    // Test get topic
+    topicParams.clear();
+    topicParams.push_back("#Channel1");
+    ChannelCmds::topicUserCmd(client1, *server, topicParams);
+    assert(channel->getTopic() == "my changed topic");
+
+    // Test clear topic
+    topicParams.clear();
+    topicParams.push_back("#Channel1");
+    topicParams.push_back(":");
+    ChannelCmds::topicUserCmd(client1, *server, topicParams); 
+    assert(channel->getTopic() == "");
 }
 
 int main()

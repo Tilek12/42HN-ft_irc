@@ -12,4 +12,7 @@
 #define ERR_BADCHANMASK "476"
 #define ERR_CHANOPRIVSNEEDED "482"
 
+#define RPL_NOTOPIC "331"
+#define RPL_TOPIC "332"
+
 #endif

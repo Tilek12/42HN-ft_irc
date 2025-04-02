@@ -196,7 +196,7 @@ void ChannelCmds::inviteUserCmd(IClient& client, IServer& server, std::vector<st
     CommandHandler::SendMessage(&client, client.getNickname() + " INVITE " + user + " to " + channelName);
 }
 
-static void topicUserCmd(IClient& client, IServer& server, std::vector<std::string>& topicParams)
+void ChannelCmds::topicUserCmd(IClient& client, IServer& server, std::vector<std::string>& topicParams)
 {
     if (topicParams.empty())
     {
@@ -210,10 +210,27 @@ static void topicUserCmd(IClient& client, IServer& server, std::vector<std::stri
         CommandHandler::SendMessage(&client, "Error code " + std::string(ERR_NOSUCHCHANNEL) + " : non existing channel " + channelName);
         return;
     }
-    std::string topic = channel->getTopic();
+    if (!channel->isOperator(client.getNickname()) || channel->getOperators().empty())
+    {
+        CommandHandler::SendMessage(&client, "Error code " + std::string(ERR_CHANOPRIVSNEEDED) + ": can not set TOPIC. you are not a channel operator of " + channelName);
+        return;
+    }
     if (topicParams.size() == 1)
     {
-        CommandHandler::SendMessage(&client, "TOPIC of channel " + channelName + " is " + topic);
+        if (channel->getTopic().empty())
+            CommandHandler::SendMessage(&client, "Reply code " + std::string(RPL_NOTOPIC) + " : no TOPIC existing in channel " + channelName);
+        else
+            CommandHandler::SendMessage(&client, "Reply code " + std::string(RPL_TOPIC) + " : TOPIC of channel " + channelName + " is " + channel->getTopic());
+        return;
     }
-    
+    std::string newTopic = topicParams[1];
+    if (topicParams.size() == 2 && newTopic.front() == ':')
+    {
+        channel->setTopic(newTopic.erase(0, 1));
+        if (channel->getTopic().empty())
+            CommandHandler::SendMessage(&client, "Reply code " + std::string(RPL_NOTOPIC) + " : no TOPIC existing in channel " + channelName);
+        else
+            CommandHandler::SendMessage(&client, "TOPIC of channel " + channelName + " is: " + channel->getTopic());
+        return;
+    }
 }
