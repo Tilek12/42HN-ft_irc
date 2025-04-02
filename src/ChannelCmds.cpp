@@ -195,3 +195,25 @@ void ChannelCmds::inviteUserCmd(IClient& client, IServer& server, std::vector<st
     channel->addInvitedUser(user);
     CommandHandler::SendMessage(&client, client.getNickname() + " INVITE " + user + " to " + channelName);
 }
+
+static void topicUserCmd(IClient& client, IServer& server, std::vector<std::string>& topicParams)
+{
+    if (topicParams.empty())
+    {
+        std::cerr << "Error code " << ERR_NEEDMOREPARAMS << " TOPIC: not enough topicParams" << std::endl;
+        return;
+    }
+    std::string channelName = topicParams[0];
+    Channel* channel = server.getChannel(channelName);
+    if (!channel)
+    {
+        CommandHandler::SendMessage(&client, "Error code " + std::string(ERR_NOSUCHCHANNEL) + " : non existing channel " + channelName);
+        return;
+    }
+    std::string topic = channel->getTopic();
+    if (topicParams.size() == 1)
+    {
+        CommandHandler::SendMessage(&client, "TOPIC of channel " + channelName + " is " + topic);
+    }
+    
+}

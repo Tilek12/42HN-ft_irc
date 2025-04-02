@@ -84,6 +84,7 @@ void test_channel_commands()
     ChannelCmds::joinChannelCmd(client1, *server, joinParams);
     ChannelCmds::joinChannelCmd(client2, *server, joinParams);
     ChannelCmds::joinChannelCmd(client3, *server, joinParams);
+    assert(server->getChannel("#Channel1")->getUsers().size() == 3);
 
     joinParams.clear();
     joinParams.push_back("#Channel2");
@@ -93,12 +94,14 @@ void test_channel_commands()
     // Test Leaving a channel
     partParams.push_back("#Channel1");
     ChannelCmds::partChannelCmd(client2, *server, partParams);
+    assert(server->getChannel("#Channel1")->getUsers().size() == 2);
 
     // Test Kicking a user with a reason
     kickParams.push_back("#Channel2");
     kickParams.push_back("user3");
     kickParams.push_back("Spamming the chat");
     ChannelCmds::kickUserCmd(client1, *server, kickParams);
+    assert(server->getChannel("#Channel2")->getUsers().size() == 1);
 
     // Test Kicking a user from a multiple channels
     joinParams.clear();
@@ -108,11 +111,13 @@ void test_channel_commands()
     kickParams.push_back("#Channel1,#Channel2");
     kickParams.push_back("user99,user3");
     ChannelCmds::kickUserCmd(client1, *server, kickParams);
+    assert(server->getChannel("#Channel2")->getUsers().size() == 1);
 
     // Test inviting a user to a not isInvitedOnly channel => error
     inviteParams.push_back("user4");
     inviteParams.push_back("#Channel1");
     ChannelCmds::inviteUserCmd(client1, *server, inviteParams);
+    assert(server->getChannel("#Channel1")->getInvitedUsers().size() == 0);
 
     // Test inviting a user to a channel
     Channel* channel = server->getChannel("#Channel1");
@@ -120,18 +125,23 @@ void test_channel_commands()
     inviteParams.push_back("user4");
     inviteParams.push_back("#Channel1");
     ChannelCmds::inviteUserCmd(client1, *server, inviteParams);
+    assert(server->getChannel("#Channel1")->getInvitedUsers().size() == 1);
+
 
     // Test inviting a user already in _invitedUsers
     ChannelCmds::inviteUserCmd(client1, *server, inviteParams);
+    assert(server->getChannel("#Channel1")->getInvitedUsers().size() == 1);
 
     // Test user3 is no operator, so he can not invite a user to a channel => error
     ChannelCmds::inviteUserCmd(client3, *server, inviteParams);
-    
+    assert(server->getChannel("#Channel1")->getInvitedUsers().size() == 1);
+
     // Test inviting a user
     inviteParams.clear(); 
     inviteParams.push_back("user42");
     inviteParams.push_back("#Channel1");
     ChannelCmds::inviteUserCmd(client1, *server, inviteParams);
+    assert(server->getChannel("#Channel1")->getInvitedUsers().size() == 2);
 }
 
 int main()
