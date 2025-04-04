@@ -238,7 +238,7 @@ void ChannelCmds::topicUserCmd(IClient& client, IServer& server, std::vector<std
     }
 }
 
-void ChannelCmds::modeUserCmd(IClient& client, IServer& server, std::vector<std::string>& modeParams)
+void ChannelCmds::modeChannelCmd(IClient& client, IServer& server, std::vector<std::string>& modeParams)
 {
     if (modeParams.size() < 2)
     {

@@ -187,7 +187,7 @@ void test_channel_modes()
 
     // Test  without parameters => error expected
     std::vector<std::string> modeParams;
-    ChannelCmds::modeUserCmd(client1, *server, modeParams);
+    ChannelCmds::modeChannelCmd(client1, *server, modeParams);
 
     // Test: Create a channel and make client1 the operator
     std::vector<std::string> joinParams = {"#TestChannel"};
@@ -198,22 +198,22 @@ void test_channel_modes()
     // Test: +i (Invite-Only Mode)
     modeParams.push_back("#TestChannel");
     modeParams.push_back("+i");
-    ChannelCmds::modeUserCmd(client1, *server, modeParams);
+    ChannelCmds::modeChannelCmd(client1, *server, modeParams);
     assert(server->getChannel("#TestChannel")->getIsInviteOnly() == true);
     
     // Test: -i (Remove Invite-Only Mode)
     modeParams.clear();
     modeParams.push_back("#TestChannel");
     modeParams.push_back("-i");
-    ChannelCmds::modeUserCmd(client2, *server, modeParams); // error expected
-    ChannelCmds::modeUserCmd(client1, *server, modeParams);
+    ChannelCmds::modeChannelCmd(client2, *server, modeParams); // error expected
+    ChannelCmds::modeChannelCmd(client1, *server, modeParams);
     assert(server->getChannel("#TestChannel")->getIsInviteOnly() == false);
     
     // Test: -t (Remove Only Operator Can Change Topic Mode)
     modeParams.clear();
     modeParams.push_back("#TestChannel");
     modeParams.push_back("-t");
-    ChannelCmds::modeUserCmd(client1, *server, modeParams);
+    ChannelCmds::modeChannelCmd(client1, *server, modeParams);
     assert(server->getChannel("#TestChannel")->getOnlyOperatorCanChangeTopic() == false);
     
     std::vector<std::string> topicParams;
@@ -229,7 +229,7 @@ void test_channel_modes()
     topicParams.clear();
     topicParams.push_back("#TestChannel");
     topicParams.push_back(":hello new topic here");
-    ChannelCmds::modeUserCmd(client1, *server, modeParams);
+    ChannelCmds::modeChannelCmd(client1, *server, modeParams);
     ChannelCmds::topicUserCmd(client1, *server, topicParams);
     assert(server->getChannel("#TestChannel")->getOnlyOperatorCanChangeTopic() == true);
     assert(server->getChannel("#TestChannel")->getTopic() == "hello new topic here");
@@ -239,7 +239,7 @@ void test_channel_modes()
     modeParams.push_back("#TestChannel");
     modeParams.push_back("+l");
     modeParams.push_back("3");
-    ChannelCmds::modeUserCmd(client1, *server, modeParams);
+    ChannelCmds::modeChannelCmd(client1, *server, modeParams);
     assert(server->getChannel("#TestChannel")->getUserLimit() == 3);
     ChannelCmds::joinChannelCmd(client3, *server, joinParams);
     assert(server->getChannel("#TestChannel")->getUserLimit() == 3);
@@ -247,7 +247,7 @@ void test_channel_modes()
 
     // Test: -l (Remove User Limit)
     modeParams = {"#TestChannel", "-l"};
-    ChannelCmds::modeUserCmd(client1, *server, modeParams);
+    ChannelCmds::modeChannelCmd(client1, *server, modeParams);
     assert(server->getChannel("#TestChannel")->getUserLimit() == 0);
 
     // Test: +k (Set Channel Password)
@@ -255,7 +255,7 @@ void test_channel_modes()
     modeParams.push_back("#TestChannel");
     modeParams.push_back("+k");
     modeParams.push_back("secretpass");
-    ChannelCmds::modeUserCmd(client1, *server, modeParams);
+    ChannelCmds::modeChannelCmd(client1, *server, modeParams);
     assert(server->getChannel("#TestChannel")->getHasPassword() == true);
     assert(server->getChannel("#TestChannel")->getPassword() == "secretpass");
 
@@ -264,7 +264,7 @@ void test_channel_modes()
     modeParams.push_back("#TestChannel");
     modeParams.push_back("-k");
     modeParams.push_back("secretpass");
-    ChannelCmds::modeUserCmd(client1, *server, modeParams);
+    ChannelCmds::modeChannelCmd(client1, *server, modeParams);
     assert(server->getChannel("#TestChannel")->getHasPassword() == false);
     assert(server->getChannel("#TestChannel")->getPassword() == "");
 
@@ -272,7 +272,7 @@ void test_channel_modes()
     modeParams.clear();
     modeParams.push_back("#TestChannel");
     modeParams.push_back("-z");
-    ChannelCmds::modeUserCmd(client1, *server, modeParams);
+    ChannelCmds::modeChannelCmd(client1, *server, modeParams);
 
     server->stop();
 }

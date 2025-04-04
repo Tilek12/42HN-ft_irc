@@ -10,7 +10,8 @@ Channel::Channel()
 }
 Channel::Channel(const std::string& name)
 	:	_name(name),  _topic(""), _isInviteOnly(false), \
-	_hasPassword(false), _password(""), _userLimit(0), _onlyOperatorCanChangeTopic(true)
+	_hasPassword(false), _password(""), _userLimit(0), \
+	_onlyOperatorCanChangeTopic(true)
 {
 
 }
@@ -67,7 +68,8 @@ void Channel::addUser(const std::string& user)
 	if (_userLimit == 0 || _users.size() < _userLimit)
         _users.push_back(user);
     else
-        std::cerr << "User limit reached, cannot add " << user << " to channel " << _name << std::endl;
+        std::cerr << "User limit reached, cannot add " << user \
+		<< " to channel " << _name << std::endl;
 }
 
 void Channel::removeUser(const std::string& user)
@@ -141,19 +143,13 @@ void Channel::setUserLimit(size_t userLimit)
 bool Channel::isValidChannelName(const std::string& name)
 {
 	if (name.size() > 50 || name.empty())
-	{
 		return false;
-	}
 	if (name[0] != '#' && name[0] != '&' && name[0] != '+' && name[0] != '!')
-	{
 		return false;
-	}
 	for (size_t i = 0; i < name.size(); i++)
 	{
 		if (name[i] == ' ' || name[i] == ',' || name[i] == 7)
-		{
 			return false;
-		}
 	}
 	return true;
 }
