@@ -210,10 +210,13 @@ void ChannelCmds::topicUserCmd(IClient& client, IServer& server, std::vector<std
         CommandHandler::SendMessage(&client, "Error code " + std::string(ERR_NOSUCHCHANNEL) + " : non existing channel " + channelName);
         return;
     }
-    if (!channel->isOperator(client.getNickname()) || channel->getOperators().empty())
+    if (channel->getOnlyOperatorCanChangeTopic())
     {
-        CommandHandler::SendMessage(&client, "Error code " + std::string(ERR_CHANOPRIVSNEEDED) + ": can not set TOPIC. you are not a channel operator of " + channelName);
-        return;
+        if (!channel->isOperator(client.getNickname()) || channel->getOperators().empty())
+        {
+            CommandHandler::SendMessage(&client, "Error code " + std::string(ERR_CHANOPRIVSNEEDED) + ": can not set TOPIC. you are not a channel operator of " + channelName);
+            return;
+        }
     }
     if (topicParams.size() == 1)
     {
@@ -232,5 +235,95 @@ void ChannelCmds::topicUserCmd(IClient& client, IServer& server, std::vector<std
         else
             CommandHandler::SendMessage(&client, "TOPIC of channel " + channelName + " is: " + channel->getTopic());
         return;
+    }
+}
+
+void ChannelCmds::modeUserCmd(IClient& client, IServer& server, std::vector<std::string>& modeParams)
+{
+    if (modeParams.size() < 2)
+    {
+        std::cerr << "Error code " << ERR_NEEDMOREPARAMS << " MODE: not enough modeParams" << std::endl;
+        return;
+    }
+    std::string channelName = modeParams[0];
+    Channel* channel = server.getChannel(channelName);
+    if (!channel)
+    {
+        CommandHandler::SendMessage(&client, "Error code " + std::string(ERR_NOCHANMODES) + " : non existing channel " + channelName);
+        return;
+    }
+    if (!channel->isOperator(client.getNickname()) || channel->getOperators().empty())
+    {
+        CommandHandler::SendMessage(&client, "Error code " + std::string(ERR_CHANOPRIVSNEEDED) + ": can not MODE. you are not a channel operator of " + channelName);
+        return;
+    }
+    std::string mode = modeParams[1];
+    if (modeParams.size() == 2)
+    {
+        if (mode == "+i")
+        {
+            channel->setIsInviteOnly(true);
+            return;
+        }
+        else if (mode == "-i")
+        {
+            channel->setIsInviteOnly(false);
+            return;
+        }
+        else if (mode == "+t")
+        {
+            channel->setOnlyOperatorCanChangeTopic(true);
+            return;
+        }
+        else if (mode == "-t")
+        {
+            channel->setOnlyOperatorCanChangeTopic(false);
+            return;
+        }
+        else if (mode == "-l")
+        {
+            channel->setUserLimit(0);
+            return;
+        }
+        else
+        {
+            CommandHandler::SendMessage(&client, "Error code " + std::string(ERR_UNKNOWNMODE) + ": unknown channel mode " + mode);
+            return;
+        }
+    }
+    else if (modeParams.size() == 3)
+    {
+        if (mode == "+o" || mode == "-o")
+        {
+            std::string user = modeParams[2];
+            if (mode == "+o")
+                channel->addOperator(user);
+            else if (mode == "-o")
+                channel->removeOperator(user);
+        }
+        else if (mode == "+k" || mode == "-k")
+        {
+            std::string password = modeParams[2];
+            if (mode == "+k")
+            {
+                channel->setHasPassword(true);
+                channel->setPassword(password);
+            }
+            else if (mode == "-k")
+            {
+                channel->setHasPassword(false);
+                channel->setPassword("");
+            }
+        }
+        else if (mode == "+l")
+        {
+            int userLimit = std::stoi(modeParams[2]);
+            channel->setUserLimit(userLimit);
+        }
+        else
+        {
+            CommandHandler::SendMessage(&client, "Error code " + std::string(ERR_UNKNOWNMODE) + ": unknown channel mode " + mode);
+            return;
+        }
     }
 }

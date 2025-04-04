@@ -19,6 +19,8 @@ public:
 	static void kickUserCmd(IClient& client, IServer& server, std::vector<std::string>& kickParams);
 	static void inviteUserCmd(IClient& client, IServer& server, std::vector<std::string>& inviteParams);
 	static void topicUserCmd(IClient& client, IServer& server, std::vector<std::string>& topicParams);
+	static void modeUserCmd(IClient& client, IServer& server, std::vector<std::string>& modeParams);
+
 };
 
 #endif

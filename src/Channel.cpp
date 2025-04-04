@@ -10,7 +10,7 @@ Channel::Channel()
 }
 Channel::Channel(const std::string& name)
 	:	_name(name),  _topic(""), _isInviteOnly(false), \
-	_hasPassword(false), _password(""), _userLimit(0)
+	_hasPassword(false), _password(""), _userLimit(0), _onlyOperatorCanChangeTopic(true)
 {
 
 }
@@ -187,4 +187,14 @@ bool  Channel::isOperator(const std::string& user)
 bool  Channel::isInvitedUser(const std::string& user)
 {
 	return std::find(_invitedUsers.begin(), _invitedUsers.end(), user) != _invitedUsers.end();
+}
+
+bool Channel::getOnlyOperatorCanChangeTopic()
+{
+	return _onlyOperatorCanChangeTopic;
+}
+
+void Channel::setOnlyOperatorCanChangeTopic(bool OnlyOperatorCanChangeTopic)
+{
+	_onlyOperatorCanChangeTopic = OnlyOperatorCanChangeTopic;
 }

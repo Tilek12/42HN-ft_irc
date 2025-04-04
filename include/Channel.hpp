@@ -21,7 +21,7 @@ private:
 	bool						_hasPassword;
 	std::string					_password;
 	size_t						_userLimit;
-
+	bool						_onlyOperatorCanChangeTopic;
 	bool						_isValidPassword(const std::string password);
 public:
 	Channel();
@@ -50,6 +50,8 @@ public:
 	void						setUserLimit(size_t limit);
 	std::string					getPassword() const override;
 	void						setPassword(const std::string& password);
+	bool						getOnlyOperatorCanChangeTopic();
+	void						setOnlyOperatorCanChangeTopic(bool OnlyOperatorCanChangeTopic);
 
 	static bool					isValidChannelName(const std::string& name);
 	bool 						isUser(const std::string& user) override;
