@@ -1,0 +1,149 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   commands.cpp                                       :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: ryusupov <ryusupov@student.42.fr>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/04/04 19:18:33 by ryusupov          #+#    #+#             */
+/*   Updated: 2025/04/04 21:02:58 by ryusupov         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
+#include "../include/client_c_h.hpp"
+
+/*------Parsing PRIVMSG and NOTICE commands------*/
+bool CommandHandler::handlePrivMsgNotice(std::istringstream &iss, std::vector<std::string> &arguments) {
+	std::string target, message;
+		if (!(iss >> target)){
+			std::cerr << "Error: Not target provided for " << std::endl;
+			return false;
+		}
+		arguments.push_back(target);
+
+		std::getline(iss, message);
+		if (!message.empty() && message[0] == ' ') message.erase(0, 1);
+		if (message.empty() || message[0] != ':')
+			return {};
+		message.erase(0, 1);
+		arguments.push_back(message);
+
+	return true;
+}
+
+/*------Parsing USER command------*/
+bool CommandHandler::handleUser(std::istringstream &iss, std::vector<std::string> &arguments) {
+	std::string username, hostname, servername, realname;
+
+		if (!(iss >> username >> hostname >> servername)) {
+			std::cerr << "Error: Incomplete USER command!" << std::endl;
+			return false;
+		}
+
+		arguments.push_back(username);
+		arguments.push_back(hostname);
+		arguments.push_back(servername);
+
+		std::getline(iss, realname);
+		if (!realname.empty() && realname[0] == ' ') realname.erase(0, 1);
+
+		if (realname.empty() || realname[0] != ':')
+			return false;
+		realname.erase(0, 1);
+		arguments.push_back(realname);
+
+	return true;
+}
+
+/*------Parsing TOPIC command------*/
+bool CommandHandler::handleTopic(std::istringstream &iss, std::vector<std::string> &arguments) {
+	std::string channel, topic;
+
+		if (!(iss >> channel)) {
+			std::cerr << "Error: No channel provided for TOPIC command!" << std::endl;
+			return false;
+		}
+		arguments.push_back(channel);
+
+		std::getline(iss, topic);
+		if (!(topic.empty() && topic[0] == ' ')) topic.erase(0, 1);
+
+		if (topic.empty() || topic[0] != ':')
+			return false;
+		topic.erase(0, 1);
+
+		if (!topic.empty())
+			arguments.push_back(topic);
+
+	return true;
+}
+
+/*------Parsing MODE command------*/
+bool CommandHandler::handleMode(std::istringstream &iss, std::vector<std::string> &arguments) {
+	std::string channel, flag, user;
+		if (!(iss >> channel)) {
+			std::cout << "Error: No channel provided for MODE command!" << std::endl;
+			return false;
+		}
+		arguments.push_back(channel);
+
+		if (!(iss >> flag && (flag[0] == '+' || flag[0] == '-')
+				&& std::string("okilt").find(flag[1]) != std::string::npos)) {
+			std::cout << "Please enter a valid flag for MODE command!" << std::endl;
+			return false;
+		}
+		arguments.push_back(flag);
+
+		std::getline(iss, user);
+		if (!(user.empty() && user[0] == ' ')) user.erase(0, 1);
+
+		if (!(user.empty()))
+			arguments.push_back(user);
+	return true;
+}
+
+/*------Parsing Simple commands------*/
+bool CommandHandler::handleSimpleCommands(std::istringstream &iss, std::vector<std::string> &arguments) {
+	std::string arg2, arg3;
+
+	if (!(iss >> arg2)) {
+		std::cerr << "No arg2 provided!" << std::endl;
+		return {};
+	}
+	arguments.push_back(arg2);
+
+	/*checking for a password and adding them to a vector*/
+	if (!(iss >> arg3))
+		return true;
+	arguments.push_back(arg3);
+
+	/*checking if there is no any additional arguments provided*/
+	if (iss.rdbuf()->in_avail() > 0) {
+		std::cerr << "Error: There are extra argument provided please check and type again!" << std::endl;
+		return false;
+	}
+
+	return true;
+}
+
+/*------Parsing KICK command------*/
+bool CommandHandler::handleKick(std::istringstream &iss, std::vector<std::string> &arguments) {
+	std::string channel, user, reason;
+
+	if (!(iss >> channel) || std::string("#!&").find(channel[0]) != std::string::npos)
+		return false;
+	arguments.push_back(channel);
+
+	if (!(iss >> user))
+		return false;
+	arguments.push_back(user);
+
+	if (iss.rdbuf()->in_avail() > 0){
+		std::getline(iss, reason);
+		if (!(reason.empty()) && user[0] == ' ') user.erase(0, 1);
+		if (reason.empty() || reason[0] != ':')
+			return false;
+		arguments.push_back(reason);
+	}
+	return true;
+}

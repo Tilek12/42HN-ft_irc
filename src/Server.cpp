@@ -369,8 +369,6 @@ void	Server::sendToClient( int fd, const std::string& message ) {
 
 }
 
-
-
 void Server::addClient(Client* client) {
 	if (!client->getNickname().empty()) {
 		_clientsNick[client->getNickname()] = client;
