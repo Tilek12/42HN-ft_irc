@@ -62,7 +62,8 @@ void Channel::addUser(const std::string& user)
 	auto it = std::find(_invitedUsers.begin(), _invitedUsers.end(), user);
 	if (_isInviteOnly && it == _invitedUsers.end())
     {
-        std::cerr << "User " << user << " is not invited to join " << _name << std::endl;
+        std::cerr << "User " << user << " is not invited to join " << \
+			_name << std::endl;
         return;
     }
 	if (_userLimit == 0 || _users.size() < _userLimit)
@@ -178,11 +179,13 @@ bool Channel::isUser(const std::string& user)
 }
 bool  Channel::isOperator(const std::string& user)
 {
-	return std::find(_operators.begin(), _operators.end(), user) != _operators.end();
+	return std::find(_operators.begin(), _operators.end(), user) \
+		!= _operators.end();
 }
 bool  Channel::isInvitedUser(const std::string& user)
 {
-	return std::find(_invitedUsers.begin(), _invitedUsers.end(), user) != _invitedUsers.end();
+	return std::find(_invitedUsers.begin(), _invitedUsers.end(), user) \
+		!= _invitedUsers.end();
 }
 
 bool Channel::getOnlyOperatorCanChangeTopic()
