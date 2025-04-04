@@ -13,11 +13,15 @@
 #include "../include/IChannel.hpp"
 #include "../include/IClient.hpp"
 
+void processJoinRequest(IClient& client, IServer& server, const std::string& channelName, \
+    const std::string& password);
+bool joinAllowed(IClient& client, IChannel* channel, const std::string& password);
+
 void ChannelCmds::joinChannelCmd(IClient& client, IServer& server, std::vector<std::string>& joinParams)
 {
-    IChannel* channel;
     std::vector<std::string> channelNames;
     std::vector<std::string> passwords;
+    std::string password;
 
     if (joinParams.empty())
     {
@@ -27,42 +31,63 @@ void ChannelCmds::joinChannelCmd(IClient& client, IServer& server, std::vector<s
     channelNames = parseCommaString(joinParams[0]);
     if (joinParams.size() > 1)
         passwords = parseCommaString(joinParams[1]);
-
     for (size_t i = 0; i < channelNames.size(); ++i)
     {
-        if (Channel::isValidChannelName(channelNames[i]))
-        {
-            channel = server.getChannel(channelNames[i]);
-            if (!channel)
-            {
-                channel = server.createChannel(channelNames[i]);
-                channel->addOperator(client.getNickname());
-            }
-        }
+        if (i < passwords.size())
+            password = passwords[i];
         else
-        {
-            std::cerr << "Error code " << ERR_BADCHANMASK << ": bad channel mask. Invalid channel name: " << channelNames[i] << std::endl;
-            continue;
-        }
-        if (channel->getHasPassword() && channel->getPassword() != passwords[i])
-        {
-            CommandHandler::SendMessage(&client, "Error code " + std::string(ERR_BADCHANNELKEY) + ": invalid password.");
-            continue;
-        }
-        bool isInvited = std::find(channel->getInvitedUsers().begin(), channel->getInvitedUsers().end(), client.getNickname()) != channel->getInvitedUsers().end();
-        if (channel->getIsInviteOnly() && !isInvited)
-        {
-            CommandHandler::SendMessage(&client, "Error code " + std::string(ERR_INVITEONLYCHAN) + ":Cannot join. Channel is invite only");
-            continue;
-        }
-        if (channel->getUserLimit() > 0 && channel->getUsers().size() >= channel->getUserLimit())
-        {
-            CommandHandler::SendMessage(&client, "Error code " + std::string(ERR_CHANNELISFULL) + ":Cannot join. Channel is full");
-            continue;
-        }
-        channel->addUser(client.getNickname());
-        CommandHandler::SendMessage(&client, client.getNickname() + " JOIN " + channelNames[i]);
+            password = "";
+            processJoinRequest(client, server, channelNames[i], password);
     }
+}
+
+void processJoinRequest(IClient& client, IServer& server, \
+    const std::string& channelName, const std::string& password)
+{
+    IChannel* channel;
+    if (Channel::isValidChannelName(channelName))
+    {
+        channel = server.getChannel(channelName);
+        if (!channel)
+        {
+            channel = server.createChannel(channelName);
+            channel->addOperator(client.getNickname());
+        }
+    }
+    else
+    {
+        std::cerr << "Error code " << ERR_BADCHANMASK << ": bad channel mask. \
+            Invalid channel name: " << channelName << std::endl;
+        return;
+    }
+    if (!joinAllowed(client, channel, password))
+    {
+        return;
+    }
+    channel->addUser(client.getNickname());
+    CommandHandler::SendMessage(&client, client.getNickname() + " JOIN " + channelName);
+}
+bool joinAllowed(IClient& client, IChannel* channel, const std::string& password)
+{
+    if (channel->getHasPassword() && channel->getPassword() != password)
+    {
+        CommandHandler::SendMessage(&client, "Error code " + std::string(ERR_BADCHANNELKEY) + ": invalid password.");
+        return false;
+    }
+    bool isInvited = std::find(channel->getInvitedUsers().begin(), channel->getInvitedUsers().end(), client.getNickname()) \
+        != channel->getInvitedUsers().end();
+    if (channel->getIsInviteOnly() && !isInvited)
+    {
+        CommandHandler::SendMessage(&client, "Error code " + std::string(ERR_INVITEONLYCHAN) + \
+            ":Cannot join. Channel is invite only");
+        return false;
+    }
+    if (channel->getUserLimit() > 0 && channel->getUsers().size() >= channel->getUserLimit())
+    {
+        CommandHandler::SendMessage(&client, "Error code " + std::string(ERR_CHANNELISFULL) + ":Cannot join. Channel is full");
+        return false;
+    }
+    return true;
 }
 
 void ChannelCmds::partChannelCmd(IClient& client, IServer& server, std::vector<std::string>& partParams)
