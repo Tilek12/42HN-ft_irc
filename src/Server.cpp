@@ -180,7 +180,8 @@ void	Server::_processClientBuffer( Client* client ) {
 					  << "CMD [" << client->getSocketFd() << "]: " << message
 					  << RESET << std::endl;
 			_arguments = _commandHandler->parseCommand(message);
-			std::cout << "size: " << _arguments.size() << std::endl;
+			if (_arguments.empty())
+				std::cout << "Error: Unknown command or invalid command!" << std::endl;
 		}
 	}
 

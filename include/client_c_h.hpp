@@ -6,7 +6,7 @@
 /*   By: ryusupov <ryusupov@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: Invalid date        by                   #+#    #+#             */
-/*   Updated: 2025/04/04 21:10:25 by ryusupov         ###   ########.fr       */
+/*   Updated: 2025/04/05 15:40:34 by ryusupov         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,6 +34,7 @@ class CommandHandler{
 		static void SendMessage(IClient *client, const std::string &msg);
 		void SendError(Client *client, const std::string &msg);
 
+		std::vector<std::string> &getArguments();
 		static std::vector<std::string> parseCommand(const std::string &command);
 		static std::vector<std::string> parseSpecialCommands(const std::string &command, const std::unordered_set<std::string> &setOfCmds);
 		/*Helper methods for functions*/
@@ -43,6 +44,9 @@ class CommandHandler{
 		static bool handleMode(std::istringstream &iss, std::vector<std::string> &arguments);
 		static bool handleSimpleCommands(std::istringstream &iss, std::vector<std::string> &arguments);
 		static bool handleKick(std::istringstream &iss, std::vector<std::string> &arguments);
+
+
+
 };
 
 #endif
