@@ -4,37 +4,43 @@
 static void	handleCap( Server* server, int fd, const std::vector<std::string>& args ) {
 
 	std::string reply;
+	std::string subcmd = args[1];
+	int argsNum = args.size();
 
-	if ( args[1] == "END" )
+	if ( subcmd == "END" )
 		return;
-	if ( args[1] == "LS" )
-		reply = "CAP * LS :multi-prefix away-notify extended-join\r\n";
-	else if ( args[1] == "REQ" ) {
+	else if ( subcmd == "LS" )
+		reply = "CAP * LS :multi-prefix away-notify extended-join";
+	else if ( subcmd == "REQ" ) {
 		reply = "CAP * ACK ";
-		for ( int i = 2; i < args.size(); i++ )
+		for ( int i = 2; i < argsNum - 1; i++ ) {
 			reply += args[i];
-		reply += "\r\n";
+			if ( i != argsNum - 2 )
+			reply += " ";
+		}
 	}
 
-	server->sendToClient( fd, reply );
+	std::cout << CYAN << reply << RESET << std::endl;
+	// server->sendToClient( fd, reply );
 
 }
 
 static void	handlePing( Server* server, int fd, const std::vector<std::string>& args ) {
 
 	std::string reply = "PONG ";
+	int argsNum = args.size();
 
 	if ( args[1].find( ":" ) != std::string::npos )
 		reply += ":";
 
-	for ( int i = 1; i < args.size() - 1; i++ ) {
+	for ( int i = 1; i < argsNum - 1; i++ ) {
 		reply += args[i];
-		if ( i != args.size() - 1 )
+		if ( i != argsNum - 2 )
 			reply += " ";
 	}
-	reply += "\r\n";
 
-	server->sendToClient( fd, reply );
+	std::cout << CYAN << reply << std::endl;
+	// server->sendToClient( fd, reply );
 
 }
 
@@ -44,8 +50,9 @@ static void	handleNotice( Server* server, std::string nickname, const std::vecto
 		if ( args[i].find( "LAGCHECK" ) != std::string::npos ) {
 			// std::string reply = "NOTICE " + nickname + " :LAGCHECK_REPLY " +
 			// 					args[i].substr( args[i].find( "LAGCHECK" ) + 9 ) + "\r\n";
-			std::string reply = "PONG :" + args[i + 1] + "\r\n";
-			server->sendToClient( nickname, reply );
+			std::string reply = "PONG :" + args[i + 1];
+			std::cout << CYAN << reply << std::endl;
+			// server->sendToClient( nickname, reply );
 		}
 	}
 

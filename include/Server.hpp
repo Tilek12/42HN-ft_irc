@@ -38,6 +38,7 @@ class Server : public IServer {
 
 private:
 
+	std::string						_creationTime;		// Server Creation time
 	std::string						_password;			// Password for Server
 	int								_serverFD;			// file descriptor for Server socket
 	struct sockaddr_in				_serverAddress;		// Server socket address
@@ -51,6 +52,7 @@ private:
 	Server( const Server& other ) = delete;
 	Server& operator=( const Server&  other ) = delete;
 
+	void	_setCreationTime( void );
 	void	_setupServer( void );
 	void	_handleConnections( void );
 	void	_acceptNewConnection( void );
@@ -68,9 +70,10 @@ public:
 	void						start( void ) override;
 	void						stop( void ) override;
 	const std::string&			getPassword( void ) const override;
-	bool						getIsRunning( void );
-	void						setIsRunning( bool value );
-	std::vector<std::string>	getArguments( void );
+	const std::string& 			getCreationTime( void ) const override;
+	bool						getIsRunning( void ) override;
+	void						setIsRunning( bool value ) override;
+	std::vector<std::string>	getArguments( void ) override;
 
 	// Client management
 	void	addClient( Client* client ) override;
@@ -89,6 +92,7 @@ public:
 	// Messaging
 	void	sendToClient( int fd, const std::string& message ) override;
 	void	sendToClient( const std::string& nickname, const std::string& message ) override;
+	void	sendError( int fd, const std::string& errorCode, const std::string& message ) override;
 	void	broadcastMessage( const std::string& channelName, const std::string& message ) override;
 
 };

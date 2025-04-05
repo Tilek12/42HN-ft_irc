@@ -22,6 +22,9 @@ Server::Server( int port, const std::string& password ) :
 	if ( password.empty() || password.size() < 3 )
 		throw std::runtime_error( "ERROR: Password must contain no less than 3 characters." );
 
+	// Set Server Creation time
+	_setCreationTime();
+
 	// Setup settings and run Server
 	_setupServer();
 
@@ -35,6 +38,16 @@ Server::~Server( void ) { stop(); }
 ////////////////////////////////////////////////////////////////////////////////
 // ========================  Core Server operations  ======================== //
 ////////////////////////////////////////////////////////////////////////////////
+
+/*----------------------------*/
+/*  Set Server Creation Time  */
+/*----------------------------*/
+void	Server::_setCreationTime( void ) {
+
+	time_t now = time( nullptr );
+	_creationTime = ctime( &now );
+
+}
 
 /*----------------*/
 /*  Setup Server  */
@@ -170,10 +183,10 @@ void	Server::_disconnectClient( int fd, const std::string& reason ) {
 
 }
 
-static std::string getCreationDate( void ) {
-	time_t now = time( nullptr );
-	return ctime( &now );
-}
+/*----------------------------*/
+/*  Get Server Creation Time  */
+/*----------------------------*/
+const std::string& Server::getCreationTime( void ) const { return _creationTime; }
 
 /*---------------------------------------*/
 /*  Define processClientBuffer function  */
@@ -202,40 +215,40 @@ void	Server::_processClientBuffer( Client* client ) {
 		std::string host = client->getHostname();
 		std::string user = client->getUsername();
 		std::string nick = client->getNickname();
-		std::string date = getCreationDate();
+		// std::string time = getCreationTime();
 		if ( message == "CAP LS" )
-			sendToClient( fd, "CAP * LS :multi-prefix away-notify extended-join\r\n" );
+			sendToClient( fd, "CAP * LS :multi-prefix away-notify extended-join" );
 		else if ( message == "PING :127.0.0.1")
-			sendToClient( fd, "PONG :127.0.0.1\r\n" );
+			sendToClient( fd, "PONG :127.0.0.1" );
 		else if ( message == "PING " + user + " TRLnet" )
-			sendToClient( fd, "PONG :" + user + " TRLnet\r\n" );
+			sendToClient( fd, "PONG :" + user + " TRLnet" );
 		else if ( message == "CAP REQ :multi-prefix away-notify extended-join" )
-			sendToClient( fd, "CAP * ACK :multi-prefix away-notify extended-join\r\n" );
+			sendToClient( fd, "CAP * ACK :multi-prefix away-notify extended-join" );
 		else if ( message.find("USER") != std::string::npos ) {
 			// 001 RPL_WELCOME
 			sendToClient( fd, ":" + IRCname + " 001 " + nick +
-							" :Welcome to the IRC Network " + nick + "!" + user + "@" + host + "\r\n" );
+							" :Welcome to the IRC Network " + nick + "!" + user + "@" + host );
 			// 002 RPL_YOURHOST
 			sendToClient( fd, ":" + IRCname + " 002 " + nick +
-							" :Your host is " + IRCname + ", running version 1.0\r\n" );
+							" :Your host is " + IRCname + ", running version 1.0" );
 			// 003 RPL_CREATED
 			sendToClient( fd, ":" + IRCname + " 003 " + nick +
-							" :This server was created " + date + "\r\n" );
+							" :This server was created " + _creationTime );
 			// 004 RPL_MYINFO
 			sendToClient( fd, ":" + IRCname + " 004 " + nick +
-							" " + IRCname + " 1.0 +aiow +ntklovb\r\n" );
+							" " + IRCname + " 1.0 +aiow +ntklovb" );
 
 			// MOTD ( Message of the Day )
-			sendToClient( fd, ":" + IRCname + " 375 " + nick + " :- " + IRCname + " Message of the Day -\r\n" );
-			sendToClient( fd, ":" + IRCname + " 372 " + nick + " :- Welcome to our server!\r\n" );
-			sendToClient( fd, ":" + IRCname + " 376 " + nick + " :End of /MOTD command\r\n" );
+			sendToClient( fd, ":" + IRCname + " 375 " + nick + " :- " + IRCname + " Message of the Day -" );
+			sendToClient( fd, ":" + IRCname + " 372 " + nick + " :- Welcome to our server!" );
+			sendToClient( fd, ":" + IRCname + " 376 " + nick + " :End of /MOTD command" );
 
 		}
 		else if ( message.find( "LAGCHECK" ) != std::string::npos ) {
 			// std::string reply = "NOTICE " + client->getNickname() + " :LAGCHECK_REPLY " +
-			// 					message.substr( message.find( "LAGCHECK" ) + 9 ) + "\r\n";
+			// 					message.substr( message.find( "LAGCHECK" ) + 9 );
 			// sendToClient( fd, reply );
-			std::string reply = "PONG :" + message.substr( message.find( "LAGCHECK" ) + 9 ) + "\r\n";
+			std::string reply = "PONG :" + message.substr( message.find( "LAGCHECK" ) + 9 );
 			sendToClient( fd, reply );
 		}
 //////////////////////////////////////////////////////////////////////////////////////////////////
@@ -502,7 +515,9 @@ void	Server::sendToClient( int fd, const std::string& message ) {
 	if ( !isClientExist( fd ) )
 		return;
 
-	if ( send( fd, message.c_str(), message.length(), 0 ) < 0 )
+	std::string reply = message + "\r\n";
+
+	if ( send( fd, reply.c_str(), reply.length(), 0 ) < 0 )
 		_disconnectClient( fd, "Send error" );
 
 }
@@ -518,6 +533,26 @@ void	Server::sendToClient( const std::string& nickname, const std::string& messa
 	Client* client = getClient( nickname );
 
 	sendToClient( client->getSocketFd(), message );
+
+}
+
+/*----------------------------------------------*/
+/*  Send Error message to Client defined by fd  */
+/*----------------------------------------------*/
+void	Server::sendError( int fd, const std::string& errorCode, const std::string& message ) {
+
+	std::string	nickname = "*";
+	if ( _clients.count(fd) && !_clients[fd]->getNickname().empty() )
+		nickname = _clients[fd]->getNickname();
+
+	std::string errorReply = ":" + IRCname + " " + errorCode + " " + nickname + " " + message;
+
+	sendToClient( fd, errorReply );
+
+	// Log the error
+	std::cerr << RED << "[ERROR] Sent to fd=" << fd
+			  << " (" << nickname << "): " << errorCode << " " << message
+			  << RESET << std::endl;
 
 }
 
