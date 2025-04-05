@@ -30,13 +30,7 @@ Server::Server( int port, const std::string& password ) :
 /*---------------------------*/
 /*  Server Class destructor  */
 /*---------------------------*/
-Server::~Server( void ) {
-
-	// Gracefully stop Server
-	stop();
-	delete _commandHandler;
-
-}
+Server::~Server( void ) { stop(); }
 
 ////////////////////////////////////////////////////////////////////////////////
 // ========================  Core Server operations  ======================== //
@@ -176,6 +170,11 @@ void	Server::_disconnectClient( int fd, const std::string& reason ) {
 
 }
 
+static std::string getCreationDate( void ) {
+	time_t now = time( nullptr );
+	return ctime( &now );
+}
+
 /*---------------------------------------*/
 /*  Define processClientBuffer function  */
 /*---------------------------------------*/
@@ -195,12 +194,54 @@ void	Server::_processClientBuffer( Client* client ) {
 			_commandHandler->handleCommand( client, message );
 		}
 
-		if ( message == "CAP LS")
-			sendToClient( client->getSocketFd(), "CAP * LS :multi-prefix sasl away-notify extended-join\r\n" );
+//////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////  FOR TESTING!!! DELETE!!!  ///////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////////////
+		int fd = client->getSocketFd();
+		std::string localhost = "127.0.0.1";
+		std::string host = client->getHostname();
+		std::string user = client->getUsername();
+		std::string nick = client->getNickname();
+		std::string date = getCreationDate();
+		if ( message == "CAP LS" )
+			sendToClient( fd, "CAP * LS :multi-prefix away-notify extended-join\r\n" );
 		else if ( message == "PING :127.0.0.1")
-			sendToClient( client->getSocketFd(), "PONG :127.0.0.1\r\n" );
+			sendToClient( fd, "PONG :127.0.0.1\r\n" );
+		else if ( message == "PING " + user + " TRLnet" )
+			sendToClient( fd, "PONG :" + user + " TRLnet\r\n" );
 		else if ( message == "CAP REQ :multi-prefix away-notify extended-join" )
-			sendToClient( client->getSocketFd(), "CAP * ACK :multi-prefix away-notify extended-join\r\n" );
+			sendToClient( fd, "CAP * ACK :multi-prefix away-notify extended-join\r\n" );
+		else if ( message.find("USER") != std::string::npos ) {
+			// 001 RPL_WELCOME
+			sendToClient( fd, ":" + IRCname + " 001 " + nick +
+							" :Welcome to the IRC Network " + nick + "!" + user + "@" + host + "\r\n" );
+			// 002 RPL_YOURHOST
+			sendToClient( fd, ":" + IRCname + " 002 " + nick +
+							" :Your host is " + IRCname + ", running version 1.0\r\n" );
+			// 003 RPL_CREATED
+			sendToClient( fd, ":" + IRCname + " 003 " + nick +
+							" :This server was created " + date + "\r\n" );
+			// 004 RPL_MYINFO
+			sendToClient( fd, ":" + IRCname + " 004 " + nick +
+							" " + IRCname + " 1.0 +aiow +ntklovb\r\n" );
+
+			// MOTD ( Message of the Day )
+			sendToClient( fd, ":" + IRCname + " 375 " + nick + " :- " + IRCname + " Message of the Day -\r\n" );
+			sendToClient( fd, ":" + IRCname + " 372 " + nick + " :- Welcome to our server!\r\n" );
+			sendToClient( fd, ":" + IRCname + " 376 " + nick + " :End of /MOTD command\r\n" );
+
+		}
+		else if ( message.find( "LAGCHECK" ) != std::string::npos ) {
+			// std::string reply = "NOTICE " + client->getNickname() + " :LAGCHECK_REPLY " +
+			// 					message.substr( message.find( "LAGCHECK" ) + 9 ) + "\r\n";
+			// sendToClient( fd, reply );
+			std::string reply = "PONG :" + message.substr( message.find( "LAGCHECK" ) + 9 ) + "\r\n";
+			sendToClient( fd, reply );
+		}
+//////////////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////////////
+
 	}
 
 }
@@ -213,7 +254,6 @@ void	Server::_handleClientData( int fd ) {
 	// Recieving data
 	char buffer[1024];
 	ssize_t bytesRead = recv( fd, buffer, sizeof( buffer ) - 1, 0 );
-
 	if ( bytesRead <= 0 ) {
 		_disconnectClient( fd, bytesRead == 0 ? "" : "Read error" );
 		return;
@@ -223,12 +263,13 @@ void	Server::_handleClientData( int fd ) {
 	Client* client = getClient( fd );
 	client->appendToBuffer( buffer, bytesRead );
 
-	_processClientBuffer( client ); // Handle complete messages
+	// Handle complete messages
+	_processClientBuffer( client );
 
 }
 
 /*------------------------------------*/
-/*  Handle connections to the Server  */
+/*  Handle Connections to the Server  */
 /*------------------------------------*/
 void	Server::_handleConnections( void ) {
 
@@ -279,6 +320,9 @@ void	Server::stop( void ) {
 			  << "Server shutdown..."
 			  << RESET << std::endl;
 
+	// Set running to false
+	_isRunning = false;
+
 	// Disconnect all clients
 	auto clientsCopy = _clients;
 	for ( const auto& [fd, client] : clientsCopy )
@@ -299,6 +343,9 @@ void	Server::stop( void ) {
 	// Clear poll fds
 	_pollFDs.clear();
 
+	// Delete CommandHandler object
+	delete _commandHandler;
+
 }
 
 /*-----------------------*/
@@ -316,8 +363,13 @@ bool	Server::getIsRunning( void ) { return _isRunning; }
 /*-----------------------*/
 void	Server::setIsRunning( bool value ) { _isRunning = value; }
 
+/*-----------------------------------*/
+/*  Get Command and argument values  */
+/*-----------------------------------*/
+std::vector<std::string>	Server::getArguments( void ) { return _arguments; }
+
 ////////////////////////////////////////////////////////////////////////////////
-// ===========================  Client management  ========================== //
+// ===========================  Client Management  ========================== //
 ////////////////////////////////////////////////////////////////////////////////
 
 /*------------------*/
@@ -379,7 +431,7 @@ bool	Server::isClientExist( int fd ) {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-// ==========================  Channel management  ========================== //
+// ==========================  Channel Management  ========================== //
 ////////////////////////////////////////////////////////////////////////////////
 
 /*-------------------*/

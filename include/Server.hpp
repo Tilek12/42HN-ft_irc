@@ -46,6 +46,7 @@ private:
 	std::map<std::string, Channel*>	_channels;			// Map of channel names to Channel pointers
 	bool							_isRunning;			// Server running check
 	CommandHandler*					_commandHandler;	// Local Command Handler object
+	std::vector<std::string>		_arguments;			// Parsed command and arguments
 
 	Server( const Server& other ) = delete;
 	Server& operator=( const Server&  other ) = delete;
@@ -64,11 +65,12 @@ public:
 	~Server( void );
 
 	// Core server operations
-	void				start( void ) override;
-	void				stop( void ) override;
-	const std::string&	getPassword( void ) const override;
-	bool				getIsRunning( void );
-	void				setIsRunning( bool value );
+	void						start( void ) override;
+	void						stop( void ) override;
+	const std::string&			getPassword( void ) const override;
+	bool						getIsRunning( void );
+	void						setIsRunning( bool value );
+	std::vector<std::string>	getArguments( void );
 
 	// Client management
 	void	addClient( Client* client ) override;
@@ -90,3 +92,5 @@ public:
 	void	broadcastMessage( const std::string& channelName, const std::string& message ) override;
 
 };
+
+void	serverCmdHandler( Server* server, Client* client );
