@@ -22,6 +22,8 @@ public:
 	virtual	bool isUser(const std::string& user) = 0;
 	virtual	bool isOperator(const std::string& user) = 0;
 	virtual	bool isInvitedUser(const std::string& user) = 0;
+	virtual bool isValidPassword(const std::string password) = 0;
+	virtual std::string getName() const = 0;
 };
 
 #endif

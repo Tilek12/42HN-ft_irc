@@ -155,7 +155,7 @@ bool Channel::isValidChannelName(const std::string& name)
 	return true;
 }
 
-bool Channel::_isValidPassword(const std::string password)
+bool Channel::isValidPassword(const std::string password)
 {
 	if (_password == password)
 		return true;

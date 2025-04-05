@@ -115,6 +115,7 @@ void test_channel_commands()
     kickParams.push_back("#Channel1,#Channel2");
     kickParams.push_back("user99,user3");
     ChannelCmds::kickUserCmd(client1, *server, kickParams);
+
     assert(server->getChannel("#Channel2")->getUsers().size() == 1);
 
     // Test inviting a user to a not isInvitedOnly channel => error

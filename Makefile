@@ -22,7 +22,9 @@ SRC =	$(SRC_DIR)/Server.cpp \
 		$(SRC_DIR)/ChannelCmds.cpp \
 		$(SRC_DIR)/Client.cpp \
 		$(SRC_DIR)/channelHelperFcts.cpp \
-		$(SRC_DIR)/client_c_h.cpp
+		$(SRC_DIR)/client_c_h.cpp \
+		$(SRC_DIR)/channelCmdsUtils.cpp \
+		$(SRC_DIR)/channelCmdsUserRole.cpp
 
 OBJ = $(SRC:$(SRC_DIR)/%.cpp=$(OBJ_DIR)/%.o)
 
