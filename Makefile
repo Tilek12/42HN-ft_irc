@@ -32,7 +32,8 @@ OBJ = $(SRC:$(SRC_DIR)/%.cpp=$(OBJ_DIR)/%.o)
 all: $(OBJ_DIR) $(NAME)
 
 $(NAME): $(OBJ)
-	@$(CXX) $(CXXFLAGS) $(OBJ) $(SRC_DIR)/main.cpp -o $(NAME) > /dev/null 2>&1
+	@$(CXX) $(CXXFLAGS) $(OBJ) $(SRC_DIR)/main.cpp -o $(NAME)
+#> /dev/null 2>&1
 	@echo "$(GREEN)object files created.$(RESET)"
 	@echo "$(GREEN)$(NAME) created. $(RESET)"
 
@@ -59,7 +60,7 @@ re: fclean all
 
 # Run tests
 test: $(OBJ) $(TEST_CHANNEL) $(TEST_TILEK)
-	@./$(TEST_CHANNEL) || echo "$(TEST_CHANNEL) failed"
+	@./$(TEST_CHANNEL) || echo "$(VIOLET)$(TEST_CHANNEL) failed$(RESET)"
 	@./$(TEST_TILEK) || echo "$(VIOLET)$(TEST_TILEK) failed$(RESET)"
 	@echo "$(GREEN)Tests ran successfully.$(RESET)"
 

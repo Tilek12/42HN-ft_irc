@@ -3,8 +3,10 @@
 main
 ircserv
 a.out
+test
 test_channel
 test_tilek
 /obj
 /logs
 /logs/*.txt
+/test.dSYM/*

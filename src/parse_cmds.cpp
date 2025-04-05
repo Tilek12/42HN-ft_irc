@@ -6,7 +6,7 @@
 /*   By: ryusupov <ryusupov@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/31 14:30:49 by ryusupov          #+#    #+#             */
-/*   Updated: 2025/04/04 21:10:02 by ryusupov         ###   ########.fr       */
+/*   Updated: 2025/04/05 18:54:13 by ryusupov         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,6 +34,8 @@ std::vector<std::string>CommandHandler::parseSpecialCommands(const std::string &
 			return {};
 		else if (cmd == "KICK" && !handleKick(iss, arguments))
 			return {};
+		// else if (cmd == "PING" && !handlePing(iss, arguments))
+		// 	return {};
 	}
 	return (arguments);
 }
@@ -45,7 +47,7 @@ std::vector<std::string>CommandHandler::parseCommand(const std::string &command)
 
 	/*Set of all the available commands*/
 	static const std::unordered_set<std::string> setOfAllCmds = {
-		"JOIN", "PART", "QUIT", "NICK", "PING", "PONG", "INVITE"
+		"JOIN", "PART", "QUIT", "NICK", "INVITE", "CAP", "PING"
 	};
 	/*Set of special commands with more that three arguments required*/
 	static const std::unordered_set<std::string> setOfSpecialCmds = {
@@ -67,6 +69,7 @@ std::vector<std::string>CommandHandler::parseCommand(const std::string &command)
 	return arguments;
 }
 
+//TODO: Need to implement CAP PING NTOICE FOR SERVER
 
 // void testParseJoinCommand(const std::string& commandLine) {
 //     std::vector<std::string> parsed = parseCommand(commandLine);
