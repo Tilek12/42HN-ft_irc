@@ -6,7 +6,7 @@
 /*   By: ryusupov <ryusupov@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/04 19:18:33 by ryusupov          #+#    #+#             */
-/*   Updated: 2025/04/05 18:30:43 by ryusupov         ###   ########.fr       */
+/*   Updated: 2025/04/06 21:34:25 by ryusupov         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,6 +29,39 @@ bool CommandHandler::handlePrivMsgNotice(std::istringstream &iss, std::vector<st
 		arguments.push_back(message);
 
 	return true;
+}
+
+/*------Parsing NOTICE command*/
+bool CommandHandler::handleNotice(std::istringstream &iss, std::vector<std::string> &arguments) {
+	std::string lagcheck, msg, lagData;
+	bool found = false;
+
+	while (iss >> lagcheck) {
+		if (lagcheck == ":\001LAGCHECK") {
+			found = true;
+			//the case if there is no witespace between LAGCHECK and the rest of the msg
+			if (lagcheck.size() > 10) {
+				std::cout << "here\n";
+				arguments.push_back(msg);
+				arguments.push_back(":LAGCHECK");
+				arguments.push_back(lagcheck.substr(11));
+				return true;
+			}
+
+			arguments.push_back(msg);
+			arguments.push_back(":LAGCHECK");
+
+			std::getline(iss, lagData);
+			if (!lagData.empty() && lagData[0] == ' ')
+			lagData.erase(0, 1);
+			if (!(lagData.empty()))
+			arguments.push_back(lagData);
+			return true;
+		}
+		if (!msg.empty()) msg += " ";
+		msg += lagcheck;
+	}
+	return false;
 }
 
 /*------Parsing USER command------*/
@@ -140,7 +173,7 @@ bool CommandHandler::handleKick(std::istringstream &iss, std::vector<std::string
 
 	if (iss.rdbuf()->in_avail() > 0){
 		std::getline(iss, reason);
-		if (!(reason.empty()) && user[0] == ' ') user.erase(0, 1);
+		if (!(reason.empty()) && reason[0] == ' ') reason.erase(0, 1);
 		if (reason.empty() || reason[0] != ':')
 			return false;
 		arguments.push_back(reason);
@@ -149,8 +182,33 @@ bool CommandHandler::handleKick(std::istringstream &iss, std::vector<std::string
 }
 
 
-// /*------Parsing PING command------*/
-// bool CommandHandler::handlePing(std::istringstream &iss, std::vector<std::string> &arguments) {
-// 	std::string arg1, arg2;
+/*------Parsing PING command------*/
+bool CommandHandler::handlePing(std::istringstream &iss, std::vector<std::string> &arguments) {
+	std::string arg2;
 
-// }
+	if (iss.rdbuf()->in_avail() > 0) {
+		std::getline(iss, arg2);
+		if (!(arg2.empty()) && arg2[0] == ' ') arg2.erase(0, 1);
+		if (arg2.empty())
+			return false;
+		arguments.push_back(arg2);
+	}
+	return true;
+}
+
+bool CommandHandler::handleCap(std::istringstream &iss, std::vector<std::string> &arguments) {
+	std::string arg1, arg2;
+
+	if (!(iss >> arg1)){
+		std::cerr << "No arg2 provided!" << std::endl;
+		return {};
+	}
+	arguments.push_back(arg1);
+	if (iss.rdbuf()->in_avail() > 0) {
+		std::getline(iss, arg2);
+		if (arg2.empty())
+			return false;
+		arguments.push_back(arg2);
+	}
+	return true;
+}

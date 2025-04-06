@@ -1,33 +1,67 @@
-// #include <iostream>
-// #include "../include/Client.hpp"
-// #include "../include/client_c_h.hpp"
-// #include "../include/Server.hpp"
+#include <iostream>
+#include <sstream>
+#include <vector>
+#include <string>
 
-// int main() {
-//     Server *server = new Server(6667, "123");
-//     CommandHandler *handler = new CommandHandler(*server);
+class CommandHandler {
+public:
+    bool handleNotice(std::istringstream &iss, std::vector<std::string> &arguments);
+};
 
-//     // Creating test clients with a file descriptor and hostname
-//     Client client1(1, "host1.local");
-//     Client client2(2, "host2.local");
-//     Client client3(3, "host3.local");
-//     Client client4(3, "host3.local");
+bool CommandHandler::handleNotice(std::istringstream &iss, std::vector<std::string> &arguments) {
+    std::string lagcheck, msg, lagData;
 
+    while (iss >> lagcheck) {
+        if (lagcheck.size() >= 9 && lagcheck.compare(0, 9, ":LAGCHECK") == 0) {
+            // the case if there is no whitespace between LAGCHECK and the rest of the msg
+            if (lagcheck.size() > 9) {
+                arguments.push_back(msg);
+                arguments.push_back(":LAGCHECK");
+                arguments.push_back(lagcheck.substr(9));
+                return true;
+            }
 
-//     // Simulating commands
-//     handler->handleCommand(&client1, "NICK Rustam");
-//     handler->handleCommand(&client2, "NICK Tilek");
-//     handler->handleCommand(&client3, "NICK Linda");
-//     handler->handleCommand(&client4, "USER testuser 0 * :Test Real Name");
+            arguments.push_back(msg);
+            arguments.push_back(":LAGCHECK");
 
-//     server->addClient(&client1);
-//     server->addClient(&client2);
-//     server->addClient(&client3);
-//     server->addClient(&client4);
+            std::getline(iss, lagData);
+            if (!lagData.empty() && lagData[0] == ' ')
+                lagData.erase(0, 1);
+            if (!lagData.empty())
+                arguments.push_back(lagData);
+            return true;
+        }
+        if (!msg.empty()) msg += " ";
+        msg += lagcheck;
+    }
+    return false;
+}
 
-//     handler->handleCommand(&client1, "PRIVMSG Linda :Hello!");
-//     delete server;
-//     delete handler;
+int main() {
+    CommandHandler handler;
 
-//     return 0;
-// }
+    std::vector<std::string> testCases[] = {
+        { "Welcome to the IRC Network !@127.0.0.1 :LAGCHECK 1743961970610447-yeah-:)" },
+        { "Welcome to IRC :LAGCHECK123456789" },
+        { "Just some text with no lagcheck" },
+        { ":LAGCHECK diretly startcs here" },
+        { "Stuff before :LAGCHECK" }
+    };
+
+    for (const auto &input : testCases) {
+        std::vector<std::string> args;
+        std::istringstream iss(input[0]);
+        std::cout << "\nInput: " << input[0] << std::endl;
+
+        if (handler.handleNotice(iss, args)) {
+            std::cout << "Parsed arguments:\n";
+            for (size_t i = 0; i < args.size(); ++i) {
+                std::cout << "  Arg[" << i << "]: [" << args[i] << "]\n";
+            }
+        } else {
+            std::cout << "No LAGCHECK found or invalid format.\n";
+        }
+    }
+
+    return 0;
+}

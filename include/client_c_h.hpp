@@ -6,7 +6,7 @@
 /*   By: ryusupov <ryusupov@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: Invalid date        by                   #+#    #+#             */
-/*   Updated: 2025/04/05 18:26:28 by ryusupov         ###   ########.fr       */
+/*   Updated: 2025/04/06 19:31:13 by ryusupov         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,6 +45,8 @@ class CommandHandler{
 		static bool handleSimpleCommands(std::istringstream &iss, std::vector<std::string> &arguments);
 		static bool handleKick(std::istringstream &iss, std::vector<std::string> &arguments);
 		static bool handlePing(std::istringstream &iss, std::vector<std::string> &arguments);
+		static bool handleCap(std::istringstream &iss, std::vector<std::string> &arguments);
+		static bool handleNotice(std::istringstream &iss, std::vector<std::string> &arguments);
 
 
 
