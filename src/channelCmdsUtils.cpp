@@ -112,3 +112,37 @@ void processKickRequest(IClient& client, IServer& server, \
 		CommandHandler::SendMessage(&client, client.getNickname() + " KICK " + \
             userName + " from " + channelName + " :" + reason);
 }
+
+void processInviteRequest(IClient& client, IChannel* channel, \
+    const std::string& userName)
+{
+    channel->addInvitedUser(userName);
+    CommandHandler::SendMessage(&client, client.getNickname() + " INVITE " + \
+        userName + " to " + channel->getName());
+}
+
+void processGetTopicRequest(IClient& client, IChannel* channel)
+{
+    if (channel->getTopic().empty())
+            CommandHandler::SendMessage(&client, "Reply code " + \
+                std::string(RPL_NOTOPIC) + " : no TOPIC existing in channel " \
+                + channel->getName());
+    else
+        CommandHandler::SendMessage(&client, "Reply code " + \
+            std::string(RPL_TOPIC) + " : TOPIC of channel " + channel->getName() + \
+            " is " + channel->getTopic());
+    return;
+}
+
+void processSetTopicRequest(IClient& client, IChannel* channel, std::string newTopic)
+{
+    channel->setTopic(newTopic.erase(0, 1));
+    if (channel->getTopic().empty())
+        CommandHandler::SendMessage(&client, "Reply code " + \
+            std::string(RPL_NOTOPIC) + " : no TOPIC existing in channel " + \
+            channel->getName());
+    else
+        CommandHandler::SendMessage(&client, "TOPIC of channel " + \
+            channel->getName() + " is: " + channel->getTopic());
+    return;
+}

@@ -35,5 +35,10 @@ void processKickRequest(IClient& client, IServer& server, \
 bool isOperatorOnChannel(IClient& client, IChannel* channel);
 bool isClientOnChannel(IClient& client, IChannel* channel);
 bool isUserOnChannel(IClient& client, IChannel* channel, const std::string& userName);
+bool isInvitedUserOnChannel(IClient& client, IChannel* channel, const std::string& userName);
+void processInviteRequest(IClient& client, IChannel* channel, const std::string& userName);
+bool canOnlyOperatorChangeTopic(IClient& client, IChannel* channel);
+void processGetTopicRequest(IClient& client, IChannel* channel);
+void processSetTopicRequest(IClient& client, IChannel* channel, std::string newTopic);
 
 #endif

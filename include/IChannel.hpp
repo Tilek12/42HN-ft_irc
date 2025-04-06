@@ -24,6 +24,11 @@ public:
 	virtual	bool isInvitedUser(const std::string& user) = 0;
 	virtual bool isValidPassword(const std::string password) = 0;
 	virtual std::string getName() const = 0;
+	virtual void addInvitedUser(const std::string& user) = 0;
+	virtual bool getOnlyOperatorCanChangeTopic() = 0;
+	virtual std::string getTopic() const = 0;
+	virtual void setTopic(const std::string& topic) = 0;
+	
 };
 
 #endif

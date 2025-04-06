@@ -41,10 +41,38 @@ bool isUserOnChannel(IClient& client, IChannel* channel, const std::string& user
 	if (!isUserOnChannel || usersInChannel.empty())
 	{
 		CommandHandler::SendMessage(&client, "Error code " + \
-			std::string(ERR_USERNOTINCHANNEL) + ": can not kick. user " + userName + \
-			" is not in channel " + channel->getName());
+			std::string(ERR_USERNOTINCHANNEL) + " " + userName + " is not in channel " \
+			+ channel->getName());
 		return false;
 	}
 	else
 		return true;
+}
+
+bool isInvitedUserOnChannel(IClient& client, IChannel* channel, const std::string& userName)
+{
+	if (channel->isInvitedUser(userName))
+	{
+		CommandHandler::SendMessage(&client, "Error code " + \
+			std::string(ERR_USERONCHANNEL) +  ": user " + userName +  \
+			" already in invitedUsers on channel " + channel->getName());
+		return true;
+	}
+	else
+		return false;
+}
+
+void canOnlyOperatorChangeTopic(IClient& client, IChannel* channel)
+{
+	if (channel->getOnlyOperatorCanChangeTopic())
+    {
+        if (!channel->isOperator(client.getNickname()) || channel->getOperators().empty())
+        {
+            CommandHandler::SendMessage(&client, "Error code " + \
+                std::string(ERR_CHANOPRIVSNEEDED) + ": can not set TOPIC. "\
+                "You are not a channel operator of " + channel->getName());
+            return;
+        }
+    }
+	return;
 }

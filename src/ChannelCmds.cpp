@@ -86,7 +86,8 @@ void ChannelCmds::inviteUserCmd(IClient& client, IServer& server, std::vector<st
 {
     if (inviteParams.size() < 2)
     {
-        std::cerr << "Error code " << ERR_NEEDMOREPARAMS << " INVITE: not enough inviteParams" << std::endl;
+        std::cerr << "Error code " << ERR_NEEDMOREPARAMS << \
+            " INVITE: not enough inviteParams" << std::endl;
         return;
     }
     std::string user = inviteParams[0];
@@ -94,31 +95,23 @@ void ChannelCmds::inviteUserCmd(IClient& client, IServer& server, std::vector<st
     Channel* channel = server.getChannel(channelName);
     if (!channel)
     {
-        CommandHandler::SendMessage(&client, "Error code " + std::string(ERR_NOSUCHCHANNEL) + " : non existing channel " + channelName);
+        CommandHandler::SendMessage(&client, "Error code " + \
+            std::string(ERR_NOSUCHCHANNEL) + " : non existing channel " + channelName);
         return;
     }
     if (!(channel->getIsInviteOnly()))
     {
-        CommandHandler::SendMessage(&client, "Error: no isInvitedOnly channel " + channelName);
+        CommandHandler::SendMessage(&client, "Error: no isInvitedOnly channel " \
+            + channelName);
         return;
     }
-    if (!channel->isOperator(client.getNickname()) || channel->getOperators().empty())
-    {
-        CommandHandler::SendMessage(&client, "Error code " + std::string(ERR_CHANOPRIVSNEEDED) + ": can not invite. you are not a channel operator of " + channelName);
+    if (!isOperatorOnChannel(client, channel))
+		return;
+    if (isUserOnChannel(client, channel, user))
         return;
-    }
-    if (channel->isUser(user))
-    {
-        CommandHandler::SendMessage(&client, "Error code " + std::string(ERR_USERONCHANNEL) + ": user " + user + " already on channel " + channelName);
+    if (isInvitedUserOnChannel(client, channel, user))
         return;
-    }
-    if (channel->isInvitedUser(user))
-    {
-        CommandHandler::SendMessage(&client, "Error code " + std::string(ERR_USERONCHANNEL) +  ": user " + user +  " already in invitedUsers on channel " + channelName);
-        return;
-    }
-    channel->addInvitedUser(user);
-    CommandHandler::SendMessage(&client, client.getNickname() + " INVITE " + user + " to " + channelName);
+    processInviteRequest(client, channel, user);
 }
 
 void ChannelCmds::topicUserCmd(IClient& client, IServer& server, std::vector<std::string>& topicParams)
@@ -132,35 +125,17 @@ void ChannelCmds::topicUserCmd(IClient& client, IServer& server, std::vector<std
     Channel* channel = server.getChannel(channelName);
     if (!channel)
     {
-        CommandHandler::SendMessage(&client, "Error code " + std::string(ERR_NOSUCHCHANNEL) + " : non existing channel " + channelName);
+        CommandHandler::SendMessage(&client, "Error code " + \
+            std::string(ERR_NOSUCHCHANNEL) + " : non existing channel " + channelName);
         return;
     }
-    if (channel->getOnlyOperatorCanChangeTopic())
-    {
-        if (!channel->isOperator(client.getNickname()) || channel->getOperators().empty())
-        {
-            CommandHandler::SendMessage(&client, "Error code " + std::string(ERR_CHANOPRIVSNEEDED) + ": can not set TOPIC. you are not a channel operator of " + channelName);
-            return;
-        }
-    }
+    if (canOnlyOperatorChangeTopic(client, channel))
+       return;
     if (topicParams.size() == 1)
-    {
-        if (channel->getTopic().empty())
-            CommandHandler::SendMessage(&client, "Reply code " + std::string(RPL_NOTOPIC) + " : no TOPIC existing in channel " + channelName);
-        else
-            CommandHandler::SendMessage(&client, "Reply code " + std::string(RPL_TOPIC) + " : TOPIC of channel " + channelName + " is " + channel->getTopic());
-        return;
-    }
+        processGetTopicRequest(client, channel);
     std::string newTopic = topicParams[1];
     if (topicParams.size() == 2 && newTopic.front() == ':')
-    {
-        channel->setTopic(newTopic.erase(0, 1));
-        if (channel->getTopic().empty())
-            CommandHandler::SendMessage(&client, "Reply code " + std::string(RPL_NOTOPIC) + " : no TOPIC existing in channel " + channelName);
-        else
-            CommandHandler::SendMessage(&client, "TOPIC of channel " + channelName + " is: " + channel->getTopic());
-        return;
-    }
+        processSetTopicRequest(client, channel, newTopic);
 }
 
 void ChannelCmds::modeChannelCmd(IClient& client, IServer& server, std::vector<std::string>& modeParams)
