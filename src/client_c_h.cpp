@@ -6,7 +6,7 @@
 /*   By: ryusupov <ryusupov@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/22 16:37:19 by ryusupov          #+#    #+#             */
-/*   Updated: 2025/04/05 18:50:10 by ryusupov         ###   ########.fr       */
+/*   Updated: 2025/04/06 21:45:06 by ryusupov         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,6 +14,7 @@
 
 #include "../include/client_c_h.hpp"
 #include "../include/Client.hpp"
+#include "../include/ChannelCmds.hpp"
 #include "../include/ChannelCmds.hpp"
 
 CommandHandler::CommandHandler(Server& srv) : server(srv) {
@@ -41,7 +42,7 @@ void CommandHandler::handleCommand(Client *client, const std::string &command){
 		}
 
 		client->setNickname(nickname);
-
+		server.addClient(client);
 		SendMessage(client, "Your nickname is now " + nickname);
 		server.addClient(client);
 	} else if (parsed_command == "USER") {

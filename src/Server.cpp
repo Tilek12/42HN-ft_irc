@@ -195,11 +195,9 @@ void	Server::_processClientBuffer( Client* client ) {
 
 	std::string& buffer = client->getBuffer();
 	size_t	pos;
-
 	while ( ( pos = buffer.find("\r\n") ) != std::string::npos ) {
 		std::string message = buffer.substr( 0, pos );
 		buffer.erase( 0, pos + 2 ); // Remove processed message
-
 		if ( !message.empty() ) {
 			std::cout << YELLOW
 					  << "CMD [" << client->getSocketFd() << "]: " << message
