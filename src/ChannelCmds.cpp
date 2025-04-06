@@ -149,81 +149,15 @@ void ChannelCmds::modeChannelCmd(IClient& client, IServer& server, std::vector<s
     Channel* channel = server.getChannel(channelName);
     if (!channel)
     {
-        CommandHandler::SendMessage(&client, "Error code " + std::string(ERR_NOCHANMODES) + " : non existing channel " + channelName);
+        CommandHandler::SendMessage(&client, "Error code " + \
+            std::string(ERR_NOCHANMODES) + " : non existing channel " + channelName);
         return;
     }
-    if (!channel->isOperator(client.getNickname()) || channel->getOperators().empty())
-    {
-        CommandHandler::SendMessage(&client, "Error code " + std::string(ERR_CHANOPRIVSNEEDED) + ": can not MODE. you are not a channel operator of " + channelName);
+    if (!isOperatorOnChannel(client, channel))
         return;
-    }
     std::string mode = modeParams[1];
     if (modeParams.size() == 2)
-    {
-        if (mode == "+i")
-        {
-            channel->setIsInviteOnly(true);
-            return;
-        }
-        else if (mode == "-i")
-        {
-            channel->setIsInviteOnly(false);
-            return;
-        }
-        else if (mode == "+t")
-        {
-            channel->setOnlyOperatorCanChangeTopic(true);
-            return;
-        }
-        else if (mode == "-t")
-        {
-            channel->setOnlyOperatorCanChangeTopic(false);
-            return;
-        }
-        else if (mode == "-l")
-        {
-            channel->setUserLimit(0);
-            return;
-        }
-        else
-        {
-            CommandHandler::SendMessage(&client, "Error code " + std::string(ERR_UNKNOWNMODE) + ": unknown channel mode " + mode);
-            return;
-        }
-    }
+        processModeTwoArgsRequest(client, channel, mode);
     else if (modeParams.size() == 3)
-    {
-        if (mode == "+o" || mode == "-o")
-        {
-            std::string user = modeParams[2];
-            if (mode == "+o")
-                channel->addOperator(user);
-            else if (mode == "-o")
-                channel->removeOperator(user);
-        }
-        else if (mode == "+k" || mode == "-k")
-        {
-            std::string password = modeParams[2];
-            if (mode == "+k")
-            {
-                channel->setHasPassword(true);
-                channel->setPassword(password);
-            }
-            else if (mode == "-k")
-            {
-                channel->setHasPassword(false);
-                channel->setPassword("");
-            }
-        }
-        else if (mode == "+l")
-        {
-            int userLimit = std::stoi(modeParams[2]);
-            channel->setUserLimit(userLimit);
-        }
-        else
-        {
-            CommandHandler::SendMessage(&client, "Error code " + std::string(ERR_UNKNOWNMODE) + ": unknown channel mode " + mode);
-            return;
-        }
-    }
+        processModeThreeArgsRequest(client, channel, mode, modeParams[2]);
 }

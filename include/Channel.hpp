@@ -38,20 +38,20 @@ public:
 	void 						removeUser(const std::string& user) override;
 	std::vector<std::string> 	getOperators() const override;
 	void 						addOperator(const std::string& oper) override;
-	void 						removeOperator(const std::string& oper);
+	void 						removeOperator(const std::string& oper) override;
 	std::vector<std::string> 	getInvitedUsers() const override;
 	void						addInvitedUser(const std::string& user) override;
 	void						removeInvitedUser(const std::string& user);
 	bool 						getHasPassword() const override;
-	void 						setHasPassword(bool hasPassword);
+	void 						setHasPassword(bool hasPassword) override;
 	bool 						getIsInviteOnly() const override;
-	void 						setIsInviteOnly(bool isInviteOnly);
+	void 						setIsInviteOnly(bool isInviteOnly) override;
 	size_t						getUserLimit() const override;
-	void						setUserLimit(size_t limit);
+	void						setUserLimit(size_t limit) override;
 	std::string					getPassword() const override;
-	void						setPassword(const std::string& password);
+	void						setPassword(const std::string& password) override;
 	bool						getOnlyOperatorCanChangeTopic() override;
-	void						setOnlyOperatorCanChangeTopic(bool OnlyOperatorCanChangeTopic);
+	void						setOnlyOperatorCanChangeTopic(bool OnlyOperatorCanChangeTopic) override;
 
 	bool						isValidPassword(const std::string password) override;
 	static bool					isValidChannelName(const std::string& name);

@@ -40,5 +40,8 @@ void processInviteRequest(IClient& client, IChannel* channel, const std::string&
 bool canOnlyOperatorChangeTopic(IClient& client, IChannel* channel);
 void processGetTopicRequest(IClient& client, IChannel* channel);
 void processSetTopicRequest(IClient& client, IChannel* channel, std::string newTopic);
+void processModeTwoArgsRequest(IClient& client, IChannel* channel, std::string mode);
+void processModeThreeArgsRequest(IClient& client, IChannel* channel, std::string mode, std::string modeParamIdx2);
+
 
 #endif

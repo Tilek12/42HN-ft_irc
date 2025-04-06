@@ -146,3 +146,51 @@ void processSetTopicRequest(IClient& client, IChannel* channel, std::string newT
             channel->getName() + " is: " + channel->getTopic());
     return;
 }
+
+void processModeTwoArgsRequest(IClient& client, IChannel* channel, std::string mode)
+{
+    if (mode == "+i")
+        channel->setIsInviteOnly(true);
+    else if (mode == "-i")
+        channel->setIsInviteOnly(false);
+    else if (mode == "+t")
+        channel->setOnlyOperatorCanChangeTopic(true);
+    else if (mode == "-t")
+        channel->setOnlyOperatorCanChangeTopic(false);
+    else if (mode == "-l")
+        channel->setUserLimit(0);
+    else
+    {
+        CommandHandler::SendMessage(&client, "Error code " + \
+            std::string(ERR_UNKNOWNMODE) + ": unknown channel mode " + mode);
+    }
+    return;
+}
+void processModeThreeArgsRequest(IClient& client, IChannel* channel, std::string mode, std::string modeParamIdx2)
+{
+    if (mode == "+o")
+        channel->addOperator(modeParamIdx2);
+    else if (mode == "-o")
+        channel->removeOperator(modeParamIdx2);
+    else if (mode == "+k")
+    {
+        channel->setHasPassword(true);
+            channel->setPassword(modeParamIdx2);
+    }
+    else if (mode == "-k")
+    {
+        channel->setHasPassword(false);
+        channel->setPassword("");
+    }
+    else if (mode == "+l")
+    {
+        int userLimit = std::stoi(modeParamIdx2);
+        channel->setUserLimit(userLimit);
+    }
+    else
+    {
+        CommandHandler::SendMessage(&client, "Error code " + \
+            std::string(ERR_UNKNOWNMODE) + ": unknown channel mode " + mode);
+        return;
+    }
+}
