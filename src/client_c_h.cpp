@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   client_c_h.cpp                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ryusupov <ryusupov@student.42.fr>          +#+  +:+       +#+        */
+/*   By: llacsivy <llacsivy@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/22 16:37:19 by ryusupov          #+#    #+#             */
-/*   Updated: 2025/04/08 17:59:07 by ryusupov         ###   ########.fr       */
+/*   Updated: 2025/04/08 18:20:05 by llacsivy         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,7 +14,6 @@
 
 #include "../include/client_c_h.hpp"
 #include "../include/Client.hpp"
-#include "../include/ChannelCmds.hpp"
 #include "../include/ChannelCmds.hpp"
 #include "../include/IClient.hpp"
 
@@ -110,7 +109,7 @@ void	CommandHandler::MainCommandHandller(Client *client, std::vector<std::string
 		serverCmdHandler(&server, client);
 	}
 	else if (channelCmds.find(args[0]) != channelCmds.end()) {
-		//
+		channelCmdHandler(*client, server, args);
 	}
 	else if (clientCmds.find(args[0]) != clientCmds.end()) {
 		clientCmdHandler(client, args);
