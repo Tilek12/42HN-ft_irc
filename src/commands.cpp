@@ -6,7 +6,7 @@
 /*   By: ryusupov <ryusupov@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/04 19:18:33 by ryusupov          #+#    #+#             */
-/*   Updated: 2025/04/06 21:34:25 by ryusupov         ###   ########.fr       */
+/*   Updated: 2025/04/08 15:12:41 by ryusupov         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -206,6 +206,7 @@ bool CommandHandler::handleCap(std::istringstream &iss, std::vector<std::string>
 	arguments.push_back(arg1);
 	if (iss.rdbuf()->in_avail() > 0) {
 		std::getline(iss, arg2);
+		if (!(arg2.empty()) && arg2[0] == ' ') arg2.erase(0, 1);
 		if (arg2.empty())
 			return false;
 		arguments.push_back(arg2);

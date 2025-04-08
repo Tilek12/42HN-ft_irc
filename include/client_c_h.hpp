@@ -6,7 +6,7 @@
 /*   By: ryusupov <ryusupov@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: Invalid date        by                   #+#    #+#             */
-/*   Updated: 2025/04/06 19:31:13 by ryusupov         ###   ########.fr       */
+/*   Updated: 2025/04/08 15:32:03 by ryusupov         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,7 +28,7 @@ class CommandHandler{
 		Server &server;
 
 	public:
-		void handleCommand(Client *client, const std::string &command);
+		void clientCmdHandler(Client *client, std::vector<std::string> &command);
 		CommandHandler(Server& srv);
 		bool NickNameTaken(std::string &nickname);
 		static void SendMessage(IClient *client, const std::string &msg);
@@ -47,6 +47,7 @@ class CommandHandler{
 		static bool handlePing(std::istringstream &iss, std::vector<std::string> &arguments);
 		static bool handleCap(std::istringstream &iss, std::vector<std::string> &arguments);
 		static bool handleNotice(std::istringstream &iss, std::vector<std::string> &arguments);
+		void	MainCommandHandller(Client *client, std::vector<std::string> &args);
 
 
 

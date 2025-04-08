@@ -25,6 +25,7 @@ SRC =	$(SRC_DIR)/Server.cpp \
 		$(SRC_DIR)/client_c_h.cpp \
 		$(SRC_DIR)/parse_cmds.cpp \
 		$(SRC_DIR)/commands.cpp \
+		$(SRC_DIR)/serverCmdHandler.cpp
 
 OBJ = $(SRC:$(SRC_DIR)/%.cpp=$(OBJ_DIR)/%.o)
 
