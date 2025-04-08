@@ -10,3 +10,5 @@ test_tilek
 /logs
 /logs/*.txt
 /test.dSYM/*
+ircserv.dSYM/*
+test_channel.dSYM/*

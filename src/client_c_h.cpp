@@ -6,7 +6,7 @@
 /*   By: ryusupov <ryusupov@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/22 16:37:19 by ryusupov          #+#    #+#             */
-/*   Updated: 2025/04/08 17:29:53 by ryusupov         ###   ########.fr       */
+/*   Updated: 2025/04/08 17:59:07 by ryusupov         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,6 +16,7 @@
 #include "../include/Client.hpp"
 #include "../include/ChannelCmds.hpp"
 #include "../include/ChannelCmds.hpp"
+#include "../include/IClient.hpp"
 
 CommandHandler::CommandHandler(Server& srv) : server(srv) {
 	//
