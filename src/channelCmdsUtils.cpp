@@ -27,8 +27,9 @@ void processJoinRequest(IClient& client, IServer& server, \
         return;
     }
     channel->addUser(client.getNickname());
-    // CommandHandler::SendMessage(&client, client.getNickname() + " JOIN " + channelName);
-    server.sendToClient(client.getNickname(), client.getNickname() + " JOIN " + channelName);
+    std::string reply = ":" +  client.getNickname() + "!" \
+        + "@" + client.getHostname() + " JOIN :" + channel->getName();
+    server.sendToClient(client.getNickname(), reply);
 }
 
 bool joinAllowed(IClient& client, IChannel* channel, const std::string& password)
