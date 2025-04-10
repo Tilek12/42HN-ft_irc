@@ -36,5 +36,4 @@ void channelCmdHandler(IClient& client, IServer& server, \
 	}
 	else
 		std::cerr << "Error: command " << args[0] << "not found!" << std::endl;
-	
 }

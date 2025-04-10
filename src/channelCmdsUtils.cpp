@@ -19,11 +19,13 @@ void processJoinRequest(IClient& client, IServer& server, \
     }
     else
     {
-        std::cerr << "Error code " << IRCerror::ERR_BADCHANMASK << ": bad channel mask. \
-            Invalid channel name: " << channelName << std::endl;
+        std::string errorMsg = ":" + IRCname + " " + IRCerror::ERR_BADCHANMASK + " " \
+            + client.getNickname() + " " + channelName + " :Bad Channel Mask\r\n";
+        server.sendToClient(client.getNickname(), errorMsg);
+        std::cerr << errorMsg;
         return;
     }
-    if (!joinAllowed(client, channel, password))
+    if (!joinAllowed(client, server, channel, password))
     {
         return;
     }
@@ -31,14 +33,17 @@ void processJoinRequest(IClient& client, IServer& server, \
     std::string reply = ":" +  client.getNickname() + "!" \
         + "@" + client.getHostname() + " JOIN :" + channel->getName();
     server.sendToClient(client.getNickname(), reply);
+    std::cout << reply;
 }
 
-bool joinAllowed(IClient& client, IChannel* channel, const std::string& password)
+bool joinAllowed(IClient& client, IServer& server, IChannel* channel, const std::string& password)
 {
     if (channel->getHasPassword() && channel->isValidPassword(password))
     {
-        CommandHandler::SendMessage(&client, "Error code " + \
-			std::string(IRCerror::ERR_BADCHANNELKEY) + ": invalid password.");
+        std::string errorMsg = ":" + IRCname + " " + IRCerror::ERR_BADCHANNELKEY \
+            + " " + client.getNickname() + " " + channel->getName() + " :Cannot join channel (+k)\r\n";
+        server.sendToClient(client.getNickname(), errorMsg);
+        std::cerr << errorMsg;
         return false;
     }
     bool isInvited = std::find(channel->getInvitedUsers().begin(), \
@@ -46,14 +51,18 @@ bool joinAllowed(IClient& client, IChannel* channel, const std::string& password
         != channel->getInvitedUsers().end();
     if (channel->getIsInviteOnly() && !isInvited)
     {
-        CommandHandler::SendMessage(&client, "Error code " + std::string(IRCerror::ERR_INVITEONLYCHAN) + \
-            ":Cannot join. Channel is invite only");
+        std::string errorMsg = ":" + IRCname + " " + IRCerror::ERR_INVITEONLYCHAN +
+        " " + client.getNickname() + " " + channel->getName() + " :Cannot join channel (+i)\r\n";
+        server.sendToClient(client.getNickname(), errorMsg);
+        std::cerr << errorMsg;
         return false;
     }
     if (channel->getUserLimit() > 0 && channel->getUsers().size() >= channel->getUserLimit())
     {
-        CommandHandler::SendMessage(&client, "Error code " + \
-			std::string(IRCerror::ERR_CHANNELISFULL) + ":Cannot join. Channel is full");
+        std::string errorMsg = ":" + IRCname + " " + IRCerror::ERR_CHANNELISFULL +
+            " " + client.getNickname() + " " + channel->getName() + " :Cannot join channel (+l)\r\n";
+        server.sendToClient(client.getNickname(), errorMsg);
+        std::cerr << errorMsg;
         return false;
     }
     return true;
@@ -62,29 +71,34 @@ bool joinAllowed(IClient& client, IChannel* channel, const std::string& password
 void processPartRequest(IClient& client, IServer& server, \
     const std::string& channelName, const std::string& reason)
 {
-    IChannel* channel;
-    
-    channel = server.getChannel(channelName);
+     IChannel* channel = server.getChannel(channelName);
     if (!channel)
     {
-        CommandHandler::SendMessage(&client, "Error code " + \
-			std::string(IRCerror::ERR_NOSUCHCHANNEL) + " :non existing channel " + channelName);
+        std::string errorMsg = ":" + IRCname + " " + IRCerror::ERR_NOSUCHCHANNEL +
+            " " + client.getNickname() + " " + channelName + " :No such channel\r\n";
+        server.sendToClient(client.getNickname(), errorMsg);
+        std::cerr << errorMsg;
         return;
     }
     bool isClientOnChannel = std::find(channel->getUsers().begin(), \
 		channel->getUsers().end(), client.getNickname()) != channel->getUsers().end();
     if (!isClientOnChannel)
     {
-        CommandHandler::SendMessage(&client, "Error code " + \
-			std::string(IRCerror::ERR_NOTONCHANNEL) + " :you are not on channel " + channelName);
+        std::string errorMsg = ":" + IRCname + " " + IRCerror::ERR_NOTONCHANNEL +
+            " " + client.getNickname() + " " + channelName + " :You're not on that channel\r\n";
+        server.sendToClient(client.getNickname(), errorMsg);
+        std::cerr << errorMsg;
         return;
     }
     channel->removeUser(client.getNickname());
+    std::string reply;
     if (reason.empty())
-        CommandHandler::SendMessage(&client, client.getNickname() + " PART " + channelName);
+        reply = ":" + client.getNickname() + " PART " + channelName;
     else
-        CommandHandler::SendMessage(&client, client.getNickname() + " PART " + \
-			channelName + ":" + reason);
+        reply = ":" + client.getNickname() + " PART " + channelName + " :" + reason;
+    server.sendToClient(client.getNickname(), reply);
+    server.broadcastMessage(channel->getName(), reply);
+    std::cout << reply;
     if (channel->getUsers().size() == 0)
         server.removeChannel(channelName);
 }
@@ -97,60 +111,61 @@ void processKickRequest(IClient& client, IServer& server, \
 	channel = server.getChannel(channelName);
 	if (!channel)
 	{
-		CommandHandler::SendMessage(&client, "Error code " + \
-			std::string(IRCerror::ERR_NOSUCHCHANNEL) + " :non existing channel " + channelName);
+        std::string errorMsg = ":" + IRCname + " " + IRCerror::ERR_NOSUCHCHANNEL + " " +
+            client.getNickname() + " " + channelName + " :No such channel";
+        server.sendToClient(client.getNickname(), errorMsg);
+        server.broadcastMessage(client.getNickname(), errorMsg);
+        std::cerr << errorMsg << std::endl;
 		return;
 	}
-	if (!isOperatorOnChannel(client, channel))
+	if (!isOperatorOnChannel(client, server, channel))
 		return;
-	if (!isClientOnChannel(client, channel))
+	if (!isClientOnChannel(client, server, channel))
 		return;
-    if (!isUserOnChannel(client, channel, userName))
+    if (!isUserOnChannel(client, server, channel, userName))
 		return;
 	channel->removeUser(userName);
-	if (reason.empty())
-		CommandHandler::SendMessage(&client, client.getNickname() + " KICK " + \
-            userName + " from " + channelName);
-	else
-		CommandHandler::SendMessage(&client, client.getNickname() + " KICK " + \
-            userName + " from " + channelName + " :" + reason);
+    std::string replyMsg;
+    if (reason.empty())
+        replyMsg = ":" + client.getNickname() + " KICK " +
+            userName + " " + channelName;
+    else
+        std::string kickMessage = ":" + client.getNickname() + " KICK " +
+            userName + " " + channelName + " :" + reason;
+    server.sendToClient(channelName, replyMsg);
+    std::cerr << replyMsg << std::endl;
 }
 
-void processInviteRequest(IClient& client, IChannel* channel, \
+void processInviteRequest(IClient& client, IServer& server, IChannel* channel, \
     const std::string& userName)
 {
     channel->addInvitedUser(userName);
-    CommandHandler::SendMessage(&client, client.getNickname() + " INVITE " + \
-        userName + " to " + channel->getName());
+    std::string reply = ":" + client.getNickname() + " INVITE " +
+        userName + " " + channel->getName();
+    server.sendToClient(userName, reply);
+    std::cerr << reply << std::endl;
 }
 
-void processGetTopicRequest(IClient& client, IChannel* channel)
+void processGetTopicRequest(IClient& client, IServer& server, IChannel* channel)
 {
     if (channel->getTopic().empty())
-            CommandHandler::SendMessage(&client, "Reply code " + \
-                std::string(IRCreply::RPL_NOTOPIC) + " : no TOPIC existing in channel " \
-                + channel->getName());
+    {
+        std::string reply = ":" + IRCname + " " + IRCreply::RPL_NOTOPIC + " " + 
+                client.getNickname() + " " + channel->getName() + " :No topic is set for this channel";
+        server.sendToClient(client.getNickname(), reply);
+        std::cerr << reply << std::endl;
+    }
     else
-        CommandHandler::SendMessage(&client, "Reply code " + \
-            std::string(IRCreply::RPL_TOPIC) + " : TOPIC of channel " + channel->getName() + \
-            " is " + channel->getTopic());
+    {
+        std::string reply = ":" + IRCname + " " + IRCreply::RPL_TOPIC + " " +
+                client.getNickname() + " " + channel->getName() + " :" + channel->getTopic();
+        server.sendToClient(client.getNickname(), reply);
+        std::cerr << reply << std::endl;
+    }
     return;
 }
 
-void processSetTopicRequest(IClient& client, IChannel* channel, std::string newTopic)
-{
-    channel->setTopic(newTopic.erase(0, 1));
-    if (channel->getTopic().empty())
-        CommandHandler::SendMessage(&client, "Reply code " + \
-            std::string(IRCreply::RPL_NOTOPIC) + " : no TOPIC existing in channel " + \
-            channel->getName());
-    else
-        CommandHandler::SendMessage(&client, "TOPIC of channel " + \
-            channel->getName() + " is: " + channel->getTopic());
-    return;
-}
-
-void processModeTwoArgsRequest(IClient& client, IChannel* channel, std::string mode)
+void processModeTwoArgsRequest(IClient& client, IServer& server, IChannel* channel, std::string mode)
 {
     if (mode == "+i")
         channel->setIsInviteOnly(true);
@@ -164,12 +179,15 @@ void processModeTwoArgsRequest(IClient& client, IChannel* channel, std::string m
         channel->setUserLimit(0);
     else
     {
-        CommandHandler::SendMessage(&client, "Error code " + \
-            std::string(IRCerror::ERR_UNKNOWNMODE) + ": unknown channel mode " + mode);
+        std::string errorMsg = ":" + IRCname + " " + IRCerror::ERR_UNKNOWNMODE + " " +
+            client.getNickname() + " " + mode + " :Unknown channel mode";
+        server.sendToClient(client.getNickname(), errorMsg);
+        std::cerr << errorMsg << std::endl;
+
     }
     return;
 }
-void processModeThreeArgsRequest(IClient& client, IChannel* channel, std::string mode, std::string modeParamIdx2)
+void processModeThreeArgsRequest(IClient& client, IServer& server, IChannel* channel, std::string mode, std::string modeParamIdx2)
 {
     if (mode == "+o")
         channel->addOperator(modeParamIdx2);
@@ -178,7 +196,7 @@ void processModeThreeArgsRequest(IClient& client, IChannel* channel, std::string
     else if (mode == "+k")
     {
         channel->setHasPassword(true);
-            channel->setPassword(modeParamIdx2);
+        channel->setPassword(modeParamIdx2);
     }
     else if (mode == "-k")
     {
@@ -192,8 +210,9 @@ void processModeThreeArgsRequest(IClient& client, IChannel* channel, std::string
     }
     else
     {
-        CommandHandler::SendMessage(&client, "Error code " + \
-            std::string(IRCerror::ERR_UNKNOWNMODE) + ": unknown channel mode " + mode);
-        return;
+        std::string errorMsg = ":" + IRCname + " " + IRCerror::ERR_UNKNOWNMODE + " " +
+            client.getNickname() + " " + mode + " :Unknown channel mode";
+        server.sendToClient(client.getNickname(), errorMsg);
+        std::cerr << errorMsg << std::endl;
     }
 }
