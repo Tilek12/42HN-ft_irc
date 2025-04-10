@@ -1,5 +1,6 @@
 #include "../include/ChannelCmds.hpp"
-#include "../include/errorReplies.hpp"
+#include "../include/IRCerror.hpp"
+#include "../include/IRCreply.hpp"
 #include "../include/client_c_h.hpp"
 #include "../include/channelHelperFcts.hpp"
 
@@ -18,7 +19,7 @@ void processJoinRequest(IClient& client, IServer& server, \
     }
     else
     {
-        std::cerr << "Error code " << ERR_BADCHANMASK << ": bad channel mask. \
+        std::cerr << "Error code " << IRCerror::ERR_BADCHANMASK << ": bad channel mask. \
             Invalid channel name: " << channelName << std::endl;
         return;
     }
@@ -37,7 +38,7 @@ bool joinAllowed(IClient& client, IChannel* channel, const std::string& password
     if (channel->getHasPassword() && channel->isValidPassword(password))
     {
         CommandHandler::SendMessage(&client, "Error code " + \
-			std::string(ERR_BADCHANNELKEY) + ": invalid password.");
+			std::string(IRCerror::ERR_BADCHANNELKEY) + ": invalid password.");
         return false;
     }
     bool isInvited = std::find(channel->getInvitedUsers().begin(), \
@@ -45,14 +46,14 @@ bool joinAllowed(IClient& client, IChannel* channel, const std::string& password
         != channel->getInvitedUsers().end();
     if (channel->getIsInviteOnly() && !isInvited)
     {
-        CommandHandler::SendMessage(&client, "Error code " + std::string(ERR_INVITEONLYCHAN) + \
+        CommandHandler::SendMessage(&client, "Error code " + std::string(IRCerror::ERR_INVITEONLYCHAN) + \
             ":Cannot join. Channel is invite only");
         return false;
     }
     if (channel->getUserLimit() > 0 && channel->getUsers().size() >= channel->getUserLimit())
     {
         CommandHandler::SendMessage(&client, "Error code " + \
-			std::string(ERR_CHANNELISFULL) + ":Cannot join. Channel is full");
+			std::string(IRCerror::ERR_CHANNELISFULL) + ":Cannot join. Channel is full");
         return false;
     }
     return true;
@@ -67,7 +68,7 @@ void processPartRequest(IClient& client, IServer& server, \
     if (!channel)
     {
         CommandHandler::SendMessage(&client, "Error code " + \
-			std::string(ERR_NOSUCHCHANNEL) + " :non existing channel " + channelName);
+			std::string(IRCerror::ERR_NOSUCHCHANNEL) + " :non existing channel " + channelName);
         return;
     }
     bool isClientOnChannel = std::find(channel->getUsers().begin(), \
@@ -75,7 +76,7 @@ void processPartRequest(IClient& client, IServer& server, \
     if (!isClientOnChannel)
     {
         CommandHandler::SendMessage(&client, "Error code " + \
-			std::string(ERR_NOTONCHANNEL) + " :you are not on channel " + channelName);
+			std::string(IRCerror::ERR_NOTONCHANNEL) + " :you are not on channel " + channelName);
         return;
     }
     channel->removeUser(client.getNickname());
@@ -97,7 +98,7 @@ void processKickRequest(IClient& client, IServer& server, \
 	if (!channel)
 	{
 		CommandHandler::SendMessage(&client, "Error code " + \
-			std::string(ERR_NOSUCHCHANNEL) + " :non existing channel " + channelName);
+			std::string(IRCerror::ERR_NOSUCHCHANNEL) + " :non existing channel " + channelName);
 		return;
 	}
 	if (!isOperatorOnChannel(client, channel))
@@ -127,11 +128,11 @@ void processGetTopicRequest(IClient& client, IChannel* channel)
 {
     if (channel->getTopic().empty())
             CommandHandler::SendMessage(&client, "Reply code " + \
-                std::string(RPL_NOTOPIC) + " : no TOPIC existing in channel " \
+                std::string(IRCreply::RPL_NOTOPIC) + " : no TOPIC existing in channel " \
                 + channel->getName());
     else
         CommandHandler::SendMessage(&client, "Reply code " + \
-            std::string(RPL_TOPIC) + " : TOPIC of channel " + channel->getName() + \
+            std::string(IRCreply::RPL_TOPIC) + " : TOPIC of channel " + channel->getName() + \
             " is " + channel->getTopic());
     return;
 }
@@ -141,7 +142,7 @@ void processSetTopicRequest(IClient& client, IChannel* channel, std::string newT
     channel->setTopic(newTopic.erase(0, 1));
     if (channel->getTopic().empty())
         CommandHandler::SendMessage(&client, "Reply code " + \
-            std::string(RPL_NOTOPIC) + " : no TOPIC existing in channel " + \
+            std::string(IRCreply::RPL_NOTOPIC) + " : no TOPIC existing in channel " + \
             channel->getName());
     else
         CommandHandler::SendMessage(&client, "TOPIC of channel " + \
@@ -164,7 +165,7 @@ void processModeTwoArgsRequest(IClient& client, IChannel* channel, std::string m
     else
     {
         CommandHandler::SendMessage(&client, "Error code " + \
-            std::string(ERR_UNKNOWNMODE) + ": unknown channel mode " + mode);
+            std::string(IRCerror::ERR_UNKNOWNMODE) + ": unknown channel mode " + mode);
     }
     return;
 }
@@ -192,7 +193,7 @@ void processModeThreeArgsRequest(IClient& client, IChannel* channel, std::string
     else
     {
         CommandHandler::SendMessage(&client, "Error code " + \
-            std::string(ERR_UNKNOWNMODE) + ": unknown channel mode " + mode);
+            std::string(IRCerror::ERR_UNKNOWNMODE) + ": unknown channel mode " + mode);
         return;
     }
 }
