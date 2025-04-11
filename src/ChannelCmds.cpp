@@ -2,7 +2,7 @@
 #include <iostream>
 #include <string>
 
-#include "../include/errorReplies.hpp"
+#include "../include/IRCerror.hpp"
 #include "../include/Channel.hpp"
 #include "../include/ChannelCmds.hpp"
 #include "../include/channelHelperFcts.hpp"
@@ -21,7 +21,10 @@ void ChannelCmds::joinChannelCmd(IClient& client, IServer& server, std::vector<s
 
     if (joinParams.empty())
     {
-        std::cerr << "Error code " << ERR_NEEDMOREPARAMS << " JOIN: not enough joinParams" << std::endl;
+        std::string errorMsg = ":" + IRCname + " " + IRCerror::ERR_NEEDMOREPARAMS + \
+            " " + client.getNickname() + " JOIN :Not enough parameters\r\n";
+        server.sendToClient(client.getNickname(), errorMsg);
+        std::cerr << errorMsg;
         return;
     }
     channelNames = parseCommaString(joinParams[0]);
@@ -44,7 +47,10 @@ void ChannelCmds::partChannelCmd(IClient& client, IServer& server, std::vector<s
 
     if (partParams.empty())
     {
-        std::cerr << "Error code " << ERR_NEEDMOREPARAMS << " PART: not enough partParams" << std::endl;
+        std::string errorMsg = ":" + IRCname + " " + IRCerror::ERR_NEEDMOREPARAMS +
+            " " + client.getNickname() + " PART :Not enough parameters\r\n";
+        server.sendToClient(client.getNickname(), errorMsg);
+        std::cerr << errorMsg;
         return;
     }
     channelNames = parseCommaString(partParams[0]);
@@ -65,11 +71,14 @@ void ChannelCmds::kickUserCmd(IClient& client, IServer& server, std::vector<std:
 
     if (kickParams.size() < 2)
     {
-        std::cerr << "Error code " << ERR_NEEDMOREPARAMS << " KICK: not enough kickParams" << std::endl;
+        std::string errorMsg = ":" + IRCname + " " + IRCerror::ERR_NEEDMOREPARAMS + " " +
+            client.getNickname() + " KICK :Not enough parameters";
+        std::cerr << errorMsg << std::endl;
         return;
     }
     channelNames = parseCommaString(kickParams[0]);
     userNames = parseCommaString(kickParams[1]);
+    printVec(userNames);
     if (kickParams.size() == 3)
         reason = kickParams[2];
     for (size_t i = 0; i < channelNames.size(); i++)
@@ -86,78 +95,92 @@ void ChannelCmds::inviteUserCmd(IClient& client, IServer& server, std::vector<st
 {
     if (inviteParams.size() < 2)
     {
-        std::cerr << "Error code " << ERR_NEEDMOREPARAMS << \
+        std::cerr << "Error code " << IRCerror::ERR_NEEDMOREPARAMS << \
             " INVITE: not enough inviteParams" << std::endl;
         return;
     }
     std::string user = inviteParams[0];
     std::string channelName = inviteParams[1];
     Channel* channel = server.getChannel(channelName);
+    std::string errorMsg;
     if (!channel)
     {
-        CommandHandler::SendMessage(&client, "Error code " + \
-            std::string(ERR_NOSUCHCHANNEL) + " : non existing channel " + channelName);
+        errorMsg = ":" + IRCname + " " + IRCerror::ERR_NOCHANMODES + " " +
+                            client.getNickname() + " " + channelName + " :Channel does not exist";
+        server.sendToClient(client.getNickname(), errorMsg);
+        std::cerr << errorMsg << std::endl;
         return;
     }
     if (!(channel->getIsInviteOnly()))
     {
-        CommandHandler::SendMessage(&client, "Error: no isInvitedOnly channel " \
-            + channelName);
+        errorMsg = "NOTICE " + client.getNickname() + " :Channel is not invite-only";
+        server.sendToClient(client.getNickname(), errorMsg);
+        std::cerr << errorMsg << std::endl;
         return;
     }
-    if (!isOperatorOnChannel(client, channel))
+    if (!isOperatorOnChannel(client, server, channel))
 		return;
-    if (isUserOnChannel(client, channel, user))
+    if (isUserOnChannel(client, server, channel, user))
         return;
-    if (isInvitedUserOnChannel(client, channel, user))
+    if (isInvitedUserOnChannel(client, server, channel, user))
         return;
-    processInviteRequest(client, channel, user);
+    processInviteRequest(client, server, channel, user);
 }
 
 void ChannelCmds::topicUserCmd(IClient& client, IServer& server, std::vector<std::string>& topicParams)
 {
     if (topicParams.empty())
     {
-        std::cerr << "Error code " << ERR_NEEDMOREPARAMS << " TOPIC: not enough topicParams" << std::endl;
+        std::string errorMsg = ":" + IRCname + " " + IRCerror::ERR_NEEDMOREPARAMS + " " +
+                       client.getNickname() + " TOPIC :Not enough parameters";
+        server.sendToClient(client.getNickname(), errorMsg);
+        std::cerr << errorMsg << std::endl;
         return;
     }
     std::string channelName = topicParams[0];
     Channel* channel = server.getChannel(channelName);
     if (!channel)
     {
-        CommandHandler::SendMessage(&client, "Error code " + \
-            std::string(ERR_NOSUCHCHANNEL) + " : non existing channel " + channelName);
+        std::string errorMsg = ":" + IRCname + " " + IRCerror::ERR_NOSUCHCHANNEL + " " +
+                       client.getNickname() + " " + channelName + " :No such channel";
+        server.sendToClient(client.getNickname(), errorMsg);
+        std::cerr << errorMsg << std::endl;
         return;
     }
-    if (canOnlyOperatorChangeTopic(client, channel))
+    if (canOnlyOperatorChangeTopic(client, server, channel))
        return;
     if (topicParams.size() == 1)
-        processGetTopicRequest(client, channel);
+        processGetTopicRequest(client, server, channel);
     std::string newTopic = topicParams[1];
     if (topicParams.size() == 2 && newTopic.front() == ':')
-        processSetTopicRequest(client, channel, newTopic);
+        processSetTopicRequest(client, server, channel, newTopic);
 }
 
 void ChannelCmds::modeChannelCmd(IClient& client, IServer& server, std::vector<std::string>& modeParams)
 {
     if (modeParams.size() < 2)
     {
-        std::cerr << "Error code " << ERR_NEEDMOREPARAMS << " MODE: not enough modeParams" << std::endl;
+        std::string reply = ":" + IRCname + " " + IRCerror::ERR_NEEDMOREPARAMS + " " +
+        client.getNickname() + " MODE :Not enough parameters";
+        server.sendToClient(client.getNickname(), reply);
+        std::cout << reply << std::endl;
         return;
     }
     std::string channelName = modeParams[0];
     Channel* channel = server.getChannel(channelName);
     if (!channel)
     {
-        CommandHandler::SendMessage(&client, "Error code " + \
-            std::string(ERR_NOCHANMODES) + " : non existing channel " + channelName);
+        std::string reply = ":" + IRCname + " " + IRCerror::ERR_NOCHANMODES + " " +
+        client.getNickname() + " " + channelName + " :Channel does not exist";
+        server.sendToClient(client.getNickname(), reply);
+        std::cerr << reply << std::endl;
         return;
     }
-    if (!isOperatorOnChannel(client, channel))
+    if (!isOperatorOnChannel(client, server, channel))
         return;
     std::string mode = modeParams[1];
     if (modeParams.size() == 2)
-        processModeTwoArgsRequest(client, channel, mode);
+        processModeTwoArgsRequest(client, server, channel, mode);
     else if (modeParams.size() == 3)
-        processModeThreeArgsRequest(client, channel, mode, modeParams[2]);
+        processModeThreeArgsRequest(client, server, channel, mode, modeParams[2]);
 }

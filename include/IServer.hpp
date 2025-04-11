@@ -38,6 +38,6 @@ public:
 	virtual void	sendToClient( int fd, const std::string& message ) = 0;
 	virtual void	sendToClient( const std::string& nickname, const std::string& message ) = 0;
 	virtual void	sendError( int fd, const std::string& errorCode, const std::string& message ) = 0;
-	virtual void	broadcastMessage( const std::string& channelName, const std::string& message ) = 0;
+	virtual void	broadcastMessage( Client *client, const std::string& channelName, const std::string& message ) = 0;
 
 };

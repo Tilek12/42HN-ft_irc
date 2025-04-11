@@ -6,7 +6,7 @@
 /*   By: ryusupov <ryusupov@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/22 16:37:19 by ryusupov          #+#    #+#             */
-/*   Updated: 2025/04/11 17:54:31 by ryusupov         ###   ########.fr       */
+/*   Updated: 2025/04/11 20:34:55 by ryusupov         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,9 +15,9 @@
 #include "../include/client_c_h.hpp"
 #include "../include/Client.hpp"
 #include "../include/ChannelCmds.hpp"
-#include "../include/ChannelCmds.hpp"
 #include "../include/IClient.hpp"
 
+//FIXME: PRIVMSG IS SENDING THE TEXT TWICE IN CHANNELS
 CommandHandler::CommandHandler(Server& srv) : server(srv) {
 	//
 }
@@ -66,7 +66,7 @@ void	CommandHandler::findTargetPrivmsg(Client *client, std::vector<std::string> 
 	if (target[0] == '#') {
 		std::string prefix = ":" + client->getNickname() + "!" + client->getUsername() + "@" + client->getHostname();
         std::string fullMessage = prefix + " PRIVMSG " + target + " :" + msg + "\r\n";
-		server.broadcastMessage(target, msg);
+		server.broadcastMessage(client, target, fullMessage);
 	}
 	else {
 		std::string prefix = ":" + client->getNickname() + "!" + client->getUsername() + "@" + client->getHostname();

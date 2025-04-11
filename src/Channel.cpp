@@ -1,6 +1,5 @@
 #include "../include/Channel.hpp"
 #include "../include/IChannel.hpp"
-#include "../include/errorReplies.hpp"
 #include "../include/channelHelperFcts.hpp"
 
 Channel::Channel()

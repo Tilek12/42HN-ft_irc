@@ -561,7 +561,7 @@ void	Server::sendError( int fd, const std::string& errorCode, const std::string&
 /*--------------------------------*/
 /*  Broadcast message in Channel  */
 /*--------------------------------*/
-void	Server::broadcastMessage( const std::string& channelName, const std::string& message ) {
+void	Server::broadcastMessage( Client *client, const std::string& channelName, const std::string& message ) {
 
 	Channel* channel = getChannel( channelName );
 	if ( !channel ) return;
@@ -574,6 +574,8 @@ void	Server::broadcastMessage( const std::string& channelName, const std::string
 	{
 		recipients.insert( group.begin(), group.end() );
 	}
+
+	recipients.erase( client->getNickname());
 
 	for ( const auto& [fd, client] : _clients ) {
 		if ( recipients.count( client->getNickname() ) )

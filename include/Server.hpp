@@ -93,7 +93,7 @@ public:
 	void	sendToClient( int fd, const std::string& message ) override;
 	void	sendToClient( const std::string& nickname, const std::string& message ) override;
 	void	sendError( int fd, const std::string& errorCode, const std::string& message ) override;
-	void	broadcastMessage( const std::string& channelName, const std::string& message ) override;
+	void	broadcastMessage(Client *client,  const std::string& channelName, const std::string& message ) override;
 
 };
 

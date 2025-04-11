@@ -6,7 +6,7 @@
 /*   By: ryusupov <ryusupov@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/04 19:18:33 by ryusupov          #+#    #+#             */
-/*   Updated: 2025/04/11 17:26:41 by ryusupov         ###   ########.fr       */
+/*   Updated: 2025/04/11 18:32:41 by ryusupov         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -121,7 +121,7 @@ bool CommandHandler::handleMode(std::istringstream &iss, std::vector<std::string
 		arguments.push_back(channel);
 
 		if (!(iss >> flag && (flag[0] == '+' || flag[0] == '-')
-				&& std::string("okilt").find(flag[1]) != std::string::npos)) {
+				&& std::string("okilt").find(flag[1]) == std::string::npos)) {
 			std::cout << "Please enter a valid flag for MODE command!" << std::endl;
 			return false;
 		}
