@@ -2,7 +2,7 @@
 | ------- | ------- | ------- | ------- | -------- | -------- |
 | JOIN    | #channel1 |         |         |          |          |
 | JOIN    | #channel1 | password1 |         |          |          |
-| JOIN    | #channel1,&channel2,+channel3,!channel4 | password1, password2 |         |          |          |
+| JOIN    | #channel1,&channel2,+channel3,!channel4 | password1,password2 |         |          |          |
 | PART    | #channel1 |         |         |          |          |
 | PART    | #channel2 | :one reason for leaving the channel |         |          |          |
 | PART    | #channel1,&channel2,+channel3,!channel4 |         |         |          |          |
