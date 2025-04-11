@@ -6,7 +6,7 @@
 /*   By: ryusupov <ryusupov@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/22 16:37:19 by ryusupov          #+#    #+#             */
-/*   Updated: 2025/04/08 17:59:07 by ryusupov         ###   ########.fr       */
+/*   Updated: 2025/04/11 17:54:31 by ryusupov         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,23 +24,12 @@ CommandHandler::CommandHandler(Server& srv) : server(srv) {
 
 void CommandHandler::clientCmdHandler(Client *client, std::vector<std::string> &command){
 
-	if (command[0] == "NICK") {
+		if (command[0] == "NICK"){
+			if (!(handleNickname(client, command)))
+				return ;
 
-		if (command[1].empty()) {
-			server.sendToClient(client->getNickname(), "Nickname is not provided! Please enter a nickname!");
-			return;
-		}
-
-		if (NickNameTaken(command[1])) {
-			server.sendToClient(client->getNickname(), "The chosen nickname has already taken! Please choose another nickname!");
-			return ;
-		}
-
-		client->setNickname(command[1]);
-		server.sendToClient(client->getNickname(), ":irc.server.com 001 " + command[1] + " :Welcome to the IRC network, " + command[1]);
-		server.addClient(client);
-	} else if (command[0] == "USER") {
-		if (command[1].empty() || command[4].empty()) {
+		}else if (command[0] == "USER") {
+		if (command.size() < 5 || command[1].empty() || command[4].empty()) {
 			SendError(client, "The username or realname is not provided!");
 			return ;
 		}
@@ -48,32 +37,95 @@ void CommandHandler::clientCmdHandler(Client *client, std::vector<std::string> &
 		client->setUsername(command[1]);
 		client->setRealname(command[2]);
 
-				// 	// 001 RPL_WELCOME
-		server.sendToClient( client->getSocketFd(), ":" + IRCname + " 001 " + client->getNickname() +
-							" :Welcome to the IRC Network " + client->getNickname() + "!" + command[1] + "@" + client->getHostname() );
-			// 002 RPL_YOURHOST
-		server.sendToClient( client->getSocketFd(), ":" + IRCname + " 002 " + client->getNickname() +
-							" :Your host is " + IRCname + ", running version 1.0" );
-			// 003 RPL_CREATED
-		server.sendToClient( client->getSocketFd(), ":" + IRCname + " 003 " + client->getNickname() +
-							" :This server was created " + server.getCreationTime() );
-			// 004 RPL_MYINFO
-		server.sendToClient( client->getSocketFd(), ":" + IRCname + " 004 " + client->getNickname() +
-							" " + IRCname + " 1.0 +aiow +ntklovb" );
-		SendMessage(client, "Welcome! " + command[1] + "!");
+		client->markUserReceived();
+
+		if (client->getIsResgistered()) {
+			registerClient(client);
+		}
 	} else if (command[0] == "PRIVMSG") {
 
 		if (command[1].empty()) {
-			SendError(client, "No recipent provided!");
+			server.sendToClient(client->getNickname(), "No recipent provided!");
 			return ;
 		}
 		if (command[2].empty()) {
-			SendError(client, "Empty msg provided!");
+			server.sendToClient(client->getNickname(), "Empty msg provided!");
 			return ;
 		}
-		server.sendToClient(command[1], command[2]);
+		findTargetPrivmsg(client, command);
 	}
 }
+
+/***************************************************************************/
+/***************************PRIVMSG COMMAND*********************************/
+/***************************************************************************/
+void	CommandHandler::findTargetPrivmsg(Client *client, std::vector<std::string> &command) {
+	std::string target = command[1];
+	std::string msg = command[2];
+
+	if (target[0] == '#') {
+		std::string prefix = ":" + client->getNickname() + "!" + client->getUsername() + "@" + client->getHostname();
+        std::string fullMessage = prefix + " PRIVMSG " + target + " :" + msg + "\r\n";
+		server.broadcastMessage(target, msg);
+	}
+	else {
+		std::string prefix = ":" + client->getNickname() + "!" + client->getUsername() + "@" + client->getHostname();
+        std::string fullMessage = prefix + " PRIVMSG " + target + " :" + msg + "\r\n";
+		server.sendToClient(target, fullMessage);
+	}
+}
+
+
+
+/***************************************************************************/
+/****************************USER COMMAND***********************************/
+/***************************************************************************/
+void	CommandHandler::registerClient(Client *client) {
+	client->setIsRegistered(true);
+	server.addClient(client);
+
+	std::string nick = client->getNickname();
+	std::string user = client->getUsername();
+	std::string host = client->getHostname();
+
+	server.sendToClient(client->getSocketFd(), ":" + IRCname + " 001 " + nick + " :Welcome to the IRC Network " + nick + "!" + user + "@" + host);
+	server.sendToClient(client->getSocketFd(), ":" + IRCname + " 002 " + nick + " :Your host is " + IRCname + ", running version 1.0");
+	server.sendToClient(client->getSocketFd(), ":" + IRCname + " 004 " + nick + " " + IRCname + " 1.0 +aiow +ntklovb");
+
+}
+
+/***************************************************************************/
+/****************************NICK COMMAND***********************************/
+/***************************************************************************/
+bool CommandHandler::handleNickname(Client *client, std::vector<std::string> &command) {
+
+	if (command.size() < 2 || command[1].empty()) {
+		server.sendToClient(client->getNickname(), "431 * :Nickname is not provided. Please enter a Nickname!");
+		return false;
+	}
+
+	std::string newNick = command[1];
+	std::string oldNick = client->getNickname();
+
+	if (NickNameTaken(newNick)) {
+		server.sendToClient(client->getNickname(), "433 * " + newNick + " :The chosen nickname has already taken!");
+		return false;
+	}
+
+	client->setNickname(newNick);
+
+	if (client->getIsResgistered()) {
+		std::string nickChangeMsg = ":" + oldNick + "!" + client->getUsername() + "@" + client->getHostname() + " NICK :" + newNick;
+		server.sendToClient(client->getNickname(), nickChangeMsg);
+	} else {
+		server.sendToClient(newNick, ":irc.server.com 001 " + newNick + " :Welcome to the IRC network, " + newNick);
+
+		client->setIsRegistered(true);
+		server.addClient(client);
+	}
+	return true;
+}
+
 
 void CommandHandler::SendMessage(IClient *client, const std::string &msg){
 	std::cout << "New message: " << msg << std::endl;
@@ -91,6 +143,9 @@ bool CommandHandler::NickNameTaken(std::string &nickname) {
 	return (false);
 }
 
+/***************************************************************************/
+/***********************COMMAND HANDLER METHOD******************************/
+/***************************************************************************/
 void	CommandHandler::MainCommandHandller(Client *client, std::vector<std::string> &args){
 	static std::unordered_set<std::string> serverCmds = {
 		"CAP", "PING", "NOTICE"
@@ -110,7 +165,7 @@ void	CommandHandler::MainCommandHandller(Client *client, std::vector<std::string
 		serverCmdHandler(&server, client);
 	}
 	else if (channelCmds.find(args[0]) != channelCmds.end()) {
-		//
+		channelCmdHandler(*client, server, args);
 	}
 	else if (clientCmds.find(args[0]) != clientCmds.end()) {
 		clientCmdHandler(client, args);

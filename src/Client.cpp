@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Client.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tkubanyc <tkubanyc@student.42.fr>          +#+  +:+       +#+        */
+/*   By: ryusupov <ryusupov@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/19 17:44:20 by ryusupov          #+#    #+#             */
-/*   Updated: 2025/04/01 12:44:52 by tkubanyc         ###   ########.fr       */
+/*   Updated: 2025/04/08 19:57:38 by ryusupov         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,6 +20,7 @@ Client::Client(int fd, std::string host) : socket_fd(fd),
 										   realname( "" ),
 										   hostname(host),
 										   isRegistered(false),
+										   userReceived(false),
 										   buffer( "" ),
 										   sendBuffer( "" ) {
 	//intializing values
@@ -74,6 +75,10 @@ void	Client::setHostname(std::string &hostname) {
 
 void	Client::setIsRegistered(bool status) {
 	this->isRegistered = status;
+}
+
+void	Client::markUserReceived() {
+	userReceived = true;
 }
 
 /*Destructor*/

@@ -6,7 +6,7 @@
 /*   By: ryusupov <ryusupov@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/04 19:18:33 by ryusupov          #+#    #+#             */
-/*   Updated: 2025/04/08 15:12:41 by ryusupov         ###   ########.fr       */
+/*   Updated: 2025/04/11 17:26:41 by ryusupov         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -163,7 +163,7 @@ bool CommandHandler::handleSimpleCommands(std::istringstream &iss, std::vector<s
 bool CommandHandler::handleKick(std::istringstream &iss, std::vector<std::string> &arguments) {
 	std::string channel, user, reason;
 
-	if (!(iss >> channel) || std::string("#!&").find(channel[0]) != std::string::npos)
+	if (!(iss >> channel) || std::string("#!&+").find(channel[0]) == std::string::npos)
 		return false;
 	arguments.push_back(channel);
 

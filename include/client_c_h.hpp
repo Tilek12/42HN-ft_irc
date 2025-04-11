@@ -6,7 +6,7 @@
 /*   By: ryusupov <ryusupov@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: Invalid date        by                   #+#    #+#             */
-/*   Updated: 2025/04/08 15:32:03 by ryusupov         ###   ########.fr       */
+/*   Updated: 2025/04/11 17:13:56 by ryusupov         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,6 +48,9 @@ class CommandHandler{
 		static bool handleCap(std::istringstream &iss, std::vector<std::string> &arguments);
 		static bool handleNotice(std::istringstream &iss, std::vector<std::string> &arguments);
 		void	MainCommandHandller(Client *client, std::vector<std::string> &args);
+		bool 	handleNickname(Client *client, std::vector<std::string> &command);
+		void	registerClient(Client *client);
+		void	findTargetPrivmsg(Client *client, std::vector<std::string> &command);
 
 
 

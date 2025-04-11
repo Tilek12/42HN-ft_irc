@@ -6,7 +6,7 @@
 /*   By: ryusupov <ryusupov@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/19 14:03:06 by ryusupov          #+#    #+#             */
-/*   Updated: 2025/03/28 15:14:33 by ryusupov         ###   ########.fr       */
+/*   Updated: 2025/04/08 19:58:54 by ryusupov         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,7 +26,7 @@ class Client : public IClient{
 		std::string realname;	//clinet's real name
 		std::string hostname;	//client's hostname
 		bool isRegistered;		//the flag to check is the client has completed registration process
-
+		bool userReceived;
 		std::string buffer;		// Buffer for recieved message
 		std::string sendBuffer;	// Buffer for output message
 
@@ -41,6 +41,7 @@ class Client : public IClient{
 			std::string getRealname() const override;
 			std::string getHostname() const override;
 			bool		getIsResgistered() const override;
+			void		markUserReceived();
 
 			/*Setters*/
 			void	setSocketFd(int fd) override;
