@@ -130,10 +130,10 @@ void processKickRequest(IClient& client, IServer& server, \
         replyMsg = ":" + client.getNickname() + " KICK " +
             userName + " " + channelName;
     else
-        std::string kickMessage = ":" + client.getNickname() + " KICK " +
+        replyMsg = ":" + client.getNickname() + " KICK " +
             userName + " " + channelName + " :" + reason;
     server.sendToClient(channelName, replyMsg);
-    std::cerr << replyMsg << std::endl;
+    std::cout << replyMsg << std::endl;
 }
 
 void processInviteRequest(IClient& client, IServer& server, IChannel* channel, \
@@ -143,7 +143,7 @@ void processInviteRequest(IClient& client, IServer& server, IChannel* channel, \
     std::string reply = ":" + client.getNickname() + " INVITE " +
         userName + " " + channel->getName();
     server.sendToClient(userName, reply);
-    std::cerr << reply << std::endl;
+    std::cout << reply << std::endl;
 }
 
 void processGetTopicRequest(IClient& client, IServer& server, IChannel* channel)
@@ -160,9 +160,25 @@ void processGetTopicRequest(IClient& client, IServer& server, IChannel* channel)
         std::string reply = ":" + IRCname + " " + IRCreply::RPL_TOPIC + " " +
                 client.getNickname() + " " + channel->getName() + " :" + channel->getTopic();
         server.sendToClient(client.getNickname(), reply);
-        std::cerr << reply << std::endl;
+        server.broadcastMessage(client.getNickname(), reply);
+        std::cout << reply << std::endl;
     }
     return;
+}
+
+void processSetTopicRequest(IClient& client, IServer& server, IChannel* channel, std::string newTopic)
+{
+    std::string reply;
+    channel->setTopic(newTopic.erase(0, 1));
+    if (channel->getTopic().empty())
+        reply = ":" + IRCname + " " + IRCreply::RPL_NOTOPIC + " " +
+        client.getNickname() + " " + channel->getName() + " :No topic is set for this channel";
+    else
+        reply = ":" + IRCname + " " + IRCreply::RPL_TOPIC + " " +
+                    client.getNickname() + " " + channel->getName() + " :" + channel->getTopic();
+    server.sendToClient(client.getNickname(), reply);
+    server.broadcastMessage(client.getNickname(), reply);
+    std::cout << reply << std::endl;
 }
 
 void processModeTwoArgsRequest(IClient& client, IServer& server, IChannel* channel, std::string mode)
@@ -183,7 +199,6 @@ void processModeTwoArgsRequest(IClient& client, IServer& server, IChannel* chann
             client.getNickname() + " " + mode + " :Unknown channel mode";
         server.sendToClient(client.getNickname(), errorMsg);
         std::cerr << errorMsg << std::endl;
-
     }
     return;
 }
