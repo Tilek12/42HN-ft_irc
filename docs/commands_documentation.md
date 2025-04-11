@@ -11,10 +11,6 @@
 | KICK    | #channel1 | user1   | :reason for kicking user out of the channel |          |          |
 | KICK    | #channel01,&channel02,+channel03,!channel04 | user1,user2 |         |          |          |
 | KICK    | #channel01,&channel02,+channel03,!channel04 | user1,user2 | :reason for kicking user out of the channel |          |          |
-| INVITE  | user    | #channel |         |          |          |
-| TOPIC   | #channel |         |         |          |          |
-| TOPIC   | #channel | :       |         |          |          |
-| TOPIC   | #channel | :changed Topic here |         |          |          |
 | MODE    | #channel | +o      | user1   |          |          |
 | MODE    | #channel | -o      | user1   |          |          |
 | MODE    | #channel | +k      | password1 |          |          |
@@ -25,3 +21,8 @@
 | MODE    | #channel | -l      |         |          |          |
 | MODE    | #channel | +t      |         |          |          |
 | MODE    | #channel | -t      |         |          |          |
+| INVITE  | user    | #channel01 |         |          |          |
+| TOPIC   | #channel |         |         |          |          |
+| TOPIC   | #channel | :       |         |          |          |
+| TOPIC   | #channel | :changed Topic here |         |          |          |
+
