@@ -52,6 +52,6 @@ struct IRCerror {
 	static constexpr const char* ERR_UNIQOPPRIVSNEEDED = "485";	// You need uniqop privileges
 	static constexpr const char* ERR_NOOPERHOST = "491";		// No O-line for your host
 	static constexpr const char* ERR_UMODEUNKNOWNFLAG = "501";	// Unknown MODE flag
-	static constexpr const char* ERR_USERSDONTMATCH = "502";	// Cannot change or set mode for others
+	static constexpr const char* ERR_USERSDONTMATCH = "502";	// Cannot change or set mode for other
 
 };
