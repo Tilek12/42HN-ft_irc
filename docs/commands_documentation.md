@@ -1,16 +1,16 @@
 | Command | Args[1] | Args[2] | Args[3] | Spalte 5 | Spalte 6 |
 | ------- | ------- | ------- | ------- | -------- | -------- |
 | JOIN    | #channel1 |         |         |          |          |
-| JOIN    | #channel1 | password1 |         |          |          |
-| JOIN    | #channel1,&channel2,+channel3,!channel4 | password1,password2 |         |          |          |
+| JOIN    | #channel2 | password1 |         |          |          |
+| JOIN    | #channel01,&channel02,+channel03,!channel04 | password01,password02 |         |          |          |
 | PART    | #channel1 |         |         |          |          |
 | PART    | #channel2 | :one reason for leaving the channel |         |          |          |
-| PART    | #channel1,&channel2,+channel3,!channel4 |         |         |          |          |
-| PART    | #channel1,&channel2,+channel3,!channel4 | :one reason for leaving the channel |         |          |          |
+| PART    | #channel01,&channel02,+channel03,!channel04 |         |         |          |          |
+| PART    | #channel01,&channel02,+channel03,!channel04 | :one reason for leaving the channel |         |          |          |
 | KICK    | #channel1 | user1   |         |          |          |
 | KICK    | #channel1 | user1   | :reason for kicking user out of the channel |          |          |
-| KICK    | #channel1,&channel2,+channel3,!channel4 | user1,user2 |         |          |          |
-| KICK    | #channel1,&channel2,+channel3,!channel4 | user1,user2 | :reason for kicking user out of the channel |          |          |
+| KICK    | #channel01,&channel02,+channel03,!channel04 | user1,user2 |         |          |          |
+| KICK    | #channel01,&channel02,+channel03,!channel04 | user1,user2 | :reason for kicking user out of the channel |          |          |
 | INVITE  | user    | #channel |         |          |          |
 | TOPIC   | #channel |         |         |          |          |
 | TOPIC   | #channel | :       |         |          |          |
