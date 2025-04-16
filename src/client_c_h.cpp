@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   client_c_h.cpp                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: llacsivy <llacsivy@student.42.fr>          +#+  +:+       +#+        */
+/*   By: tkubanyc <tkubanyc@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/22 16:37:19 by ryusupov          #+#    #+#             */
-/*   Updated: 2025/04/08 18:20:05 by llacsivy         ###   ########.fr       */
+/*   Updated: 2025/04/15 15:04:45 by tkubanyc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,6 +25,9 @@ void CommandHandler::clientCmdHandler(Client *client, std::vector<std::string> &
 
 	if (command[0] == "NICK") {
 
+		if (!client->getIsAuthenticated())
+			return;
+
 		if (command[1].empty()) {
 			server.sendToClient(client->getNickname(), "Nickname is not provided! Please enter a nickname!");
 			return;
@@ -39,6 +42,10 @@ void CommandHandler::clientCmdHandler(Client *client, std::vector<std::string> &
 		server.sendToClient(client->getNickname(), ":irc.server.com 001 " + command[1] + " :Welcome to the IRC network, " + command[1]);
 		server.addClient(client);
 	} else if (command[0] == "USER") {
+
+		if (!server.checkClientAuthentication(client))
+			return;
+
 		if (command[1].empty() || command[4].empty()) {
 			SendError(client, "The username or realname is not provided!");
 			return ;
@@ -105,7 +112,6 @@ void	CommandHandler::MainCommandHandller(Client *client, std::vector<std::string
 
 	if (serverCmds.find(args[0]) != serverCmds.end())
 	{
-		std::cout << args[0] << " = " << args[1] << std::endl;
 		serverCmdHandler(&server, client);
 	}
 	else if (channelCmds.find(args[0]) != channelCmds.end()) {

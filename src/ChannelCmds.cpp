@@ -2,7 +2,8 @@
 #include <iostream>
 #include <string>
 
-#include "../include/errorReplies.hpp"
+#include "../include/IRCreply.hpp"
+#include "../include/IRCerror.hpp"
 #include "../include/Channel.hpp"
 #include "../include/ChannelCmds.hpp"
 #include "../include/channelHelperFcts.hpp"
@@ -21,7 +22,7 @@ void ChannelCmds::joinChannelCmd(IClient& client, IServer& server, std::vector<s
 
     if (joinParams.empty())
     {
-        std::cerr << "Error code " << ERR_NEEDMOREPARAMS << " JOIN: not enough joinParams" << std::endl;
+        std::cerr << "Error code " << IRCerror::ERR_NEEDMOREPARAMS << " JOIN: not enough joinParams" << std::endl;
         return;
     }
     channelNames = parseCommaString(joinParams[0]);
@@ -44,7 +45,7 @@ void ChannelCmds::partChannelCmd(IClient& client, IServer& server, std::vector<s
 
     if (partParams.empty())
     {
-        std::cerr << "Error code " << ERR_NEEDMOREPARAMS << " PART: not enough partParams" << std::endl;
+        std::cerr << "Error code " << IRCerror::ERR_NEEDMOREPARAMS << " PART: not enough partParams" << std::endl;
         return;
     }
     channelNames = parseCommaString(partParams[0]);
@@ -65,7 +66,7 @@ void ChannelCmds::kickUserCmd(IClient& client, IServer& server, std::vector<std:
 
     if (kickParams.size() < 2)
     {
-        std::cerr << "Error code " << ERR_NEEDMOREPARAMS << " KICK: not enough kickParams" << std::endl;
+        std::cerr << "Error code " << IRCerror::ERR_NEEDMOREPARAMS << " KICK: not enough kickParams" << std::endl;
         return;
     }
     channelNames = parseCommaString(kickParams[0]);
@@ -86,7 +87,7 @@ void ChannelCmds::inviteUserCmd(IClient& client, IServer& server, std::vector<st
 {
     if (inviteParams.size() < 2)
     {
-        std::cerr << "Error code " << ERR_NEEDMOREPARAMS << \
+        std::cerr << "Error code " << IRCerror::ERR_NEEDMOREPARAMS << \
             " INVITE: not enough inviteParams" << std::endl;
         return;
     }
@@ -96,7 +97,7 @@ void ChannelCmds::inviteUserCmd(IClient& client, IServer& server, std::vector<st
     if (!channel)
     {
         CommandHandler::SendMessage(&client, "Error code " + \
-            std::string(ERR_NOSUCHCHANNEL) + " : non existing channel " + channelName);
+            std::string(IRCerror::ERR_NOSUCHCHANNEL) + " : non existing channel " + channelName);
         return;
     }
     if (!(channel->getIsInviteOnly()))
@@ -118,7 +119,7 @@ void ChannelCmds::topicUserCmd(IClient& client, IServer& server, std::vector<std
 {
     if (topicParams.empty())
     {
-        std::cerr << "Error code " << ERR_NEEDMOREPARAMS << " TOPIC: not enough topicParams" << std::endl;
+        std::cerr << "Error code " << IRCerror::ERR_NEEDMOREPARAMS << " TOPIC: not enough topicParams" << std::endl;
         return;
     }
     std::string channelName = topicParams[0];
@@ -126,7 +127,7 @@ void ChannelCmds::topicUserCmd(IClient& client, IServer& server, std::vector<std
     if (!channel)
     {
         CommandHandler::SendMessage(&client, "Error code " + \
-            std::string(ERR_NOSUCHCHANNEL) + " : non existing channel " + channelName);
+            std::string(IRCerror::ERR_NOSUCHCHANNEL) + " : non existing channel " + channelName);
         return;
     }
     if (canOnlyOperatorChangeTopic(client, channel))
@@ -142,7 +143,7 @@ void ChannelCmds::modeChannelCmd(IClient& client, IServer& server, std::vector<s
 {
     if (modeParams.size() < 2)
     {
-        std::cerr << "Error code " << ERR_NEEDMOREPARAMS << " MODE: not enough modeParams" << std::endl;
+        std::cerr << "Error code " << IRCerror::ERR_NEEDMOREPARAMS << " MODE: not enough modeParams" << std::endl;
         return;
     }
     std::string channelName = modeParams[0];
@@ -150,7 +151,7 @@ void ChannelCmds::modeChannelCmd(IClient& client, IServer& server, std::vector<s
     if (!channel)
     {
         CommandHandler::SendMessage(&client, "Error code " + \
-            std::string(ERR_NOCHANMODES) + " : non existing channel " + channelName);
+            std::string(IRCerror::ERR_NOCHANMODES) + " : non existing channel " + channelName);
         return;
     }
     if (!isOperatorOnChannel(client, channel))

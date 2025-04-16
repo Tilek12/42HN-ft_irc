@@ -6,7 +6,7 @@
 /*   By: tkubanyc <tkubanyc@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/19 17:44:20 by ryusupov          #+#    #+#             */
-/*   Updated: 2025/04/01 12:44:52 by tkubanyc         ###   ########.fr       */
+/*   Updated: 2025/04/11 10:18:56 by tkubanyc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -114,3 +114,9 @@ std::string Client::getNextMessage() {
     sendBuffer.erase(0, pos + 2);
     return message;
 }
+
+/////////////////////////  NEW FUNCTION  ///////////////////////////////
+bool	Client::getIsAuthenticated() const { return isAuthenticated; }
+
+/////////////////////////  NEW FUNCTION  ///////////////////////////////
+void	Client::setIsAuthenticated(bool status) { isAuthenticated = status; }

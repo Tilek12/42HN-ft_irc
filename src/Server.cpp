@@ -137,52 +137,6 @@ void	Server::_acceptNewConnection( void ) {
 
 }
 
-/*-------------------------------------*/
-/*  Disconnect Client from the Server  */
-/*-------------------------------------*/
-void	Server::_disconnectClient( int fd, const std::string& reason ) {
-
-	// Check for Client existance
-	if ( !isClientExist( fd ) )
-		return;
-
-	// Temp values
-	Client* client = getClient( fd );
-	std::string nickname = client->getNickname();
-
-	// Remove Client from all channels
-	// auto channelsCopy = _channels;
-	// for ( const auto& [name, channel] : channelsCopy ) {
-	// 	if ( channel->isUser( nickname ) )
-	// 		channel->removeUser( nickname );
-
-	// 	if ( channel->isOperator( nickname ) )
-	// 		channel->removeOperator( nickname );
-
-	// 	if ( channel->isInvited( nickname ) )
-	// 		channel->removeInvitedUser( nickname );
-	// }
-
-	// Remove from poll list
-	for ( auto it = _pollFDs.begin(); it != _pollFDs.end(); ++it ) {
-		if ( it->fd == fd ) {
-			_pollFDs.erase( it );
-			break;
-		}
-	}
-
-	// Delete Client
-	close( fd );
-	_clients.erase( fd );
-	delete client;
-
-	// Print disconnection message
-	std::cout << PURPLE << "Client disconnected (fd: " << fd << ")";
-	if ( !reason.empty() ) std::cout << " - Reason: " << reason;
-	std::cout << RESET << std::endl;
-
-}
-
 /*----------------------------*/
 /*  Get Server Creation Time  */
 /*----------------------------*/
@@ -200,7 +154,7 @@ void	Server::_processClientBuffer( Client* client ) {
 		buffer.erase( 0, pos + 2 ); // Remove processed message
 		if ( !message.empty() ) {
 			std::cout << YELLOW
-					  << "CMD [" << client->getSocketFd() << "]: " << message
+					  << "CMD INPUT  [" << client->getSocketFd() << "]: " << message
 					  << RESET << std::endl;
 			_arguments = _commandHandler->parseCommand(message);
 			if (!(_arguments.empty()))
@@ -270,7 +224,7 @@ void	Server::_handleClientData( int fd ) {
 	char buffer[1024];
 	ssize_t bytesRead = recv( fd, buffer, sizeof( buffer ) - 1, 0 );
 	if ( bytesRead <= 0 ) {
-		_disconnectClient( fd, bytesRead == 0 ? "" : "Read error" );
+		disconnectClient( fd, bytesRead == 0 ? "" : "Read error" );
 		return;
 	}
 
@@ -303,7 +257,7 @@ void	Server::_handleConnections( void ) {
 		}
 
 		if ( _pollFDs[i].revents & ( POLLHUP | POLLERR | POLLNVAL ) )
-			_disconnectClient( _pollFDs[i].fd, "Connection error" );
+			disconnectClient( _pollFDs[i].fd, "Connection error" );
 	}
 
 }
@@ -341,7 +295,7 @@ void	Server::stop( void ) {
 	// Disconnect all clients
 	auto clientsCopy = _clients;
 	for ( const auto& [fd, client] : clientsCopy )
-		_disconnectClient( fd, "Server shutdown" );
+		disconnectClient( fd, "Server shutdown" );
 
 	// Cleanup channels
 	auto channelsCopy = _channels;
@@ -363,10 +317,10 @@ void	Server::stop( void ) {
 
 }
 
-/*-----------------------*/
-/*  Get Server password  */
-/*-----------------------*/
-const std::string&	Server::getPassword( void ) const { return _password; }
+/*-------------------------*/
+/*  Check Server password  */
+/*-------------------------*/
+bool	Server::validatePassword( const std::string& pass ) const { return pass == _password; }
 
 /*-----------------------*/
 /*  Get isRunning value  */
@@ -445,6 +399,67 @@ bool	Server::isClientExist( int fd ) {
 
 }
 
+/*-------------------------------------*/
+/*  Disconnect Client from the Server  */
+/*-------------------------------------*/
+void	Server::disconnectClient( int fd, const std::string& reason ) {
+
+	// Check for Client existance
+	if ( !isClientExist( fd ) )
+		return;
+
+	// Temp values
+	Client* client = getClient( fd );
+	std::string nickname = client->getNickname();
+
+	// Remove Client from all channels
+	auto channelsCopy = _channels;
+	for ( const auto& [name, channel] : channelsCopy ) {
+		if ( channel->isUser( nickname ) )
+			channel->removeUser( nickname );
+
+		if ( channel->isOperator( nickname ) )
+			channel->removeOperator( nickname );
+
+		if ( channel->isInvitedUser( nickname ) )
+			channel->removeInvitedUser( nickname );
+	}
+
+	// Remove from poll list
+	for ( auto it = _pollFDs.begin(); it != _pollFDs.end(); ++it ) {
+		if ( it->fd == fd ) {
+			_pollFDs.erase( it );
+			break;
+		}
+	}
+
+	// Delete Client
+	close( fd );
+	_clients.erase( fd );
+	delete client;
+
+	// Print disconnection message
+	std::cout << PURPLE << "Client disconnected (fd: " << fd << ")";
+	if ( !reason.empty() ) std::cout << " - Reason: " << reason;
+	std::cout << RESET << std::endl;
+
+}
+
+/*---------------------------------*/
+/*  Check password Authentication  */
+/*---------------------------------*/
+bool	Server::checkClientAuthentication( Client* client ) {
+
+	if ( !client->getIsAuthenticated() ) {
+		sendError( client->getSocketFd(), IRCerror::ERR_PASSWDMISMATCH, ":Password required" );
+		disconnectClient( client->getSocketFd(), "No Password provided" );
+		return false;
+	}
+
+	return true;
+
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 // ==========================  Channel Management  ========================== //
 ////////////////////////////////////////////////////////////////////////////////
@@ -517,10 +532,14 @@ void	Server::sendToClient( int fd, const std::string& message ) {
 	if ( !isClientExist( fd ) )
 		return;
 
+	std::cout << CYAN
+			  << "CMD OUTPUT [" << fd << "]: " << message
+			  << RESET << std::endl;
+
 	std::string reply = message + "\r\n";
 
 	if ( send( fd, reply.c_str(), reply.length(), 0 ) < 0 )
-		_disconnectClient( fd, "Send error" );
+		disconnectClient( fd, "Send error" );
 
 }
 
@@ -549,19 +568,16 @@ void	Server::sendError( int fd, const std::string& errorCode, const std::string&
 
 	std::string errorReply = ":" + IRCname + " " + errorCode + " " + nickname + " " + message;
 
-	sendToClient( fd, errorReply );
+	std::cerr << RED << "[ERROR] " << RESET;
 
-	// Log the error
-	std::cerr << RED << "[ERROR] Sent to fd=" << fd
-			  << " (" << nickname << "): " << errorCode << " " << message
-			  << RESET << std::endl;
+	sendToClient( fd, errorReply );
 
 }
 
 /*--------------------------------*/
 /*  Broadcast message in Channel  */
 /*--------------------------------*/
-void	Server::broadcastMessage( const std::string& channelName, const std::string& message ) {
+void	Server::broadcastMessage( Client* client, const std::string& channelName, const std::string& message ) {
 
 	Channel* channel = getChannel( channelName );
 	if ( !channel ) return;
@@ -575,9 +591,27 @@ void	Server::broadcastMessage( const std::string& channelName, const std::string
 		recipients.insert( group.begin(), group.end() );
 	}
 
+	recipients.erase( client->getNickname() );
+
 	for ( const auto& [fd, client] : _clients ) {
 		if ( recipients.count( client->getNickname() ) )
 			sendToClient( fd, message );
+	}
+
+}
+
+/*---------------------------------------------------------*/
+/*  Broadcast message in All Channels where the Client is  */
+/*---------------------------------------------------------*/
+void	Server::broadcastMsgInClientChannels( Client* client, const std::string& message ) {
+
+	std::string clientName = client->getNickname();
+
+	for ( const auto& [channelName, channel] : _channels ) {
+		if ( channel->isUser( clientName ) ||
+				channel->isOperator( clientName ) ||
+				channel->isInvitedUser( clientName ) )
+			broadcastMessage( client, channelName, message );
 	}
 
 }

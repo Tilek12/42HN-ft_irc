@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Client.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ryusupov <ryusupov@student.42.fr>          +#+  +:+       +#+        */
+/*   By: tkubanyc <tkubanyc@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/19 14:03:06 by ryusupov          #+#    #+#             */
-/*   Updated: 2025/03/28 15:14:33 by ryusupov         ###   ########.fr       */
+/*   Updated: 2025/04/10 12:47:28 by tkubanyc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,6 +27,8 @@ class Client : public IClient{
 		std::string hostname;	//client's hostname
 		bool isRegistered;		//the flag to check is the client has completed registration process
 
+		bool isAuthenticated;	// <------ CHECK IF CLIENT IS AUTHENTICATED BY SERVER PASSWORD <--- NEW
+
 		std::string buffer;		// Buffer for recieved message
 		std::string sendBuffer;	// Buffer for output message
 
@@ -42,6 +44,9 @@ class Client : public IClient{
 			std::string getHostname() const override;
 			bool		getIsResgistered() const override;
 
+			bool		getIsAuthenticated() const; // <------ NEW FUNCTION ----------
+
+
 			/*Setters*/
 			void	setSocketFd(int fd) override;
 			void	setNickname(std::string &nickname) override;
@@ -49,6 +54,8 @@ class Client : public IClient{
 			void	setRealname(std::string &realname) override;
 			void	setHostname(std::string &hostname) override;
 			void	setIsRegistered(bool status) override;
+
+			void	setIsAuthenticated(bool status); // <------ NEW FUNCTION ----------
 
 
 			// Buffer management

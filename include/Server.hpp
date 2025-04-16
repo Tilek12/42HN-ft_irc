@@ -19,6 +19,8 @@
 #include "Client.hpp"
 #include "Channel.hpp"
 #include "client_c_h.hpp"
+#include "IRCreply.hpp"
+#include "IRCerror.hpp"
 
 /*------------------------------------*/
 /*  Define Global constant variables  */
@@ -58,9 +60,8 @@ private:
 	void	_acceptNewConnection( void );
 	void	_handleClientData( int fd );
 	void	_processClientBuffer( Client* client );
-	void	_disconnectClient( int fd, const std::string& reason );
 
-public:
+	public:
 
 	// Class Constructor and Destructor
 	Server( int port, const std::string& password );
@@ -69,7 +70,7 @@ public:
 	// Core server operations
 	void						start( void ) override;
 	void						stop( void ) override;
-	const std::string&			getPassword( void ) const override;
+	bool						validatePassword( const std::string& pass ) const override;
 	const std::string& 			getCreationTime( void ) const override;
 	bool						getIsRunning( void ) override;
 	void						setIsRunning( bool value ) override;
@@ -81,6 +82,8 @@ public:
 	Client*	getClient( const std::string& nickname ) const override;
 	bool	isClientExist( const std::string& nickname ) override;
 	bool	isClientExist( int fd ) override;
+	bool	checkClientAuthentication( Client* client ) override;
+	void	disconnectClient( int fd, const std::string& reason ) override;
 
 	// Channel management
 	void		addChannel( Channel* channel ) override;
@@ -93,7 +96,10 @@ public:
 	void	sendToClient( int fd, const std::string& message ) override;
 	void	sendToClient( const std::string& nickname, const std::string& message ) override;
 	void	sendError( int fd, const std::string& errorCode, const std::string& message ) override;
-	void	broadcastMessage( const std::string& channelName, const std::string& message ) override;
+	void	broadcastMessage( Client* client,
+							  const std::string& channelName,
+							  const std::string& message ) override;
+	void	broadcastMsgInClientChannels( Client* client, const std::string& message ) override;
 
 };
 

@@ -14,14 +14,12 @@ static void	handleCap( Server* server, int fd, const std::vector<std::string>& a
 	else if ( subcmd == "REQ" ) {
 		reply = "CAP * ACK ";
 		for ( int i = 2; i < argsNum; i++ ) {
-			std::cout << "arg=" << args[i] << "\n";
 			reply += args[i];
 			if ( i != argsNum - 1 )
 			reply += " ";
 		}
 	}
 
-	std::cout << CYAN << reply << RESET << std::endl;
 	server->sendToClient( fd, reply );
 
 }
@@ -40,21 +38,74 @@ static void	handlePing( Server* server, int fd, const std::vector<std::string>& 
 			reply += " ";
 	}
 
-	std::cout << CYAN << reply << std::endl;
 	server->sendToClient( fd, reply );
+
+}
+
+static void	handlePass( Server* server, Client* client, const std::vector<std::string>& args ) {
+
+	int fd = client->getSocketFd();
+
+	// Check if already registered
+	if ( client->getIsResgistered() ) {
+		server->sendError( fd, IRCerror::ERR_ALREADYREGISTRED, ":You may not register" );
+		return;
+	}
+
+	// Check if already sent password
+	if ( client->getIsAuthenticated() ) {
+		server->sendError( fd, IRCerror::ERR_PASSWDMISMATCH, ":Password already attempted");
+		return;
+	}
+
+	// Check parameter exists
+	if ( args.size() < 2 ) {
+		server->sendError( fd, IRCerror::ERR_NEEDMOREPARAMS, "PASS :Not enough parameters" );
+		return;
+	}
+
+	std::string pass = args[1];
+	if ( pass[0] == ':' )
+		pass = pass.substr( 1 );
+
+	if ( server->validatePassword( pass ) ) {
+		client->setIsAuthenticated( true );
+	} else {
+		server->sendError( fd, IRCerror::ERR_PASSWDMISMATCH, ":Password incorrect" );
+		server->disconnectClient( fd, "Bad password" );
+	}
+
+}
+
+static void	handleQuit( Server* server, Client* client, const std::vector<std::string>& args ) {
+
+	std::string reply = ":" + client->getNickname() +
+						"!" + client->getUsername() +
+						"@" + client->getHostname() +
+						" QUIT ";
+
+	if ( args[1].find( ":" ) == std::string::npos )
+		reply += ":";
+
+	int argsNum = args.size();
+
+	for ( int i = 1; i < argsNum; i++ ) {
+		reply += args[i];
+		if ( i != argsNum - 1 )
+			reply += " ";
+	}
+
+	server->disconnectClient( client->getSocketFd(), "Quit" );
+
+	server->broadcastMsgInClientChannels( client, reply );
 
 }
 
 static void	handleNotice( Server* server, std::string nickname, const std::vector<std::string>& args ) {
 
 	for ( int i = 1; i < args.size(); i++ ) {
-		if ( args[i].find( "LAGCHECK" ) != std::string::npos ) {
-			// std::string reply = "NOTICE " + nickname + " :LAGCHECK_REPLY " +
-			// 					args[i].substr( args[i].find( "LAGCHECK" ) + 9 ) + "\r\n";
-			std::string reply = "PONG :" + args[i + 1];
-			std::cout << CYAN << reply << std::endl;
-			server->sendToClient( nickname, reply );
-		}
+		if ( args[i].find( "LAGCHECK" ) != std::string::npos )
+			server->sendToClient( nickname, "PONG :" + args[i + 1] );
 	}
 
 }
@@ -71,6 +122,10 @@ void	serverCmdHandler( Server* server, Client* client ) {
 		handleCap( server, client->getSocketFd(), args );
 	else if ( cmd == "PING" )
 		handlePing( server, client->getSocketFd(), args );
+	else if ( cmd == "PASS")
+		handlePass( server, client, args );
+	else if ( cmd == "QUIT")
+		handleQuit( server, client, args );
 	else if ( cmd == "NOTICE" )
 		handleNotice( server, client->getNickname(), args );
 
