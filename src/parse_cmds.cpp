@@ -6,7 +6,7 @@
 /*   By: ryusupov <ryusupov@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/31 14:30:49 by ryusupov          #+#    #+#             */
-/*   Updated: 2025/04/11 14:54:40 by ryusupov         ###   ########.fr       */
+/*   Updated: 2025/04/16 12:37:27 by ryusupov         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,6 +40,8 @@ std::vector<std::string>CommandHandler::parseSpecialCommands(const std::string &
 			return {};
 		else if (cmd == "NOTICE" && !handleNotice(iss, arguments))
 			return {};
+		else if (cmd == "PART" && !handlePart(iss, arguments))
+			return {};
 		}
 	return (arguments);
 }
@@ -51,11 +53,11 @@ std::vector<std::string>CommandHandler::parseCommand(const std::string &command)
 
 	/*Set of all the available commands*/
 	static const std::unordered_set<std::string> setOfAllCmds = {
-		"JOIN", "PART", "QUIT", "NICK", "INVITE"
+		"JOIN", "QUIT", "NICK", "INVITE", "WHO"
 	};
 	/*Set of special commands with more that three arguments required*/
 	static const std::unordered_set<std::string> setOfSpecialCmds = {
-		"USER", "PRIVMSG", "NOTICE", "KICK", "TOPIC", "MODE", "PING", "CAP"
+		"USER", "PRIVMSG", "NOTICE", "KICK", "TOPIC", "MODE", "PING", "CAP", "PART"
 	};
 	/*Checking for command if it is existing command and adding it to a vector*/
 	iss >> arg1;

@@ -78,7 +78,6 @@ void ChannelCmds::kickUserCmd(IClient& client, IServer& server, std::vector<std:
     }
     channelNames = parseCommaString(kickParams[0]);
     userNames = parseCommaString(kickParams[1]);
-    printVec(userNames);
     if (kickParams.size() == 3)
         reason = kickParams[2];
     for (size_t i = 0; i < channelNames.size(); i++)
@@ -158,14 +157,6 @@ void ChannelCmds::topicUserCmd(IClient& client, IServer& server, std::vector<std
 
 void ChannelCmds::modeChannelCmd(IClient& client, IServer& server, std::vector<std::string>& modeParams)
 {
-    if (modeParams.size() < 2)
-    {
-        std::string reply = ":" + IRCname + " " + IRCerror::ERR_NEEDMOREPARAMS + " " +
-        client.getNickname() + " MODE :Not enough parameters";
-        server.sendToClient(client.getNickname(), reply);
-        std::cout << reply << std::endl;
-        return;
-    }
     std::string channelName = modeParams[0];
     Channel* channel = server.getChannel(channelName);
     if (!channel)
@@ -178,9 +169,11 @@ void ChannelCmds::modeChannelCmd(IClient& client, IServer& server, std::vector<s
     }
     if (!isOperatorOnChannel(client, server, channel))
         return;
-    std::string mode = modeParams[1];
-    if (modeParams.size() == 2)
-        processModeTwoArgsRequest(client, server, channel, mode);
-    else if (modeParams.size() == 3)
-        processModeThreeArgsRequest(client, server, channel, mode, modeParams[2]);
+    if (modeParams.size() >= 2) {
+        std::string mode = modeParams[1];
+        if (modeParams.size() == 2)
+            processModeTwoArgsRequest(client, server, channel, mode);
+        else if (modeParams.size() == 3)
+            processModeThreeArgsRequest(client, server, channel, mode, modeParams[2]);
+    }
 }

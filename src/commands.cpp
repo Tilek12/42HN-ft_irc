@@ -6,11 +6,27 @@
 /*   By: ryusupov <ryusupov@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/04 19:18:33 by ryusupov          #+#    #+#             */
-/*   Updated: 2025/04/11 18:32:41 by ryusupov         ###   ########.fr       */
+/*   Updated: 2025/04/16 17:07:35 by ryusupov         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../include/client_c_h.hpp"
+
+/*------Parsing PART command------*/
+bool CommandHandler::handlePart(std::istringstream &iss, std::vector<std::string> &args) {
+	std::string channel, reason;
+
+	if (!(iss >> channel))
+		return false;
+	args.push_back(channel);
+
+	std::getline(iss, reason);
+	if (!reason.empty() && reason[0] == ' ')
+		reason.erase(0, 1);
+	if (!(reason.empty()))
+		args.push_back(reason);
+	return true;
+}
 
 /*------Parsing PRIVMSG and NOTICE commands------*/
 bool CommandHandler::handlePrivMsgNotice(std::istringstream &iss, std::vector<std::string> &arguments) {
@@ -41,7 +57,6 @@ bool CommandHandler::handleNotice(std::istringstream &iss, std::vector<std::stri
 			found = true;
 			//the case if there is no witespace between LAGCHECK and the rest of the msg
 			if (lagcheck.size() > 10) {
-				std::cout << "here\n";
 				arguments.push_back(msg);
 				arguments.push_back(":LAGCHECK");
 				arguments.push_back(lagcheck.substr(11));
@@ -120,13 +135,12 @@ bool CommandHandler::handleMode(std::istringstream &iss, std::vector<std::string
 		}
 		arguments.push_back(channel);
 
-		if (!(iss >> flag && (flag[0] == '+' || flag[0] == '-')
-				&& std::string("okilt").find(flag[1]) == std::string::npos)) {
-			std::cout << "Please enter a valid flag for MODE command!" << std::endl;
-			return false;
+		if (iss >> flag) {
+			if (flag.size() == 1 && flag[0] == 'b') {
+				arguments.push_back(flag);
+			} else if (flag.size() == 2 && (flag[0] == '+' || flag[0] == '-'))
+				arguments.push_back(flag);
 		}
-		arguments.push_back(flag);
-
 		std::getline(iss, user);
 		if (!(user.empty() && user[0] == ' ')) user.erase(0, 1);
 

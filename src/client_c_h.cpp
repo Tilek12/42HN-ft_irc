@@ -6,7 +6,7 @@
 /*   By: ryusupov <ryusupov@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/22 16:37:19 by ryusupov          #+#    #+#             */
-/*   Updated: 2025/04/11 20:34:55 by ryusupov         ###   ########.fr       */
+/*   Updated: 2025/04/15 18:56:58 by ryusupov         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -53,8 +53,36 @@ void CommandHandler::clientCmdHandler(Client *client, std::vector<std::string> &
 			return ;
 		}
 		findTargetPrivmsg(client, command);
+	} else if (command[0] == "WHO") {
+		if (command[1].empty()) {
+			server.sendToClient(client->getNickname(), ":server.name 461 " + client->getNickname() + " WHO :Not enough parameters\r\n");
+			return ;
+		}
+		handleWhoCmd(client, command);
 	}
 }
+
+/***************************************************************************/
+/***************************WHO COMMAND*********************************/
+/***************************************************************************/
+void CommandHandler::handleWhoCmd(Client *client, std::vector<std::string> &command) {
+	Channel *channel = server.getChannel(command[1]);
+	if (!channel) {
+		server.sendToClient(client->getNickname(), ":server.name 315 " + client->getNickname() + " " + command[1] + " :End of /WHO list\r\n");
+		return ;
+	}
+	for (const std::string &nickname : channel->getUsers()) {
+		Client *user = server.getClient(nickname);
+		if (user) {
+			std::string reply = ":server.name 352 " + client->getNickname() + " " + command[1] + " " +
+                            user->getUsername() + " " + user->getHostname() + " " + "localhost" + " " +
+                            user->getNickname() + " H :" + "0 " + user->getRealname() + "\r\n";
+			server.sendToClient(client->getNickname(), reply);
+		}
+	}
+	server.sendToClient(client->getNickname(), ":server.name 315 " + client->getNickname() + " " + command[1] + " :End of /WHO list\r\n");
+}
+
 
 /***************************************************************************/
 /***************************PRIVMSG COMMAND*********************************/
@@ -156,12 +184,10 @@ void	CommandHandler::MainCommandHandller(Client *client, std::vector<std::string
 	};
 
 	static std::unordered_set<std::string> clientCmds = {
-		"PRIVMSG", "NICK", "USER"
+		"PRIVMSG", "NICK", "USER", "WHO"
 	};
 
-	if (serverCmds.find(args[0]) != serverCmds.end())
-	{
-		std::cout << args[0] << " = " << args[1] << std::endl;
+	if (serverCmds.find(args[0]) != serverCmds.end()){
 		serverCmdHandler(&server, client);
 	}
 	else if (channelCmds.find(args[0]) != channelCmds.end()) {
