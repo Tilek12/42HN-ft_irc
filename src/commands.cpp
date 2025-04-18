@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   commands.cpp                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ryusupov <ryusupov@student.42.fr>          +#+  +:+       +#+        */
+/*   By: llacsivy <llacsivy@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/04 19:18:33 by ryusupov          #+#    #+#             */
-/*   Updated: 2025/04/16 17:07:35 by ryusupov         ###   ########.fr       */
+/*   Updated: 2025/04/18 17:58:45 by llacsivy         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -180,9 +180,9 @@ bool CommandHandler::handleKick(std::istringstream &iss, std::vector<std::string
 	if (!(iss >> channel) || std::string("#!&+").find(channel[0]) == std::string::npos)
 		return false;
 	arguments.push_back(channel);
-
-	if (!(iss >> user))
-		return false;
+		
+		if (!(iss >> user))
+			return false;
 	arguments.push_back(user);
 
 	if (iss.rdbuf()->in_avail() > 0){

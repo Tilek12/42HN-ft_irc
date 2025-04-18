@@ -33,14 +33,24 @@ void processJoinRequest(IClient& client, IServer& server, \
                           "@" + client.getHostname() + " JOIN :" + channel->getName();
     server.sendToClient(client.getNickname(), joinMsg);
     server.broadcastMessage(realClient, channel->getName(), joinMsg);
+
+    if (channel->isOperator(client.getNickname())) {
+        std::string modeMsg = ":" + client.getNickname() + " MODE " + channel->getName() + " +o " + client.getNickname();
+        server.broadcastMessage(realClient, channel->getName(), modeMsg);
+        server.sendToClient(client.getNickname(), modeMsg);
+    }
     std::string userList;
-    for (auto &&i : channel->getUsers())
-        userList += i + " ";
+    for (auto &&i : channel->getUsers()) {
+        if (channel->isOperator(i))
+            userList += "@" + i + " ";
+        else
+            userList += i + " ";
+    }
     std::string reply353 = ":" + IRCname + " " + IRCreply::RPL_NAMREPLY + " " +
-                           client.getNickname() + " = " + channel->getName() + " :" + userList + "\r\n";
+                           client.getNickname() + " = " + channel->getName() + " :" + userList;
     server.sendToClient(client.getNickname(), reply353);
     std::string reply366 = ":" + IRCname + " " + IRCreply::RPL_ENDOFNAMES + " " +
-                           client.getNickname() + " " + channel->getName() + " :End of /NAMES list\r\n";
+                           client.getNickname() + " " + channel->getName() + " :End of /NAMES list";
     server.sendToClient(client.getNickname(), reply366);
 }
 
@@ -49,7 +59,7 @@ bool joinAllowed(IClient& client, IServer& server, IChannel* channel, const std:
     if (channel->getHasPassword() && channel->isValidPassword(password))
     {
         std::string errorMsg = ":" + IRCname + " " + IRCerror::ERR_BADCHANNELKEY \
-            + " " + client.getNickname() + " " + channel->getName() + " :Cannot join channel (+k)\r\n";
+            + " " + client.getNickname() + " " + channel->getName() + " :Cannot join channel (+k)";
         server.sendToClient(client.getNickname(), errorMsg);
         std::cerr << errorMsg;
         return false;
@@ -60,7 +70,7 @@ bool joinAllowed(IClient& client, IServer& server, IChannel* channel, const std:
     if (channel->getIsInviteOnly() && !isInvited)
     {
         std::string errorMsg = ":" + IRCname + " " + IRCerror::ERR_INVITEONLYCHAN +
-        " " + client.getNickname() + " " + channel->getName() + " :Cannot join channel (+i)\r\n";
+        " " + client.getNickname() + " " + channel->getName() + " :Cannot join channel (+i)";
         server.sendToClient(client.getNickname(), errorMsg);
         std::cerr << errorMsg;
         return false;
@@ -68,7 +78,7 @@ bool joinAllowed(IClient& client, IServer& server, IChannel* channel, const std:
     if (channel->getUserLimit() > 0 && channel->getUsers().size() >= channel->getUserLimit())
     {
         std::string errorMsg = ":" + IRCname + " " + IRCerror::ERR_CHANNELISFULL +
-            " " + client.getNickname() + " " + channel->getName() + " :Cannot join channel (+l)\r\n";
+            " " + client.getNickname() + " " + channel->getName() + " :Cannot join channel (+l)";
         server.sendToClient(client.getNickname(), errorMsg);
         std::cerr << errorMsg;
         return false;
@@ -108,9 +118,8 @@ void processPartRequest(IClient& client, IServer& server, \
         reply = ":" + client.getNickname() + " PART " + channelName + " :" + reason;
     server.sendToClient(client.getNickname(), reply);
     server.broadcastMessage(realClient, channel->getName(), reply);
-    // std::cout << reply;
-    // if (channel->getUsers().size() == 0)
-    //     server.removeChannel(channelName);
+    if (channel->getUsers().size() == 0)
+        server.removeChannel(channelName);
 }
 
 void processKickRequest(IClient& client, IServer& server, \
@@ -138,27 +147,6 @@ void processKickRequest(IClient& client, IServer& server, \
     if (!isUserOnChannel(client, server, channel, userName))
 		return;
 
-// server.removeChannel(client.getNickname()); // This might need to be replaced by a function like removeUserFromChannel
-// std::string reply;
-// if (reason.empty())
-//     reply = ":" + client.getNickname() + " KICK " + channelName + " " + userName + "\r\n";
-// else
-//     reply = ":" + client.getNickname() + " KICK " + channelName + " " + userName + " :" + reason + "\r\n";
-
-// // Broadcast the message to all other clients in the channel
-// server.broadcastMessage(realClient, channel->getName(), reply);
-
-// // Remove the kicked user from the channel's user list
-// channel->removeUser(userName);  // You might need to implement this in your channel class
-
-// // Send the reply to the client who sent the KICK command (optional)
-// server.sendToClient(client.getNickname(), reply);
-
-// // Optionally, you could send a separate message to the kicked user, informing them that they have been kicked
-// server.sendToClient(userName, "You have been kicked from " + channelName + " by " + client.getNickname());
-
-	// channel->removeUser(userName);
-    std::cout << "USER: " << userName << std::endl;
     server.removeChannel(client.getNickname());
     std::string reply;
     if (reason.empty())
@@ -166,22 +154,10 @@ void processKickRequest(IClient& client, IServer& server, \
     else
         reply = ":" + client.getNickname() + " KICK " + channelName + " " + userName + " :" + reason + "\r\n";
 
-    // server.sendToClient(userName, reply);// NEW
     server.broadcastMessage(realClient, channel->getName(), reply);
     server.sendToClient(client.getNickname(), reply);
     if (channel->getUsers().size() == 0)
         server.removeChannel(channelName);
-
-    Client *newClient = server.getClient(userName);
-    std::string reply2;
-    channel->removeUser(userName);
-    if (reason.empty())
-        reply2 = ":" + userName + " PART " + channelName;
-    else
-        reply2 = ":" + userName + " PART " + channelName + " :" + reason;
-    server.sendToClient(userName, reply2);
-    server.broadcastMessage(newClient, channel->getName(), reply2);
-
 }
 
 void processInviteRequest(IClient& client, IServer& server, IChannel* channel, \
@@ -262,6 +238,7 @@ void processModeTwoArgsRequest(IClient& client, IServer& server, IChannel* chann
 }
 void processModeThreeArgsRequest(IClient& client, IServer& server, IChannel* channel, std::string mode, std::string modeParamIdx2)
 {
+    bool validMode = true;
     if (mode == "+o")
         channel->addOperator(modeParamIdx2);
     else if (mode == "-o")
@@ -287,5 +264,12 @@ void processModeThreeArgsRequest(IClient& client, IServer& server, IChannel* cha
             client.getNickname() + " " + mode + " :Unknown channel mode";
         server.sendToClient(client.getNickname(), errorMsg);
         std::cerr << errorMsg << std::endl;
+        validMode = false;
+    }
+    if (validMode) 
+    {
+        std::string reply = ":" + client.getNickname() + " MODE " + channel->getName() + " " + mode + " " + modeParamIdx2;
+        server.broadcastMessage(dynamic_cast<Client*>(&client), channel->getName(), reply);
+        server.sendToClient(client.getNickname(), reply);
     }
 }
