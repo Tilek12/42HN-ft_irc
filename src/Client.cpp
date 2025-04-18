@@ -6,7 +6,7 @@
 /*   By: ryusupov <ryusupov@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/19 17:44:20 by ryusupov          #+#    #+#             */
-/*   Updated: 2025/04/08 19:57:38 by ryusupov         ###   ########.fr       */
+/*   Updated: 2025/04/18 13:38:10 by ryusupov         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -119,3 +119,9 @@ std::string Client::getNextMessage() {
     sendBuffer.erase(0, pos + 2);
     return message;
 }
+
+/////////////////////////  NEW FUNCTION  ///////////////////////////////
+bool	Client::getIsAuthenticated() const { return isAuthenticated; }
+
+/////////////////////////  NEW FUNCTION  ///////////////////////////////
+void	Client::setIsAuthenticated(bool status) { isAuthenticated = status; }

@@ -80,7 +80,8 @@ void processPartRequest(IClient& client, IServer& server, \
     const std::string& channelName, const std::string& reason)
 {
     Client* realClient = dynamic_cast<Client*>(&client);
-     IChannel* channel = server.getChannel(channelName);
+    IChannel* channel = server.getChannel(channelName);
+
     if (!channel)
     {
         std::string errorMsg = ":" + IRCname + " " + IRCerror::ERR_NOSUCHCHANNEL +
@@ -116,6 +117,7 @@ void processKickRequest(IClient& client, IServer& server, \
     const std::string& channelName, const std::string& userName, const std::string& reason)
 {
 	IChannel* channel;
+
     Client* realClient = dynamic_cast<Client*>(&client);
 
 

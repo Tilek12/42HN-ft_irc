@@ -14,7 +14,7 @@ public:
 	virtual								~IServer( void ) {}
 	virtual void						start( void ) = 0;
 	virtual void						stop( void ) = 0;
-	virtual const std::string&			getPassword( void ) const = 0;
+	virtual bool						validatePassword( const std::string& pass ) const = 0;
 	virtual const std::string&			getCreationTime( void ) const = 0;
 	virtual bool						getIsRunning( void ) = 0;
 	virtual void						setIsRunning( bool value ) = 0;
@@ -26,6 +26,8 @@ public:
 	virtual Client*		getClient( const std::string& nickname ) const = 0;
 	virtual bool		isClientExist( const std::string& nickname ) = 0;
 	virtual bool		isClientExist( int fd ) = 0;
+	virtual bool		checkClientAuthentication( Client* client ) = 0;
+	virtual void		disconnectClient( int fd, const std::string& reason ) = 0;
 
 	// Channel management
 	virtual void		addChannel( Channel* channel ) = 0;
@@ -38,6 +40,9 @@ public:
 	virtual void	sendToClient( int fd, const std::string& message ) = 0;
 	virtual void	sendToClient( const std::string& nickname, const std::string& message ) = 0;
 	virtual void	sendError( int fd, const std::string& errorCode, const std::string& message ) = 0;
-	virtual void	broadcastMessage( Client *client, const std::string& channelName, const std::string& message ) = 0;
+	virtual void	broadcastMessage( Client* client,
+									  const std::string& channelName,
+									  const std::string& message ) = 0;
+	virtual void	broadcastMsgInClientChannels( Client* client, const std::string& message ) = 0;
 
 };

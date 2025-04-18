@@ -6,7 +6,7 @@
 /*   By: ryusupov <ryusupov@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/31 14:30:49 by ryusupov          #+#    #+#             */
-/*   Updated: 2025/04/16 12:37:27 by ryusupov         ###   ########.fr       */
+/*   Updated: 2025/04/18 14:14:44 by ryusupov         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -53,7 +53,7 @@ std::vector<std::string>CommandHandler::parseCommand(const std::string &command)
 
 	/*Set of all the available commands*/
 	static const std::unordered_set<std::string> setOfAllCmds = {
-		"JOIN", "QUIT", "NICK", "INVITE", "WHO"
+		"JOIN", "QUIT", "NICK", "INVITE", "WHO", "PASS"
 	};
 	/*Set of special commands with more that three arguments required*/
 	static const std::unordered_set<std::string> setOfSpecialCmds = {

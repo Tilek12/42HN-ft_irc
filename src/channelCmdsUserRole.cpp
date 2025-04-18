@@ -42,7 +42,7 @@ bool isUserOnChannel(IClient& client, IServer& server, IChannel* channel, const 
 	if (!isUserOnChannel || usersInChannel.empty())
 	{
 		std::string errorMsg = ":" + IRCname + " " + IRCerror::ERR_USERNOTINCHANNEL + " " +
-			client.getNickname() + " " + userName + " " + channel->getName() + 
+			client.getNickname() + " " + userName + " " + channel->getName() +
 			" :User is not in channel";
 		server.sendToClient(client.getNickname(), errorMsg);
 		return false;
@@ -72,7 +72,7 @@ bool canOnlyOperatorChangeTopic(IClient& client, IServer& server, IChannel* chan
         if (!channel->isOperator(client.getNickname()) || channel->getOperators().empty())
         {
 			std::string errorMsg = ":" + IRCname + " " + IRCerror::ERR_CHANOPRIVSNEEDED + " " +
-           		client.getNickname() + " " + channel->getName() + 
+           		client.getNickname() + " " + channel->getName() +
             	" :Cannot set TOPIC. You are not a channel operator";
 			server.sendToClient(client.getNickname(), errorMsg);
             return false;

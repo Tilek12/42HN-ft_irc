@@ -6,7 +6,7 @@
 /*   By: ryusupov <ryusupov@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/19 14:03:06 by ryusupov          #+#    #+#             */
-/*   Updated: 2025/04/08 19:58:54 by ryusupov         ###   ########.fr       */
+/*   Updated: 2025/04/18 13:40:12 by ryusupov         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,6 +26,9 @@ class Client : public IClient{
 		std::string realname;	//clinet's real name
 		std::string hostname;	//client's hostname
 		bool isRegistered;		//the flag to check is the client has completed registration process
+
+		bool isAuthenticated;	// <------ CHECK IF CLIENT IS AUTHENTICATED BY SERVER PASSWORD <--- NEW
+
 		bool userReceived;
 		std::string buffer;		// Buffer for recieved message
 		std::string sendBuffer;	// Buffer for output message
@@ -41,6 +44,9 @@ class Client : public IClient{
 			std::string getRealname() const override;
 			std::string getHostname() const override;
 			bool		getIsResgistered() const override;
+
+			bool		getIsAuthenticated() const; // <------ NEW FUNCTION ----------
+
 			void		markUserReceived();
 
 			/*Setters*/
@@ -50,6 +56,8 @@ class Client : public IClient{
 			void	setRealname(std::string &realname) override;
 			void	setHostname(std::string &hostname) override;
 			void	setIsRegistered(bool status) override;
+
+			void	setIsAuthenticated(bool status); // <------ NEW FUNCTION ----------
 
 
 			// Buffer management

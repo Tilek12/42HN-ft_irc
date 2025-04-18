@@ -6,7 +6,7 @@
 /*   By: ryusupov <ryusupov@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/22 16:37:19 by ryusupov          #+#    #+#             */
-/*   Updated: 2025/04/18 13:34:18 by ryusupov         ###   ########.fr       */
+/*   Updated: 2025/04/18 14:23:19 by ryusupov         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,6 +33,9 @@ void CommandHandler::clientCmdHandler(Client *client, std::vector<std::string> &
 			SendError(client, "The username or realname is not provided!");
 			return ;
 		}
+
+		if (!server.checkClientAuthentication(client))
+			return ;
 
 		client->setUsername(command[1]);
 		client->setRealname(command[2]);
@@ -176,7 +179,7 @@ bool CommandHandler::NickNameTaken(std::string &nickname) {
 /***************************************************************************/
 void	CommandHandler::MainCommandHandller(Client *client, std::vector<std::string> &args){
 	static std::unordered_set<std::string> serverCmds = {
-		"CAP", "PING", "NOTICE"
+		"CAP", "PING", "NOTICE", "PASS"
 	};
 
 	static std::unordered_set<std::string> channelCmds = {
