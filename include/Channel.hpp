@@ -34,6 +34,7 @@ public:
 	std::string 				getTopic() const override;
 	void						setTopic(const std::string& topic) override;
 	std::vector<std::string> 	getUsers() const override;
+	std::vector<std::string> 	&getUsers();
 	void 						addUser(const std::string& user) override;
 	void 						removeUser(const std::string& user) override;
 	std::vector<std::string> 	getOperators() const override;

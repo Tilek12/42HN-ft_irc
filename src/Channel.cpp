@@ -56,6 +56,11 @@ std::vector<std::string> Channel::getUsers() const
 	return _users;
 }
 
+std::vector<std::string> &Channel::getUsers()
+{
+	return _users;
+}
+
 void Channel::addUser(const std::string& user)
 {
 	auto it = std::find(_invitedUsers.begin(), _invitedUsers.end(), user);

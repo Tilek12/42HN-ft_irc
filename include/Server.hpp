@@ -91,6 +91,7 @@ private:
 	Channel*	createChannel( const std::string& name ) override;
 	void		removeChannel( const std::string& name ) override;
 	bool		isChannelExist( const std::string& name ) override;
+	std::map<std::string, Channel*> getChannels();
 
 	// Messaging
 	void	sendToClient( int fd, const std::string& message ) override;

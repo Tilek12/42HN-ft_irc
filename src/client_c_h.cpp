@@ -6,7 +6,7 @@
 /*   By: ryusupov <ryusupov@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/22 16:37:19 by ryusupov          #+#    #+#             */
-/*   Updated: 2025/04/18 14:23:19 by ryusupov         ###   ########.fr       */
+/*   Updated: 2025/04/18 16:39:48 by ryusupov         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,8 +34,8 @@ void CommandHandler::clientCmdHandler(Client *client, std::vector<std::string> &
 			return ;
 		}
 
-		if (!server.checkClientAuthentication(client))
-			return ;
+		// if (!server.checkClientAuthentication(client))
+		// 	return ;
 
 		client->setUsername(command[1]);
 		client->setRealname(command[2]);
@@ -139,7 +139,7 @@ bool CommandHandler::handleNickname(Client *client, std::vector<std::string> &co
 	std::string oldNick = client->getNickname();
 
 	if (NickNameTaken(newNick)) {
-		server.sendToClient(client->getNickname(), "433 * " + newNick + " :The chosen nickname has already taken!");
+		server.sendToClient(client->getNickname(), "433 * " + newNick + " :The chosen nickname has already been taken!");
 		return false;
 	}
 
@@ -147,6 +147,8 @@ bool CommandHandler::handleNickname(Client *client, std::vector<std::string> &co
 
 	if (client->getIsResgistered()) {
 		std::string nickChangeMsg = ":" + oldNick + "!" + client->getUsername() + "@" + client->getHostname() + " NICK :" + newNick;
+		updateNicknameInChannels(client, oldNick, newNick, nickChangeMsg);
+		server.broadcastMessage(client, "", nickChangeMsg);
 		server.sendToClient(client->getNickname(), nickChangeMsg);
 	} else {
 		server.sendToClient(newNick, ":irc.server.com 001 " + newNick + " :Welcome to the IRC network, " + newNick);
@@ -157,6 +159,20 @@ bool CommandHandler::handleNickname(Client *client, std::vector<std::string> &co
 	return true;
 }
 
+void CommandHandler::updateNicknameInChannels(Client *client, const std::string &oldNick, const std::string &newNick, std::string msg) {
+	for (auto &&channelPair : server.getChannels()) {
+		Channel *channel = channelPair.second;
+		std::vector<std::string> &users = channel->getUsers();
+
+		for (std::string &user : users) {
+			if (user == oldNick) {
+				user = newNick;
+				server.broadcastMessage(client, channelPair.first, msg);
+				break;
+			}
+		}
+	}
+}
 
 void CommandHandler::SendMessage(IClient *client, const std::string &msg){
 	std::cout << "New message: " << msg << std::endl;

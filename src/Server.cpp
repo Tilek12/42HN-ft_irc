@@ -615,3 +615,8 @@ void	Server::broadcastMsgInClientChannels( Client* client, const std::string& me
 	}
 
 }
+
+std::map<std::string, Channel*>  Server::getChannels()
+{
+	return this->_channels;
+}
