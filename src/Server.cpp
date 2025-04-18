@@ -1,5 +1,6 @@
 
 #include "../include/Server.hpp"
+#include "../include/IRCerror.hpp"
 
 ////////////////////////////////////////////////////////////////////////////////
 // ====================  Class Constructor and Destructor  ================== //
@@ -156,11 +157,17 @@ void	Server::_processClientBuffer( Client* client ) {
 			std::cout << YELLOW
 					  << "CMD INPUT  [" << client->getSocketFd() << "]: " << message
 					  << RESET << std::endl;
-			_arguments = _commandHandler->parseCommand(message);
-			if (!(_arguments.empty()))
+			_arguments = _commandHandler->parseCommand(client, message);
+			if (_arguments.size() > 1)
 				_commandHandler->MainCommandHandller( client, _arguments );
-			else
-				std::cout << "Error: Unknown command or invalid command!" << std::endl;
+			else if (_arguments.size() == 1){
+				std::string errorMsg = ":" + IRCname + " " + IRCerror::ERR_UNKNOWNCOMMAND + \
+            	" " + client->getNickname() + " " + _arguments[0];
+				sendToClient(client->getNickname(), errorMsg);
+			}else {
+				return ;
+			}
+
 		}
 
 //////////////////////////////////////////////////////////////////////////////////////////////////
