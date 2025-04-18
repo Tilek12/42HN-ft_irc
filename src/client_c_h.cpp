@@ -6,7 +6,7 @@
 /*   By: ryusupov <ryusupov@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/22 16:37:19 by ryusupov          #+#    #+#             */
-/*   Updated: 2025/04/18 16:39:48 by ryusupov         ###   ########.fr       */
+/*   Updated: 2025/04/18 19:17:55 by ryusupov         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,7 +17,6 @@
 #include "../include/ChannelCmds.hpp"
 #include "../include/IClient.hpp"
 
-//FIXME: PRIVMSG IS SENDING THE TEXT TWICE IN CHANNELS
 CommandHandler::CommandHandler(Server& srv) : server(srv) {
 	//
 }
@@ -30,7 +29,9 @@ void CommandHandler::clientCmdHandler(Client *client, std::vector<std::string> &
 
 		}else if (command[0] == "USER") {
 		if (command.size() < 5 || command[1].empty() || command[4].empty()) {
-			SendError(client, "The username or realname is not provided!");
+			std::string errorMsg = ":" + IRCname + " " + IRCerror::ERR_NEEDMOREPARAMS + \
+    		" " + client->getNickname() + " " + command[0] + " :Not enough parameters\r\n";
+			server.sendToClient(client->getNickname(), errorMsg);
 			return ;
 		}
 
@@ -47,12 +48,10 @@ void CommandHandler::clientCmdHandler(Client *client, std::vector<std::string> &
 		}
 	} else if (command[0] == "PRIVMSG") {
 
-		if (command[1].empty()) {
-			server.sendToClient(client->getNickname(), "No recipent provided!");
-			return ;
-		}
 		if (command[2].empty()) {
-			server.sendToClient(client->getNickname(), "Empty msg provided!");
+			std::string errorMsg = ":" + IRCname + " " + IRCerror::ERR_NOTEXTTOSEND + \
+    		" " + client->getNickname() + " " + command[0] + " :No text to send\r\n";
+			server.sendToClient(client->getNickname(), errorMsg);
 			return ;
 		}
 		findTargetPrivmsg(client, command);
@@ -100,6 +99,12 @@ void	CommandHandler::findTargetPrivmsg(Client *client, std::vector<std::string> 
 		server.broadcastMessage(client, target, fullMessage);
 	}
 	else {
+		if (!server.getClient(target)){
+			std::string errorMsg = ":" + IRCname + " " + IRCerror::ERR_NOSUCHNICK + \
+    		" " + client->getNickname() + " " + command[1] + " :No such user found\r\n";
+			server.sendToClient(client->getNickname(), errorMsg);
+			return ;
+		}
 		std::string prefix = ":" + client->getNickname() + "!" + client->getUsername() + "@" + client->getHostname();
         std::string fullMessage = prefix + " PRIVMSG " + target + " :" + msg + "\r\n";
 		server.sendToClient(target, fullMessage);
@@ -139,7 +144,9 @@ bool CommandHandler::handleNickname(Client *client, std::vector<std::string> &co
 	std::string oldNick = client->getNickname();
 
 	if (NickNameTaken(newNick)) {
-		server.sendToClient(client->getNickname(), "433 * " + newNick + " :The chosen nickname has already been taken!");
+		std::string errorMsg = ":" + IRCname + " " + IRCerror::ERR_NICKNAMEINUSE + \
+    " " + client->getNickname() + " " + newNick + " :Nickname is already in use\r\n";
+		server.sendToClient(client->getNickname(), errorMsg);
 		return false;
 	}
 

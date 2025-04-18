@@ -31,7 +31,7 @@ struct IRCerror {
 	static constexpr const char* ERR_SUMMONDISABLED = "445";	// SUMMON command disabled
 	static constexpr const char* ERR_USERSDISABLED = "446";		// USERS command disabled
 	static constexpr const char* ERR_NOTREGISTERED = "451";		// You have not registered
-	static constexpr const char* ERR_NEEDMOREPARAMS = "461";	// Not enough parameters
+	static constexpr const char* ERR_NEEDMOREPARAMS = "461";	// Not enough parameters --
 	static constexpr const char* ERR_ALREADYREGISTRED = "462";	// Already registered
 	static constexpr const char* ERR_NOPERMFORHOST = "463";		// No permission for operation
 	static constexpr const char* ERR_PASSWDMISMATCH = "464";	// Password mismatch
@@ -53,5 +53,4 @@ struct IRCerror {
 	static constexpr const char* ERR_NOOPERHOST = "491";		// No O-line for your host
 	static constexpr const char* ERR_UMODEUNKNOWNFLAG = "501";	// Unknown MODE flag
 	static constexpr const char* ERR_USERSDONTMATCH = "502";	// Cannot change or set mode for other
-
 };

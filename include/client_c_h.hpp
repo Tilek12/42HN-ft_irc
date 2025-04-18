@@ -6,7 +6,7 @@
 /*   By: ryusupov <ryusupov@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: Invalid date        by                   #+#    #+#             */
-/*   Updated: 2025/04/18 16:38:00 by ryusupov         ###   ########.fr       */
+/*   Updated: 2025/04/18 18:51:56 by ryusupov         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,19 +35,19 @@ class CommandHandler{
 		void SendError(Client *client, const std::string &msg);
 
 		std::vector<std::string> &getArguments();
-		static std::vector<std::string> parseCommand(const std::string &command);
-		static std::vector<std::string> parseSpecialCommands(const std::string &command, const std::unordered_set<std::string> &setOfCmds);
+		std::vector<std::string> parseCommand(Client *client, const std::string &command);
+		std::vector<std::string> parseSpecialCommands(Client *client, const std::string &command, const std::unordered_set<std::string> &setOfCmds);
 		/*Helper methods for functions*/
-		static bool handlePrivMsgNotice(std::istringstream &iss, std::vector<std::string> &arguments);
-		static bool handleUser(std::istringstream &iss, std::vector<std::string> &arguments);
-		static bool handleTopic(std::istringstream &iss, std::vector<std::string> &arguments);
-		static bool handleMode(std::istringstream &iss, std::vector<std::string> &arguments);
-		static bool handleSimpleCommands(std::istringstream &iss, std::vector<std::string> &arguments);
-		static bool handleKick(std::istringstream &iss, std::vector<std::string> &arguments);
-		static bool handlePing(std::istringstream &iss, std::vector<std::string> &arguments);
-		static bool handleCap(std::istringstream &iss, std::vector<std::string> &arguments);
-		static bool handleNotice(std::istringstream &iss, std::vector<std::string> &arguments);
-		static bool handlePart(std::istringstream &iss, std::vector<std::string> &args);
+		bool	handlePrivMsgNotice(Client *client, std::istringstream &iss, std::vector<std::string> &arguments);
+		bool	handleUser(Client *client, std::istringstream &iss, std::vector<std::string> &arguments);
+		bool	handleTopic(Client *client, std::istringstream &iss, std::vector<std::string> &arguments);
+		bool	handleMode(Client *client, std::istringstream &iss, std::vector<std::string> &arguments);
+		bool	handleSimpleCommands(Client *client, std::istringstream &iss, std::vector<std::string> &arguments);
+		bool	handleKick(std::istringstream &iss, std::vector<std::string> &arguments);
+		bool	handlePing(std::istringstream &iss, std::vector<std::string> &arguments);
+		bool	handleCap(std::istringstream &iss, std::vector<std::string> &arguments);
+		bool	handleNotice(std::istringstream &iss, std::vector<std::string> &arguments);
+		bool	handlePart(Client *client, std::istringstream &iss, std::vector<std::string> &args);
 		void	updateNicknameInChannels(Client *client, const std::string &oldNick, const std::string &newNick, std::string msg);
 		void	MainCommandHandller(Client *client, std::vector<std::string> &args);
 		bool 	handleNickname(Client *client, std::vector<std::string> &command);
