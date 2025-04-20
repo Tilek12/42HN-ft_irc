@@ -6,7 +6,7 @@
 /*   By: llacsivy <llacsivy@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/04 19:18:33 by ryusupov          #+#    #+#             */
-/*   Updated: 2025/04/18 19:46:20 by llacsivy         ###   ########.fr       */
+/*   Updated: 2025/04/20 18:38:12 by llacsivy         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -127,7 +127,7 @@ bool CommandHandler::handleTopic(Client *client, std::istringstream &iss, std::v
 		if (!(topic.empty() && topic[0] == ' ')) topic.erase(0, 1);
 
 		if (topic.empty() || topic[0] != ':')
-			return false;
+			return true;
 		topic.erase(0, 1);
 
 		if (!topic.empty())

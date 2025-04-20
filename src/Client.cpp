@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Client.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ryusupov <ryusupov@student.42.fr>          +#+  +:+       +#+        */
+/*   By: llacsivy <llacsivy@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/19 17:44:20 by ryusupov          #+#    #+#             */
-/*   Updated: 2025/04/18 13:38:10 by ryusupov         ###   ########.fr       */
+/*   Updated: 2025/04/20 18:53:05 by llacsivy         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,6 +21,7 @@ Client::Client(int fd, std::string host) : socket_fd(fd),
 										   hostname(host),
 										   isRegistered(false),
 										   userReceived(false),
+										   isAuthenticated(false),
 										   buffer( "" ),
 										   sendBuffer( "" ) {
 	//intializing values
@@ -83,7 +84,7 @@ void	Client::markUserReceived() {
 
 /*Destructor*/
 Client::~Client() {
-	std::cout << "Client" << this->nickname << " has been disconnected!" << std::endl;
+	//
  }
 
 
