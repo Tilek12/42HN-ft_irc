@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   parse_cmds.cpp                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ryusupov <ryusupov@student.42.fr>          +#+  +:+       +#+        */
+/*   By: llacsivy <llacsivy@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/31 14:30:49 by ryusupov          #+#    #+#             */
-/*   Updated: 2025/04/18 18:52:56 by ryusupov         ###   ########.fr       */
+/*   Updated: 2025/04/20 19:26:05 by llacsivy         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,6 +42,8 @@ std::vector<std::string>CommandHandler::parseSpecialCommands(Client *client, con
 			return {};
 		else if (cmd == "PART" && !handlePart(client, iss, arguments))
 			return {};
+		else if (cmd == "QUIT" && !handleQuit(client, iss, arguments))
+			return {};
 		}
 	return (arguments);
 }
@@ -53,11 +55,11 @@ std::vector<std::string>CommandHandler::parseCommand(Client *client, const std::
 
 	/*Set of all the available commands*/
 	static const std::unordered_set<std::string> setOfAllCmds = {
-		"JOIN", "QUIT", "NICK", "INVITE", "WHO", "PASS"
+		"JOIN", "NICK", "INVITE", "WHO", "PASS"
 	};
 	/*Set of special commands with more that three arguments required*/
 	static const std::unordered_set<std::string> setOfSpecialCmds = {
-		"USER", "PRIVMSG", "NOTICE", "KICK", "TOPIC", "MODE", "PING", "CAP", "PART"
+		"USER", "PRIVMSG", "NOTICE", "KICK", "TOPIC", "MODE", "PING", "CAP", "PART", "QUIT"
 	};
 	/*Checking for command if it is existing command and adding it to a vector*/
 	iss >> arg1;

@@ -149,13 +149,11 @@ void processInviteRequest(IClient& client, IServer& server, IChannel* channel, \
     std::string reply = ":" + client.getNickname() + " INVITE " +
         userName + " " + channel->getName();
     server.sendToClient(userName, reply);
-    std::cout << reply << std::endl;
 }
 
 void processGetTopicRequest(IClient& client, IServer& server, IChannel* channel)
 {
     Client* realClient = dynamic_cast<Client*>(&client);
-
     if (channel->getTopic().empty())
     {
         std::string reply = ":" + IRCname + " " + IRCreply::RPL_NOTOPIC + " " +
@@ -168,8 +166,6 @@ void processGetTopicRequest(IClient& client, IServer& server, IChannel* channel)
         std::string reply = ":" + IRCname + " " + IRCreply::RPL_TOPIC + " " +
                 client.getNickname() + " " + channel->getName() + " :" + channel->getTopic();
         server.sendToClient(client.getNickname(), reply);
-        server.broadcastMessage(realClient, client.getNickname(), reply);
-        std::cout << reply << std::endl;
     }
     return;
 }
@@ -179,16 +175,15 @@ void processSetTopicRequest(IClient& client, IServer& server, IChannel* channel,
     Client* realClient = dynamic_cast<Client*>(&client);
 
     std::string reply;
-    channel->setTopic(newTopic.erase(0, 1));
+    channel->setTopic(newTopic);
     if (channel->getTopic().empty())
-        reply = ":" + IRCname + " " + IRCreply::RPL_NOTOPIC + " " +
+        reply = ":" + IRCname + " " + IRCreply::RPL_NOTOPIC + " " + \
         client.getNickname() + " " + channel->getName() + " :No topic is set for this channel";
     else
-        reply = ":" + IRCname + " " + IRCreply::RPL_TOPIC + " " +
+        reply = ":" + IRCname + " " + IRCreply::RPL_TOPIC + " " + \
                     client.getNickname() + " " + channel->getName() + " :" + channel->getTopic();
     server.sendToClient(client.getNickname(), reply);
-    server.broadcastMessage(realClient, client.getNickname(), reply);
-    std::cout << reply << std::endl;
+    server.broadcastMessage(realClient, channel->getName(), reply);
 }
 
 void processModeTwoArgsRequest(IClient& client, IServer& server, IChannel* channel, std::string mode)

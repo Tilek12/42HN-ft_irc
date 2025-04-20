@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   client_c_h.hpp                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ryusupov <ryusupov@student.42.fr>          +#+  +:+       +#+        */
+/*   By: llacsivy <llacsivy@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: Invalid date        by                   #+#    #+#             */
-/*   Updated: 2025/04/18 18:51:56 by ryusupov         ###   ########.fr       */
+/*   Updated: 2025/04/20 19:27:24 by llacsivy         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -54,6 +54,7 @@ class CommandHandler{
 		void	registerClient(Client *client);
 		void	findTargetPrivmsg(Client *client, std::vector<std::string> &command);
 		void	handleWhoCmd(Client *client, std::vector<std::string> &command);
+		bool 	handleQuit(Client *client, std::istringstream &iss, std::vector<std::string> &args);
 
 
 

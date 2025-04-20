@@ -10,7 +10,7 @@ bool isOperatorOnChannel(IClient& client, IServer& server, IChannel* channel)
 		client.getNickname()) != operators.end();
 	if (!isOperator || operators.empty())
 	{
-		std::string errorMsg = ":" + IRCname + " " + IRCerror::ERR_CHANOPRIVSNEEDED + " " +
+		std::string errorMsg = ":" + IRCname + " " + IRCerror::ERR_CHANOPRIVSNEEDED + " " + \
 			client.getNickname() + " " + channel->getName() + " :You are not a channel operator";
 		server.sendToClient(client.getNickname(), errorMsg);
 		return false;

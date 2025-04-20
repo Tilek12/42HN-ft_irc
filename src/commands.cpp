@@ -6,11 +6,22 @@
 /*   By: llacsivy <llacsivy@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/04 19:18:33 by ryusupov          #+#    #+#             */
-/*   Updated: 2025/04/20 18:38:12 by llacsivy         ###   ########.fr       */
+/*   Updated: 2025/04/20 20:21:46 by llacsivy         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../include/client_c_h.hpp"
+
+bool CommandHandler::handleQuit(Client *client, std::istringstream &iss, std::vector<std::string> &args) {
+	std::string reason;
+
+	std::getline(iss, reason);
+	if (!reason.empty() && reason[0] == ' ')
+		reason.erase(0, 1);
+	if (!(reason.empty()))
+		args.push_back(reason);
+	return true;
+}
 
 /*------Parsing PART command------*/
 bool CommandHandler::handlePart(Client *client, std::istringstream &iss, std::vector<std::string> &args) {
@@ -128,7 +139,7 @@ bool CommandHandler::handleTopic(Client *client, std::istringstream &iss, std::v
 
 		if (topic.empty() || topic[0] != ':')
 			return true;
-		topic.erase(0, 1);
+		// topic.erase(0, 1);
 
 		if (!topic.empty())
 			arguments.push_back(topic);

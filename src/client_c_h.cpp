@@ -6,7 +6,7 @@
 /*   By: llacsivy <llacsivy@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/22 16:37:19 by ryusupov          #+#    #+#             */
-/*   Updated: 2025/04/20 18:56:33 by llacsivy         ###   ########.fr       */
+/*   Updated: 2025/04/20 19:24:48 by llacsivy         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -201,7 +201,7 @@ bool CommandHandler::NickNameTaken(std::string &nickname) {
 /***************************************************************************/
 void	CommandHandler::MainCommandHandller(Client *client, std::vector<std::string> &args){
 	static std::unordered_set<std::string> serverCmds = {
-		"CAP", "PING", "NOTICE", "PASS"
+		"CAP", "PING", "NOTICE", "PASS", "QUIT"
 	};
 
 	static std::unordered_set<std::string> channelCmds = {
