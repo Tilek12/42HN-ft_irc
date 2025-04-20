@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   client_c_h.cpp                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ryusupov <ryusupov@student.42.fr>          +#+  +:+       +#+        */
+/*   By: tkubanyc <tkubanyc@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/22 16:37:19 by ryusupov          #+#    #+#             */
-/*   Updated: 2025/04/18 14:23:19 by ryusupov         ###   ########.fr       */
+/*   Updated: 2025/04/20 19:00:26 by tkubanyc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,11 +24,10 @@ CommandHandler::CommandHandler(Server& srv) : server(srv) {
 
 void CommandHandler::clientCmdHandler(Client *client, std::vector<std::string> &command){
 
-		if (command[0] == "NICK"){
-			if (!(handleNickname(client, command)))
-				return ;
-
-		}else if (command[0] == "USER") {
+	if (command[0] == "NICK") {
+		if (!(handleNickname(client, command)))
+			return ;
+	} else if (command[0] == "USER") {
 		if (command.size() < 5 || command[1].empty() || command[4].empty()) {
 			SendError(client, "The username or realname is not provided!");
 			return ;
@@ -39,7 +38,6 @@ void CommandHandler::clientCmdHandler(Client *client, std::vector<std::string> &
 
 		client->setUsername(command[1]);
 		client->setRealname(command[2]);
-
 		client->markUserReceived();
 
 		if (client->getIsResgistered()) {
@@ -113,7 +111,6 @@ void	CommandHandler::findTargetPrivmsg(Client *client, std::vector<std::string> 
 /***************************************************************************/
 void	CommandHandler::registerClient(Client *client) {
 	client->setIsRegistered(true);
-	server.addClient(client);
 
 	std::string nick = client->getNickname();
 	std::string user = client->getUsername();
@@ -149,10 +146,9 @@ bool CommandHandler::handleNickname(Client *client, std::vector<std::string> &co
 		std::string nickChangeMsg = ":" + oldNick + "!" + client->getUsername() + "@" + client->getHostname() + " NICK :" + newNick;
 		server.sendToClient(client->getNickname(), nickChangeMsg);
 	} else {
-		server.sendToClient(newNick, ":irc.server.com 001 " + newNick + " :Welcome to the IRC network, " + newNick);
-
 		client->setIsRegistered(true);
-		server.addClient(client);
+		std::string nickChangeMsg = ":" + oldNick + "!" + client->getUsername() + "@" + client->getHostname() + " NICK :" + newNick;
+		server.sendToClient(client->getNickname(), nickChangeMsg);
 	}
 	return true;
 }
