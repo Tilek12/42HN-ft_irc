@@ -13,12 +13,7 @@ void processJoinRequest(IClient& client, IServer& server, \
     {
         channel = server.getChannel(channelName);
         if (!channel)
-        {
-            channel = server.createChannel(channelName);
-            channel->addOperator(client.getNickname());
-            channel->setHasPassword(true);
-            channel->setPassword(password);
-        }
+            handleNewChannel(server, channel, channelName, password, client);
     }
     else
     {
@@ -36,23 +31,12 @@ void processJoinRequest(IClient& client, IServer& server, \
     server.broadcastMessage(realClient, channel->getName(), joinMsg);
 
     if (channel->isOperator(client.getNickname())) {
-        std::string modeMsg = ":" + client.getNickname() + " MODE " + channel->getName() + " +o " + client.getNickname();
+        std::string modeMsg = ":" + client.getNickname() + " MODE " + channel->getName() + \
+            " +o " + client.getNickname();
         server.broadcastMessage(realClient, channel->getName(), modeMsg);
         server.sendToClient(client.getNickname(), modeMsg);
     }
-    std::string userList;
-    for (auto &&i : channel->getUsers()) {
-        if (channel->isOperator(i))
-            userList += "@" + i + " ";
-        else
-            userList += i + " ";
-    }
-    std::string reply353 = ":" + IRCname + " " + IRCreply::RPL_NAMREPLY + " " +
-                           client.getNickname() + " = " + channel->getName() + " :" + userList;
-    server.sendToClient(client.getNickname(), reply353);
-    std::string reply366 = ":" + IRCname + " " + IRCreply::RPL_ENDOFNAMES + " " +
-                           client.getNickname() + " " + channel->getName() + " :End of /NAMES list";
-    server.sendToClient(client.getNickname(), reply366);
+    sendNameReplies(realClient, channel, server);
 }
 
 bool joinAllowed(IClient& client, IServer& server, IChannel* channel, const std::string& password)
@@ -234,7 +218,9 @@ void processModeTwoArgsRequest(IClient& client, IServer& server, IChannel* chann
     }
     return;
 }
-void processModeThreeArgsRequest(IClient& client, IServer& server, IChannel* channel, std::string mode, std::string modeParamIdx2)
+
+void processModeThreeArgsRequest(IClient& client, IServer& server, \
+    IChannel* channel, std::string mode, std::string modeParamIdx2)
 {
     bool validMode = true;
     if (mode == "+o")

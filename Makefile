@@ -28,7 +28,8 @@ SRC =	$(SRC_DIR)/Server.cpp \
 		$(SRC_DIR)/serverCmdHandler.cpp \
 		$(SRC_DIR)/channelCmdsUtils.cpp \
 		$(SRC_DIR)/channelCmdsUserRole.cpp \
-		$(SRC_DIR)/channelCmdHandler.cpp
+		$(SRC_DIR)/channelCmdHandler.cpp \
+		$(SRC_DIR)/channelCmdsUtilsJoin.cpp
 
 OBJ = $(SRC:$(SRC_DIR)/%.cpp=$(OBJ_DIR)/%.o)
 

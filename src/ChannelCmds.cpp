@@ -107,14 +107,12 @@ void ChannelCmds::inviteUserCmd(IClient& client, IServer& server, std::vector<st
         errorMsg = ":" + IRCname + " " + IRCerror::ERR_NOCHANMODES + " " +
                             client.getNickname() + " " + channelName + " :Channel does not exist";
         server.sendToClient(client.getNickname(), errorMsg);
-        std::cerr << errorMsg << std::endl;
         return;
     }
     if (!(channel->getIsInviteOnly()))
     {
         errorMsg = "NOTICE " + client.getNickname() + " :Channel is not invite-only";
         server.sendToClient(client.getNickname(), errorMsg);
-        std::cerr << errorMsg << std::endl;
         return;
     }
     if (!isOperatorOnChannel(client, server, channel))
