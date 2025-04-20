@@ -16,14 +16,15 @@ void processJoinRequest(IClient& client, IServer& server, \
         {
             channel = server.createChannel(channelName);
             channel->addOperator(client.getNickname());
+            channel->setHasPassword(true);
+            channel->setPassword(password);
         }
     }
     else
     {
         std::string errorMsg = ":" + IRCname + " " + IRCerror::ERR_BADCHANMASK + " " \
-            + client.getNickname() + " " + channelName + " :Bad Channel Mask\r\n";
+            + client.getNickname() + " " + channelName + " :Bad Channel Mask";
         server.sendToClient(client.getNickname(), errorMsg);
-        std::cerr << errorMsg;
         return;
     }
     if (!joinAllowed(client, server, channel, password))
@@ -56,12 +57,11 @@ void processJoinRequest(IClient& client, IServer& server, \
 
 bool joinAllowed(IClient& client, IServer& server, IChannel* channel, const std::string& password)
 {
-    if (channel->getHasPassword() && channel->isValidPassword(password))
+    if (channel->getHasPassword() && !channel->isValidPassword(password))
     {
         std::string errorMsg = ":" + IRCname + " " + IRCerror::ERR_BADCHANNELKEY \
             + " " + client.getNickname() + " " + channel->getName() + " :Cannot join channel (+k)";
         server.sendToClient(client.getNickname(), errorMsg);
-        std::cerr << errorMsg;
         return false;
     }
     bool isInvited = std::find(channel->getInvitedUsers().begin(), \
@@ -72,7 +72,6 @@ bool joinAllowed(IClient& client, IServer& server, IChannel* channel, const std:
         std::string errorMsg = ":" + IRCname + " " + IRCerror::ERR_INVITEONLYCHAN +
         " " + client.getNickname() + " " + channel->getName() + " :Cannot join channel (+i)";
         server.sendToClient(client.getNickname(), errorMsg);
-        std::cerr << errorMsg;
         return false;
     }
     if (channel->getUserLimit() > 0 && channel->getUsers().size() >= channel->getUserLimit())
@@ -80,7 +79,6 @@ bool joinAllowed(IClient& client, IServer& server, IChannel* channel, const std:
         std::string errorMsg = ":" + IRCname + " " + IRCerror::ERR_CHANNELISFULL +
             " " + client.getNickname() + " " + channel->getName() + " :Cannot join channel (+l)";
         server.sendToClient(client.getNickname(), errorMsg);
-        std::cerr << errorMsg;
         return false;
     }
     return true;

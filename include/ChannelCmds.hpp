@@ -45,6 +45,4 @@ void processModeTwoArgsRequest(IClient& client, IServer& server, IChannel* chann
 void processModeThreeArgsRequest(IClient& client, IServer& server, IChannel* channel, std::string mode, \
 	std::string modeParamIdx2);
 void channelCmdHandler(IClient& client, IServer& server, std::vector<std::string>& args);
-
-
 #endif

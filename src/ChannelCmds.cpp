@@ -36,7 +36,7 @@ void ChannelCmds::joinChannelCmd(IClient& client, IServer& server, std::vector<s
             password = passwords[i];
         else
             password = "";
-            processJoinRequest(client, server, channelNames[i], password);
+        processJoinRequest(client, server, channelNames[i], password);
     }
 }
 
