@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   client_c_h.cpp                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: llacsivy <llacsivy@student.42.fr>          +#+  +:+       +#+        */
+/*   By: ryusupov <ryusupov@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/22 16:37:19 by ryusupov          #+#    #+#             */
-/*   Updated: 2025/04/21 14:12:01 by llacsivy         ###   ########.fr       */
+/*   Updated: 2025/04/21 18:00:33 by ryusupov         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -93,25 +93,45 @@ void	CommandHandler::findTargetPrivmsg(Client *client, std::vector<std::string> 
 	std::string target = command[1];
 	std::string msg = command[2];
 
-	if (target[0] == '#') {
-		std::string prefix = ":" + client->getNickname() + "!" + client->getUsername() + "@" + client->getHostname();
-        std::string fullMessage = prefix + " PRIVMSG " + target + " :" + msg + "\r\n";
-		server.broadcastMessage(client, target, fullMessage);
-	}
-	else {
-		if (!server.getClient(target)){
-			std::string errorMsg = ":" + IRCname + " " + IRCerror::ERR_NOSUCHNICK + \
-    		" " + client->getNickname() + " " + command[1] + " :No such user found\r\n";
-			server.sendToClient(client->getNickname(), errorMsg);
-			return ;
+	std::vector<std::string> targets = splitTargets(target);
+
+	if (targets.size() > 0) {
+		for (size_t i = 0; i < targets.size(); i++) {
+			if (targets[i][0] == '#'){
+				std::string prefix = ":" + client->getNickname() + "!" + client->getUsername() + "@" + client->getHostname();
+				std::string fullMessage = prefix + " PRIVMSG " + targets[i] + " :" + msg + "\r\n";
+				server.broadcastMessage(client, targets[i], fullMessage);
+			}else {
+				if (!server.getClient(targets[i])){
+					std::string errorMsg = ":" + IRCname + " " + IRCerror::ERR_NOSUCHNICK + \
+					" " + client->getNickname() + " " + targets[i] + " :No such user found\r\n";
+					server.sendToClient(client->getNickname(), errorMsg);
+					continue;
+				}
+				std::string prefix = ":" + client->getNickname() + "!" + client->getUsername() + "@" + client->getHostname();
+				std::string fullMessage = prefix + " PRIVMSG " + targets[i] + " :" + msg + "\r\n";
+				server.sendToClient(targets[i], fullMessage);
+			}
 		}
-		std::string prefix = ":" + client->getNickname() + "!" + client->getUsername() + "@" + client->getHostname();
-        std::string fullMessage = prefix + " PRIVMSG " + target + " :" + msg + "\r\n";
-		server.sendToClient(target, fullMessage);
 	}
 }
 
 
+std::vector<std::string> CommandHandler::splitTargets(std::string &target) {
+	std::vector<std::string> result;
+
+	if (target.find(',') != std::string::npos) {
+		std::string temp;
+		std::istringstream tokens(target);
+
+		while (getline(tokens, temp, ','))
+			result.push_back(temp);
+
+		return result;
+	}
+	result.push_back(target);
+	return result;
+}
 
 /***************************************************************************/
 /****************************USER COMMAND***********************************/
