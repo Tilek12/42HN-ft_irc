@@ -84,13 +84,16 @@ private:
 	bool	isClientExist( int fd ) override;
 	bool	checkClientAuthentication( Client* client ) override;
 	void	disconnectClient( int fd, const std::string& reason ) override;
+	void	removeClientFromChannels( Client* client ) override;
 
 	// Channel management
-	void		addChannel( Channel* channel ) override;
-	Channel*	getChannel( const std::string& name ) const override;
-	Channel*	createChannel( const std::string& name ) override;
-	void		removeChannel( const std::string& name ) override;
-	bool		isChannelExist( const std::string& name ) override;
+	void					addChannel( Channel* channel ) override;
+	Channel*				getChannel( const std::string& name ) const override;
+	Channel*				createChannel( const std::string& name ) override;
+	void					removeChannel( const std::string& name ) override;
+	bool					isChannelExist( const std::string& name ) override;
+	void					sendNamesList( Channel* channel ) override;
+	std::vector<Channel*>	getClientChannels( Client* client ) override;
 
 	// Messaging
 	void	sendToClient( int fd, const std::string& message ) override;

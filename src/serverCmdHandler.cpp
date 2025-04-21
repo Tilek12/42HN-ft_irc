@@ -88,16 +88,33 @@ static void	handleQuit( Server* server, Client* client, const std::vector<std::s
 		reply += ":";
 
 	int argsNum = args.size();
-
 	for ( int i = 1; i < argsNum; i++ ) {
 		reply += args[i];
 		if ( i != argsNum - 1 )
 			reply += " ";
 	}
 
-	server->disconnectClient( client->getSocketFd(), "Quit" );
-
 	server->broadcastMsgInClientChannels( client, reply );
+
+	auto channels = server->getClientChannels( client );
+	if ( !channels.empty() ) {
+		for ( int i = 0; i < channels.size(); i++ )
+		{
+			// server->sendNamesList( channels[i] );
+			std::string userList;
+			for (auto &&i : channels[i]->getUsers())
+				userList += i + " ";
+			std::string reply353 = ":" + IRCname + " " + IRCreply::RPL_NAMREPLY + " " +
+								   client->getNickname() + " = " + channels[i]->getName() + " :" + userList;
+			server->sendToClient(client->getNickname(), reply353);
+			std::string reply366 = ":" + IRCname + " " + IRCreply::RPL_ENDOFNAMES + " " +
+								   client->getNickname() + " " + channels[i]->getName() + " :End of /NAMES list";
+			server->sendToClient(client->getNickname(), reply366);
+
+		}
+	}
+
+	server->disconnectClient( client->getSocketFd(), "Quit" );
 
 }
 

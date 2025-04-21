@@ -364,17 +364,18 @@ void	Server::disconnectClient( int fd, const std::string& reason ) {
 	std::string nickname = client->getNickname();
 
 	// Remove Client from all channels
-	auto channelsCopy = _channels;
-	for ( const auto& [name, channel] : channelsCopy ) {
-		if ( channel->isUser( nickname ) )
-			channel->removeUser( nickname );
+	// auto channelsCopy = _channels;
+	// for ( const auto& [name, channel] : channelsCopy ) {
+	// 	if ( channel->isUser( nickname ) )
+	// 		channel->removeUser( nickname );
 
-		if ( channel->isOperator( nickname ) )
-			channel->removeOperator( nickname );
+	// 	if ( channel->isOperator( nickname ) )
+	// 		channel->removeOperator( nickname );
 
-		if ( channel->isInvitedUser( nickname ) )
-			channel->removeInvitedUser( nickname );
-	}
+	// 	if ( channel->isInvitedUser( nickname ) )
+	// 		channel->removeInvitedUser( nickname );
+	// }
+	removeClientFromChannels( client );
 
 	// Remove from poll list
 	for ( auto it = _pollFDs.begin(); it != _pollFDs.end(); ++it ) {
@@ -408,6 +409,22 @@ bool	Server::checkClientAuthentication( Client* client ) {
 	}
 
 	return true;
+
+}
+
+/*--------------------------------------------*/
+/*  Remove Client from all Channels included  */
+/*--------------------------------------------*/
+void	Server::removeClientFromChannels( Client* client ) {
+
+	std::string clientName = client->getNickname();
+
+	for ( const auto& [channelName, channel] : _channels ) {
+		if ( channel->isUser( clientName ) ||
+				channel->isOperator( clientName ) ||
+				channel->isInvitedUser( clientName ) )
+			channel->removeUser( clientName );
+	}
 
 }
 
@@ -469,6 +486,33 @@ bool	Server::isChannelExist( const std::string& name ) {
 
 	return getChannel( name ) != nullptr;
 
+}
+
+/*--------------------------------------------*/
+/*  Send list of Client names in the Channel  */
+/*--------------------------------------------*/
+void	Server::sendNamesList( Channel* channel ) {
+
+	std::cout << "hallo\n";
+
+}
+
+/*----------------------------------------*/
+/*  Get all Channels where the Client is  */
+/*----------------------------------------*/
+std::vector<Channel*>	Server::getClientChannels( Client* client ) {
+
+	std::vector<Channel*>	channels;
+	std::string clientName = client->getNickname();
+
+	for ( const auto& [channelName, channel] : _channels ) {
+		if ( channel->isUser( clientName ) ||
+				channel->isOperator( clientName ) ||
+				channel->isInvitedUser( clientName ) )
+			channels.push_back( channel );
+	}
+
+	return channels;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
