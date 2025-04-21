@@ -6,7 +6,7 @@
 /*   By: llacsivy <llacsivy@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/04 19:18:33 by ryusupov          #+#    #+#             */
-/*   Updated: 2025/04/20 20:21:46 by llacsivy         ###   ########.fr       */
+/*   Updated: 2025/04/21 13:24:21 by llacsivy         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,6 +15,7 @@
 bool CommandHandler::handleQuit(Client *client, std::istringstream &iss, std::vector<std::string> &args) {
 	std::string reason;
 
+	(void)client;
 	std::getline(iss, reason);
 	if (!reason.empty() && reason[0] == ' ')
 		reason.erase(0, 1);

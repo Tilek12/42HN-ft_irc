@@ -153,7 +153,6 @@ void processInviteRequest(IClient& client, IServer& server, IChannel* channel, \
 
 void processGetTopicRequest(IClient& client, IServer& server, IChannel* channel)
 {
-    Client* realClient = dynamic_cast<Client*>(&client);
     if (channel->getTopic().empty())
     {
         std::string reply = ":" + IRCname + " " + IRCreply::RPL_NOTOPIC + " " +

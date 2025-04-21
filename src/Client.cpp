@@ -6,7 +6,7 @@
 /*   By: llacsivy <llacsivy@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/19 17:44:20 by ryusupov          #+#    #+#             */
-/*   Updated: 2025/04/20 18:53:05 by llacsivy         ###   ########.fr       */
+/*   Updated: 2025/04/21 13:19:42 by llacsivy         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,8 +20,8 @@ Client::Client(int fd, std::string host) : socket_fd(fd),
 										   realname( "" ),
 										   hostname(host),
 										   isRegistered(false),
-										   userReceived(false),
 										   isAuthenticated(false),
+										   userReceived(false),
 										   buffer( "" ),
 										   sendBuffer( "" ) {
 	//intializing values

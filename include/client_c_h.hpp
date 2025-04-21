@@ -6,7 +6,7 @@
 /*   By: llacsivy <llacsivy@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: Invalid date        by                   #+#    #+#             */
-/*   Updated: 2025/04/20 19:27:24 by llacsivy         ###   ########.fr       */
+/*   Updated: 2025/04/21 13:23:24 by llacsivy         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,8 +31,8 @@ class CommandHandler{
 		void clientCmdHandler(Client *client, std::vector<std::string> &command);
 		CommandHandler(Server& srv);
 		bool NickNameTaken(std::string &nickname);
-		static void SendMessage(IClient *client, const std::string &msg);
-		void SendError(Client *client, const std::string &msg);
+		static void SendMessage(const std::string &msg);
+		void SendError(const std::string &msg);
 
 		std::vector<std::string> &getArguments();
 		std::vector<std::string> parseCommand(Client *client, const std::string &command);

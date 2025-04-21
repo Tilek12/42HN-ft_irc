@@ -103,7 +103,7 @@ static void	handleQuit( Server* server, Client* client, const std::vector<std::s
 
 static void	handleNotice( Server* server, std::string nickname, const std::vector<std::string>& args ) {
 
-	for ( int i = 1; i < args.size(); i++ ) {
+	for ( size_t i = 1; i < args.size(); i++ ) {
 		if ( args[i].find( "LAGCHECK" ) != std::string::npos )
 			server->sendToClient( nickname, "PONG :" + args[i + 1] );
 	}

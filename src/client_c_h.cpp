@@ -6,7 +6,7 @@
 /*   By: llacsivy <llacsivy@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/22 16:37:19 by ryusupov          #+#    #+#             */
-/*   Updated: 2025/04/21 12:34:27 by llacsivy         ###   ########.fr       */
+/*   Updated: 2025/04/21 14:12:01 by llacsivy         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,7 +39,7 @@ void CommandHandler::clientCmdHandler(Client *client, std::vector<std::string> &
 			return ;
 
 		client->setUsername(command[1]);
-		client->setRealname(command[2]);
+		client->setRealname(command[4]);
 
 		client->markUserReceived();
 
@@ -183,14 +183,14 @@ void CommandHandler::updateNicknameInChannels(Client *client, const std::string 
 	}
 }
 
-void CommandHandler::SendMessage(IClient *client, const std::string &msg){
-	std::cout << "New message: " << msg << std::endl;
-}
+// void CommandHandler::SendMessage(const std::string &msg){
+// 	std::cout << "New message: " << msg << std::endl;
+// }
 
-void CommandHandler::SendError(Client *client, const std::string &msg) {
-	std::string message = "Error" + msg;
-	SendMessage(client, message);
-}
+// void CommandHandler::SendError(const std::string &msg) {
+// 	std::string message = "Error" + msg;
+// 	SendMessage(message);
+// }
 
 bool CommandHandler::NickNameTaken(std::string &nickname) {
 
