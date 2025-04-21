@@ -6,7 +6,7 @@
 /*   By: llacsivy <llacsivy@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/22 16:37:19 by ryusupov          #+#    #+#             */
-/*   Updated: 2025/04/20 19:24:48 by llacsivy         ###   ########.fr       */
+/*   Updated: 2025/04/21 12:34:27 by llacsivy         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -158,9 +158,12 @@ bool CommandHandler::handleNickname(Client *client, std::vector<std::string> &co
 		server.broadcastMessage(client, "", nickChangeMsg);
 		server.sendToClient(client->getNickname(), nickChangeMsg);
 	} else {
-		std::string nickChangeMsg = ":" + oldNick + "!" + client->getUsername() + "@" + client->getHostname() + " NICK :" + newNick;
-		server.sendToClient(client->getNickname(), nickChangeMsg);
-		client->setIsRegistered(true);
+		// std::string nickChangeMsg = ":" + oldNick + "!" + client->getUsername() + "@" + client->getHostname() + " NICK :" + newNick;
+		// server.sendToClient(client->getNickname(), nickChangeMsg);
+		// client->setIsRegistered(true);
+		server.sendToClient(newNick, ":irc.server.com 001 " + newNick + " :Welcome to the IRC network, " + newNick);
+ 		client->setIsRegistered(true);
+ 		server.addClient(client);
 	}
 	return true;
 }

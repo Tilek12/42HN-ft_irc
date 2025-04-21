@@ -199,9 +199,16 @@ void processModeTwoArgsRequest(IClient& client, IServer& server, IChannel* chann
     else if (mode == "-i")
         channel->setIsInviteOnly(false);
     else if (mode == "+t")
+    {
         channel->setOnlyOperatorCanChangeTopic(true);
+std::cout << "debug bool OnlyOpCanChangeTopic: " << channel->getOnlyOperatorCanChangeTopic() << std::endl; 
+    }
     else if (mode == "-t")
+    {
         channel->setOnlyOperatorCanChangeTopic(false);
+std::cout << "debug bool OnlyOpCanChangeTopic: " << channel->getOnlyOperatorCanChangeTopic() << std::endl; 
+
+    }
     else if (mode == "-l")
         channel->setUserLimit(0);
     else
