@@ -31,13 +31,14 @@ public:
 	virtual void		removeClientFromChannels( Client* client ) = 0;
 
 	// Channel management
-	virtual void					addChannel( Channel* channel ) = 0;
-	virtual Channel*				getChannel( const std::string& name ) const = 0 ;
-	virtual Channel*				createChannel( const std::string& name ) = 0;
-	virtual void					removeChannel( const std::string& name ) = 0;
-	virtual bool					isChannelExist( const std::string& name ) = 0;
-	virtual void					sendNamesList( Channel* channel ) = 0;
-	virtual std::vector<Channel*>	getClientChannels( Client* client ) = 0;
+	virtual void							addChannel( Channel* channel ) = 0;
+	virtual Channel*						getChannel( const std::string& name ) const = 0;
+	virtual std::map<std::string, Channel*>	getChannels( void ) = 0;
+	virtual Channel*						createChannel( const std::string& name ) = 0;
+	virtual void							removeChannel( const std::string& name ) = 0;
+	virtual bool							isChannelExist( const std::string& name ) = 0;
+	virtual void							sendNamesList( Channel* channel ) = 0;
+	virtual std::vector<Channel*>			getClientChannels( Client* client ) = 0;
 
 	// Messaging
 	virtual void	sendToClient( int fd, const std::string& message ) = 0;

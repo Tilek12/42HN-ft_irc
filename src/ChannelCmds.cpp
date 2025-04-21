@@ -36,7 +36,7 @@ void ChannelCmds::joinChannelCmd(IClient& client, IServer& server, std::vector<s
             password = passwords[i];
         else
             password = "";
-            processJoinRequest(client, server, channelNames[i], password);
+        processJoinRequest(client, server, channelNames[i], password);
     }
 }
 
@@ -107,14 +107,12 @@ void ChannelCmds::inviteUserCmd(IClient& client, IServer& server, std::vector<st
         errorMsg = ":" + IRCname + " " + IRCerror::ERR_NOCHANMODES + " " +
                             client.getNickname() + " " + channelName + " :Channel does not exist";
         server.sendToClient(client.getNickname(), errorMsg);
-        std::cerr << errorMsg << std::endl;
         return;
     }
     if (!(channel->getIsInviteOnly()))
     {
         errorMsg = "NOTICE " + client.getNickname() + " :Channel is not invite-only";
         server.sendToClient(client.getNickname(), errorMsg);
-        std::cerr << errorMsg << std::endl;
         return;
     }
     if (!isOperatorOnChannel(client, server, channel))
@@ -131,9 +129,8 @@ void ChannelCmds::topicUserCmd(IClient& client, IServer& server, std::vector<std
     if (topicParams.empty())
     {
         std::string errorMsg = ":" + IRCname + " " + IRCerror::ERR_NEEDMOREPARAMS + " " +
-                       client.getNickname() + " TOPIC :Not enough parameters";
+        client.getNickname() + " TOPIC :Not enough parameters";
         server.sendToClient(client.getNickname(), errorMsg);
-        std::cerr << errorMsg << std::endl;
         return;
     }
     std::string channelName = topicParams[0];
@@ -141,18 +138,20 @@ void ChannelCmds::topicUserCmd(IClient& client, IServer& server, std::vector<std
     if (!channel)
     {
         std::string errorMsg = ":" + IRCname + " " + IRCerror::ERR_NOSUCHCHANNEL + " " +
-                       client.getNickname() + " " + channelName + " :No such channel";
+        client.getNickname() + " " + channelName + " :No such channel";
         server.sendToClient(client.getNickname(), errorMsg);
-        std::cerr << errorMsg << std::endl;
         return;
     }
-    if (canOnlyOperatorChangeTopic(client, server, channel))
-       return;
+    if (!canOnlyOperatorChangeTopic(client, server, channel))
+        return;
     if (topicParams.size() == 1)
         processGetTopicRequest(client, server, channel);
     std::string newTopic = topicParams[1];
     if (topicParams.size() == 2 && newTopic.front() == ':')
+    {
+        newTopic.erase(0, 1);
         processSetTopicRequest(client, server, channel, newTopic);
+    }
 }
 
 void ChannelCmds::modeChannelCmd(IClient& client, IServer& server, std::vector<std::string>& modeParams)

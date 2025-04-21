@@ -1,5 +1,6 @@
 #include "../include/Server.hpp"
 #include "../include/Client.hpp"
+#include "../include/ChannelCmds.hpp"
 
 static void	handleCap( Server* server, int fd, const std::vector<std::string>& args ) {
 
@@ -98,20 +99,8 @@ static void	handleQuit( Server* server, Client* client, const std::vector<std::s
 
 	auto channels = server->getClientChannels( client );
 	if ( !channels.empty() ) {
-		for ( int i = 0; i < channels.size(); i++ )
-		{
-			// server->sendNamesList( channels[i] );
-			std::string userList;
-			for (auto &&i : channels[i]->getUsers())
-				userList += i + " ";
-			std::string reply353 = ":" + IRCname + " " + IRCreply::RPL_NAMREPLY + " " +
-								   client->getNickname() + " = " + channels[i]->getName() + " :" + userList;
-			server->sendToClient(client->getNickname(), reply353);
-			std::string reply366 = ":" + IRCname + " " + IRCreply::RPL_ENDOFNAMES + " " +
-								   client->getNickname() + " " + channels[i]->getName() + " :End of /NAMES list";
-			server->sendToClient(client->getNickname(), reply366);
-
-		}
+		for ( size_t i = 0; i < channels.size(); i++ )
+			sendNameReplies( client, channels[i], *server );
 	}
 
 	server->disconnectClient( client->getSocketFd(), "Quit" );
@@ -120,7 +109,7 @@ static void	handleQuit( Server* server, Client* client, const std::vector<std::s
 
 static void	handleNotice( Server* server, std::string nickname, const std::vector<std::string>& args ) {
 
-	for ( int i = 1; i < args.size(); i++ ) {
+	for ( size_t i = 1; i < args.size(); i++ ) {
 		if ( args[i].find( "LAGCHECK" ) != std::string::npos )
 			server->sendToClient( nickname, "PONG :" + args[i + 1] );
 	}

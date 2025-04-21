@@ -87,13 +87,13 @@ private:
 	void	removeClientFromChannels( Client* client ) override;
 
 	// Channel management
-	void					addChannel( Channel* channel ) override;
-	Channel*				getChannel( const std::string& name ) const override;
-	Channel*				createChannel( const std::string& name ) override;
-	void					removeChannel( const std::string& name ) override;
-	bool					isChannelExist( const std::string& name ) override;
-	void					sendNamesList( Channel* channel ) override;
-	std::vector<Channel*>	getClientChannels( Client* client ) override;
+	void							addChannel( Channel* channel ) override;
+	Channel*						getChannel( const std::string& name ) const override;
+	std::map<std::string, Channel*>	getChannels( void ) override;
+	Channel*						createChannel( const std::string& name ) override;
+	void							removeChannel( const std::string& name ) override;
+	bool							isChannelExist( const std::string& name ) override;
+	std::vector<Channel*>			getClientChannels( Client* client ) override;
 
 	// Messaging
 	void	sendToClient( int fd, const std::string& message ) override;

@@ -4,7 +4,8 @@
 
 Channel::Channel()
 	:	_name(""), _topic(""), _isInviteOnly(false), \
-		_hasPassword(false), _password(""), _userLimit(0)
+		_hasPassword(false), _password(""), _userLimit(0), \
+		_onlyOperatorCanChangeTopic(true)
 {
 }
 Channel::Channel(const std::string& name)
@@ -12,25 +13,7 @@ Channel::Channel(const std::string& name)
 	_hasPassword(false), _password(""), _userLimit(0), \
 	_onlyOperatorCanChangeTopic(true)
 {
-
 }
-
-// Channel::Channel(const std::string& name, const std::string& topic, \
-// 	bool isInviteOnly, bool hasPassword, std::string password, size_t userLimit)
-// 	:	_topic(topic), _isInviteOnly(isInviteOnly), \
-// 		_hasPassword(hasPassword), _userLimit(userLimit)
-// {
-// 	if (isValidChannelName(name))
-// 		_name = name;
-// 	else
-// 		std::cerr << "Error code " << ERR_BADCHANMASK << ": bad channel mask. \
-// 			Invalid channel name: " << name << std::endl;
-// 	if (_hasPassword)
-// 	{
-// 		if (!_isValidPassword(password))
-// 			std::cerr << "Invalid password for channel: " << name << std::endl;
-// 	}
-// }
 
 Channel::~Channel()
 {
@@ -52,6 +35,11 @@ void Channel::setTopic(const std::string& topic)
 }
 
 std::vector<std::string> Channel::getUsers() const
+{
+	return _users;
+}
+
+std::vector<std::string> &Channel::getUsers()
 {
 	return _users;
 }

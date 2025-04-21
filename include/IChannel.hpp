@@ -34,8 +34,8 @@ public:
 	virtual void removeOperator(const std::string& oper) = 0;
 	virtual void setHasPassword(bool hasPassword) = 0;
 	virtual void setPassword(const std::string& password) = 0;
-	  
-	
+
+
 };
 
 #endif

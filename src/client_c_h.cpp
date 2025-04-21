@@ -6,7 +6,7 @@
 /*   By: tkubanyc <tkubanyc@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/22 16:37:19 by ryusupov          #+#    #+#             */
-/*   Updated: 2025/04/20 19:00:26 by tkubanyc         ###   ########.fr       */
+/*   Updated: 2025/04/21 16:22:49 by tkubanyc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,7 +17,6 @@
 #include "../include/ChannelCmds.hpp"
 #include "../include/IClient.hpp"
 
-//FIXME: PRIVMSG IS SENDING THE TEXT TWICE IN CHANNELS
 CommandHandler::CommandHandler(Server& srv) : server(srv) {
 	//
 }
@@ -29,7 +28,9 @@ void CommandHandler::clientCmdHandler(Client *client, std::vector<std::string> &
 			return ;
 	} else if (command[0] == "USER") {
 		if (command.size() < 5 || command[1].empty() || command[4].empty()) {
-			SendError(client, "The username or realname is not provided!");
+			std::string errorMsg = ":" + IRCname + " " + IRCerror::ERR_NEEDMOREPARAMS + \
+    		" " + client->getNickname() + " " + command[0] + " :Not enough parameters\r\n";
+			server.sendToClient(client->getNickname(), errorMsg);
 			return ;
 		}
 
@@ -37,7 +38,8 @@ void CommandHandler::clientCmdHandler(Client *client, std::vector<std::string> &
 			return ;
 
 		client->setUsername(command[1]);
-		client->setRealname(command[2]);
+		client->setRealname(command[4]);
+
 		client->markUserReceived();
 
 		if (client->getIsResgistered()) {
@@ -45,12 +47,10 @@ void CommandHandler::clientCmdHandler(Client *client, std::vector<std::string> &
 		}
 	} else if (command[0] == "PRIVMSG") {
 
-		if (command[1].empty()) {
-			server.sendToClient(client->getNickname(), "No recipent provided!");
-			return ;
-		}
 		if (command[2].empty()) {
-			server.sendToClient(client->getNickname(), "Empty msg provided!");
+			std::string errorMsg = ":" + IRCname + " " + IRCerror::ERR_NOTEXTTOSEND + \
+    		" " + client->getNickname() + " " + command[0] + " :No text to send\r\n";
+			server.sendToClient(client->getNickname(), errorMsg);
 			return ;
 		}
 		findTargetPrivmsg(client, command);
@@ -98,6 +98,12 @@ void	CommandHandler::findTargetPrivmsg(Client *client, std::vector<std::string> 
 		server.broadcastMessage(client, target, fullMessage);
 	}
 	else {
+		if (!server.getClient(target)){
+			std::string errorMsg = ":" + IRCname + " " + IRCerror::ERR_NOSUCHNICK + \
+    		" " + client->getNickname() + " " + command[1] + " :No such user found\r\n";
+			server.sendToClient(client->getNickname(), errorMsg);
+			return ;
+		}
 		std::string prefix = ":" + client->getNickname() + "!" + client->getUsername() + "@" + client->getHostname();
         std::string fullMessage = prefix + " PRIVMSG " + target + " :" + msg + "\r\n";
 		server.sendToClient(target, fullMessage);
@@ -136,7 +142,9 @@ bool CommandHandler::handleNickname(Client *client, std::vector<std::string> &co
 	std::string oldNick = client->getNickname();
 
 	if (NickNameTaken(newNick)) {
-		server.sendToClient(client->getNickname(), "433 * " + newNick + " :The chosen nickname has already taken!");
+		std::string errorMsg = ":" + IRCname + " " + IRCerror::ERR_NICKNAMEINUSE + \
+    " " + client->getNickname() + " " + newNick + " :Nickname is already in use\r\n";
+		server.sendToClient(client->getNickname(), errorMsg);
 		return false;
 	}
 
@@ -144,24 +152,43 @@ bool CommandHandler::handleNickname(Client *client, std::vector<std::string> &co
 
 	if (client->getIsResgistered()) {
 		std::string nickChangeMsg = ":" + oldNick + "!" + client->getUsername() + "@" + client->getHostname() + " NICK :" + newNick;
+		updateNicknameInChannels(client, oldNick, newNick, nickChangeMsg);
+		server.broadcastMessage(client, "", nickChangeMsg);
 		server.sendToClient(client->getNickname(), nickChangeMsg);
 	} else {
-		client->setIsRegistered(true);
-		std::string nickChangeMsg = ":" + oldNick + "!" + client->getUsername() + "@" + client->getHostname() + " NICK :" + newNick;
-		server.sendToClient(client->getNickname(), nickChangeMsg);
+		// std::string nickChangeMsg = ":" + oldNick + "!" + client->getUsername() + "@" + client->getHostname() + " NICK :" + newNick;
+		// server.sendToClient(client->getNickname(), nickChangeMsg);
+		// client->setIsRegistered(true);
+		server.sendToClient(newNick, ":irc.server.com 001 " + newNick + " :Welcome to the IRC network, " + newNick);
+ 		client->setIsRegistered(true);
+ 		server.addClient(client);
 	}
 	return true;
 }
 
+void CommandHandler::updateNicknameInChannels(Client *client, const std::string &oldNick, const std::string &newNick, std::string msg) {
+	for (auto &&channelPair : server.getChannels()) {
+		Channel *channel = channelPair.second;
+		std::vector<std::string> &users = channel->getUsers();
 
-void CommandHandler::SendMessage(IClient *client, const std::string &msg){
-	std::cout << "New message: " << msg << std::endl;
+		for (std::string &user : users) {
+			if (user == oldNick) {
+				user = newNick;
+				server.broadcastMessage(client, channelPair.first, msg);
+				break;
+			}
+		}
+	}
 }
 
-void CommandHandler::SendError(Client *client, const std::string &msg) {
-	std::string message = "Error" + msg;
-	SendMessage(client, message);
-}
+// void CommandHandler::SendMessage(const std::string &msg){
+// 	std::cout << "New message: " << msg << std::endl;
+// }
+
+// void CommandHandler::SendError(const std::string &msg) {
+// 	std::string message = "Error" + msg;
+// 	SendMessage(message);
+// }
 
 bool CommandHandler::NickNameTaken(std::string &nickname) {
 
@@ -175,7 +202,7 @@ bool CommandHandler::NickNameTaken(std::string &nickname) {
 /***************************************************************************/
 void	CommandHandler::MainCommandHandller(Client *client, std::vector<std::string> &args){
 	static std::unordered_set<std::string> serverCmds = {
-		"CAP", "PING", "NOTICE", "PASS"
+		"CAP", "PING", "NOTICE", "PASS", "QUIT"
 	};
 
 	static std::unordered_set<std::string> channelCmds = {

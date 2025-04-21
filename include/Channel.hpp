@@ -22,18 +22,17 @@ private:
 	std::string					_password;
 	size_t						_userLimit;
 	bool						_onlyOperatorCanChangeTopic;
-	// bool						_isValidPassword(const std::string password);
+	
 public:
 	Channel();
 	Channel(const std::string& name);
-	// Channel(const std::string& name, const std::string& topic, bool isInviteOnly, \
-	// 	bool hasPassword, std::string password, size_t userLimit);
 	~Channel();
 
 	std::string 				getName() const override;
 	std::string 				getTopic() const override;
 	void						setTopic(const std::string& topic) override;
 	std::vector<std::string> 	getUsers() const override;
+	std::vector<std::string> 	&getUsers();
 	void 						addUser(const std::string& user) override;
 	void 						removeUser(const std::string& user) override;
 	std::vector<std::string> 	getOperators() const override;

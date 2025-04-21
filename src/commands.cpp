@@ -3,21 +3,37 @@
 /*                                                        :::      ::::::::   */
 /*   commands.cpp                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ryusupov <ryusupov@student.42.fr>          +#+  +:+       +#+        */
+/*   By: llacsivy <llacsivy@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/04 19:18:33 by ryusupov          #+#    #+#             */
-/*   Updated: 2025/04/16 17:07:35 by ryusupov         ###   ########.fr       */
+/*   Updated: 2025/04/21 13:24:21 by llacsivy         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../include/client_c_h.hpp"
 
+bool CommandHandler::handleQuit(Client *client, std::istringstream &iss, std::vector<std::string> &args) {
+	std::string reason;
+
+	(void)client;
+	std::getline(iss, reason);
+	if (!reason.empty() && reason[0] == ' ')
+		reason.erase(0, 1);
+	if (!(reason.empty()))
+		args.push_back(reason);
+	return true;
+}
+
 /*------Parsing PART command------*/
-bool CommandHandler::handlePart(std::istringstream &iss, std::vector<std::string> &args) {
+bool CommandHandler::handlePart(Client *client, std::istringstream &iss, std::vector<std::string> &args) {
 	std::string channel, reason;
 
-	if (!(iss >> channel))
-		return false;
+	if (!(iss >> channel)) {
+		std::string errorMsg = ":" + IRCname + " " + IRCerror::ERR_NEEDMOREPARAMS + \
+    		" " + client->getNickname() + " " + args[0] + " :No recipient given\r\n";
+			server.sendToClient(client->getNickname(), errorMsg);
+			return false;
+	}
 	args.push_back(channel);
 
 	std::getline(iss, reason);
@@ -29,10 +45,12 @@ bool CommandHandler::handlePart(std::istringstream &iss, std::vector<std::string
 }
 
 /*------Parsing PRIVMSG and NOTICE commands------*/
-bool CommandHandler::handlePrivMsgNotice(std::istringstream &iss, std::vector<std::string> &arguments) {
+bool CommandHandler::handlePrivMsgNotice(Client *client, std::istringstream &iss, std::vector<std::string> &arguments) {
 	std::string target, message;
 		if (!(iss >> target)){
-			std::cerr << "Error: Not target provided for " << std::endl;
+			std::string errorMsg = ":" + IRCname + " " + IRCerror::ERR_NEEDMOREPARAMS + \
+    		" " + client->getNickname() + " " + arguments[0] + " :No recipient given\r\n";
+			server.sendToClient(client->getNickname(), errorMsg);
 			return false;
 		}
 		arguments.push_back(target);
@@ -80,11 +98,13 @@ bool CommandHandler::handleNotice(std::istringstream &iss, std::vector<std::stri
 }
 
 /*------Parsing USER command------*/
-bool CommandHandler::handleUser(std::istringstream &iss, std::vector<std::string> &arguments) {
+bool CommandHandler::handleUser(Client *client, std::istringstream &iss, std::vector<std::string> &arguments) {
 	std::string username, hostname, servername, realname;
 
 		if (!(iss >> username >> hostname >> servername)) {
-			std::cerr << "Error: Incomplete USER command!" << std::endl;
+			std::string errorMsg = ":" + IRCname + " " + IRCerror::ERR_NEEDMOREPARAMS + \
+    		" " + client->getNickname() + " " + arguments[0] + " :Not enough parameters\r\n";
+			server.sendToClient(client->getNickname(), errorMsg);
 			return false;
 		}
 
@@ -104,11 +124,13 @@ bool CommandHandler::handleUser(std::istringstream &iss, std::vector<std::string
 }
 
 /*------Parsing TOPIC command------*/
-bool CommandHandler::handleTopic(std::istringstream &iss, std::vector<std::string> &arguments) {
+bool CommandHandler::handleTopic(Client *client, std::istringstream &iss, std::vector<std::string> &arguments) {
 	std::string channel, topic;
 
 		if (!(iss >> channel)) {
-			std::cerr << "Error: No channel provided for TOPIC command!" << std::endl;
+			std::string errorMsg = ":" + IRCname + " " + IRCerror::ERR_NEEDMOREPARAMS + \
+    		" " + client->getNickname() + " " + arguments[0] + " :Not enough parameters\r\n";
+			server.sendToClient(client->getNickname(), errorMsg);
 			return false;
 		}
 		arguments.push_back(channel);
@@ -117,8 +139,8 @@ bool CommandHandler::handleTopic(std::istringstream &iss, std::vector<std::strin
 		if (!(topic.empty() && topic[0] == ' ')) topic.erase(0, 1);
 
 		if (topic.empty() || topic[0] != ':')
-			return false;
-		topic.erase(0, 1);
+			return true;
+		// topic.erase(0, 1);
 
 		if (!topic.empty())
 			arguments.push_back(topic);
@@ -127,10 +149,12 @@ bool CommandHandler::handleTopic(std::istringstream &iss, std::vector<std::strin
 }
 
 /*------Parsing MODE command------*/
-bool CommandHandler::handleMode(std::istringstream &iss, std::vector<std::string> &arguments) {
+bool CommandHandler::handleMode(Client *client, std::istringstream &iss, std::vector<std::string> &arguments) {
 	std::string channel, flag, user;
 		if (!(iss >> channel)) {
-			std::cout << "Error: No channel provided for MODE command!" << std::endl;
+			std::string errorMsg = ":" + IRCname + " " + IRCerror::ERR_NEEDMOREPARAMS + \
+    		" " + client->getNickname() + " " + arguments[0] + " :Not enough parameters\r\n";
+			server.sendToClient(client->getNickname(), errorMsg);
 			return false;
 		}
 		arguments.push_back(channel);
@@ -150,12 +174,14 @@ bool CommandHandler::handleMode(std::istringstream &iss, std::vector<std::string
 }
 
 /*------Parsing Simple commands------*/
-bool CommandHandler::handleSimpleCommands(std::istringstream &iss, std::vector<std::string> &arguments) {
+bool CommandHandler::handleSimpleCommands(Client *client, std::istringstream &iss, std::vector<std::string> &arguments) {
 	std::string arg2, arg3;
 
 	if (!(iss >> arg2)) {
-		std::cerr << "No arg2 provided!" << std::endl;
-		return {};
+		std::string errorMsg = ":" + IRCname + " " + IRCerror::ERR_NEEDMOREPARAMS + \
+    	" " + client->getNickname() + " " + arguments[0] + " :Not enough parameters\r\n";
+		server.sendToClient(client->getNickname(), errorMsg);
+		return false;
 	}
 	arguments.push_back(arg2);
 
@@ -180,9 +206,9 @@ bool CommandHandler::handleKick(std::istringstream &iss, std::vector<std::string
 	if (!(iss >> channel) || std::string("#!&+").find(channel[0]) == std::string::npos)
 		return false;
 	arguments.push_back(channel);
-
-	if (!(iss >> user))
-		return false;
+		
+		if (!(iss >> user))
+			return false;
 	arguments.push_back(user);
 
 	if (iss.rdbuf()->in_avail() > 0){
