@@ -37,7 +37,6 @@ public:
 	virtual Channel*						createChannel( const std::string& name ) = 0;
 	virtual void							removeChannel( const std::string& name ) = 0;
 	virtual bool							isChannelExist( const std::string& name ) = 0;
-	virtual void							sendNamesList( Channel* channel ) = 0;
 	virtual std::vector<Channel*>			getClientChannels( Client* client ) = 0;
 
 	// Messaging
