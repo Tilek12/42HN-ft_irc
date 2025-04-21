@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   client_c_h.hpp                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: llacsivy <llacsivy@student.42.fr>          +#+  +:+       +#+        */
+/*   By: ryusupov <ryusupov@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: Invalid date        by                   #+#    #+#             */
-/*   Updated: 2025/04/21 13:23:24 by llacsivy         ###   ########.fr       */
+/*   Updated: 2025/04/21 16:25:26 by ryusupov         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,6 +37,7 @@ class CommandHandler{
 		std::vector<std::string> &getArguments();
 		std::vector<std::string> parseCommand(Client *client, const std::string &command);
 		std::vector<std::string> parseSpecialCommands(Client *client, const std::string &command, const std::unordered_set<std::string> &setOfCmds);
+		std::vector<std::string> splitTargets(std::string &target);
 		/*Helper methods for functions*/
 		bool	handlePrivMsgNotice(Client *client, std::istringstream &iss, std::vector<std::string> &arguments);
 		bool	handleUser(Client *client, std::istringstream &iss, std::vector<std::string> &arguments);
