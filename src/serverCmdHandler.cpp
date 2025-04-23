@@ -47,9 +47,9 @@ static void	handlePass( Server* server, Client* client, const std::vector<std::s
 
 	int fd = client->getSocketFd();
 
-	// Check if already registered
-	if ( client->getIsResgistered() ) {
-		server->sendError( fd, IRCerror::ERR_ALREADYREGISTRED, ":You may not register" );
+	// Check parameter exists
+	if ( args.size() < 2 ) {
+		server->sendError( fd, IRCerror::ERR_NEEDMOREPARAMS, "PASS :Not enough parameters" );
 		return;
 	}
 
@@ -59,9 +59,9 @@ static void	handlePass( Server* server, Client* client, const std::vector<std::s
 		return;
 	}
 
-	// Check parameter exists
-	if ( args.size() < 2 ) {
-		server->sendError( fd, IRCerror::ERR_NEEDMOREPARAMS, "PASS :Not enough parameters" );
+	// Check if already registered
+	if ( client->getIsResgistered() ) {
+		server->sendError( fd, IRCerror::ERR_ALREADYREGISTRED, ":You may not register" );
 		return;
 	}
 

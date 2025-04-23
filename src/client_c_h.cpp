@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   client_c_h.cpp                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ryusupov <ryusupov@student.42.fr>          +#+  +:+       +#+        */
+/*   By: tkubanyc <tkubanyc@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/22 16:37:19 by ryusupov          #+#    #+#             */
-/*   Updated: 2025/04/21 18:48:04 by ryusupov         ###   ########.fr       */
+/*   Updated: 2025/04/22 20:04:31 by tkubanyc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,9 +33,6 @@ void CommandHandler::clientCmdHandler(Client *client, std::vector<std::string> &
 			server.sendToClient(client->getNickname(), errorMsg);
 			return ;
 		}
-
-		if (!server.checkClientAuthentication(client))
-			return ;
 
 		client->setUsername(command[1]);
 		client->setRealname(command[4]);
@@ -180,7 +177,7 @@ bool CommandHandler::handleNickname(Client *client, std::vector<std::string> &co
 		// server.sendToClient(client->getNickname(), nickChangeMsg);
 		// client->setIsRegistered(true);
 		server.sendToClient(newNick, ":irc.server.com 001 " + newNick + " :Welcome to the IRC network, " + newNick);
- 		client->setIsRegistered(true);
+ 		// client->setIsRegistered(true);
  		server.addClient(client);
 	}
 	return true;
@@ -224,11 +221,9 @@ void	CommandHandler::MainCommandHandller(Client *client, std::vector<std::string
 	static std::unordered_set<std::string> serverCmds = {
 		"CAP", "PING", "NOTICE", "PASS", "QUIT"
 	};
-
 	static std::unordered_set<std::string> channelCmds = {
 		"JOIN", "PART", "KICK", "MODE", "TOPIC", "INVITE"
 	};
-
 	static std::unordered_set<std::string> clientCmds = {
 		"PRIVMSG", "NICK", "USER", "WHO"
 	};
@@ -237,9 +232,13 @@ void	CommandHandler::MainCommandHandller(Client *client, std::vector<std::string
 		serverCmdHandler(&server, client);
 	}
 	else if (channelCmds.find(args[0]) != channelCmds.end()) {
+		if (!server.checkClientAuthentication(client))
+			return ;
 		channelCmdHandler(*client, server, args);
 	}
 	else if (clientCmds.find(args[0]) != clientCmds.end()) {
+		if (!server.checkClientAuthentication(client))
+			return ;
 		clientCmdHandler(client, args);
 	}
 }

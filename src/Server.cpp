@@ -148,26 +148,34 @@ const std::string& Server::getCreationTime( void ) const { return _creationTime;
 /*---------------------------------------*/
 void	Server::_processClientBuffer( Client* client ) {
 
-	std::string& buffer = client->getBuffer();
-	size_t	pos;
-	while ( ( pos = buffer.find("\r\n") ) != std::string::npos ) {
-		std::string message = buffer.substr( 0, pos );
-		buffer.erase( 0, pos + 2 ); // Remove processed message
-		if ( !message.empty() ) {
+	std::string&	buffer = client->getBuffer();
+	std::string		message;
+	size_t			pos;
+
+	while ( client && ( pos = buffer.find("\n") ) != std::string::npos ) {
+
+		std::cout << buffer << std::endl;
+
+		if ( buffer[pos - 1] == '\r' )
+			message = buffer.substr( 0, pos - 1 );
+		else
+			message = buffer.substr( 0, pos );
+
+		buffer.erase( 0, pos + 1 );
+
+		if ( client && !message.empty() ) {
 			std::cout << YELLOW
 					  << "CMD INPUT  [" << client->getSocketFd() << "]: " << message
 					  << RESET << std::endl;
-			_arguments = _commandHandler->parseCommand(client, message);
-			if (_arguments.size() > 1)
+			_arguments = _commandHandler->parseCommand( client, message );
+			if ( _arguments.size() > 1 )
 				_commandHandler->MainCommandHandller( client, _arguments );
-			else if (_arguments.size() == 1){
-				std::string errorMsg = ":" + IRCname + " " + IRCerror::ERR_UNKNOWNCOMMAND + \
-            	" " + client->getNickname() + " " + _arguments[0];
-				sendToClient(client->getNickname(), errorMsg);
-			}else {
+			else if ( _arguments.size() == 1 ) {
+				std::string errorMsg = client->getNickname() + " " + _arguments[0];
+				sendError( client->getSocketFd(), IRCerror::ERR_UNKNOWNCOMMAND, errorMsg );
+			} else {
 				return ;
 			}
-
 		}
 	}
 
@@ -371,17 +379,6 @@ void	Server::disconnectClient( int fd, const std::string& reason ) {
 	std::string nickname = client->getNickname();
 
 	// Remove Client from all channels
-	// auto channelsCopy = _channels;
-	// for ( const auto& [name, channel] : channelsCopy ) {
-	// 	if ( channel->isUser( nickname ) )
-	// 		channel->removeUser( nickname );
-
-	// 	if ( channel->isOperator( nickname ) )
-	// 		channel->removeOperator( nickname );
-
-	// 	if ( channel->isInvitedUser( nickname ) )
-	// 		channel->removeInvitedUser( nickname );
-	// }
 	removeClientFromChannels( client );
 
 	// Remove from poll list
@@ -395,6 +392,7 @@ void	Server::disconnectClient( int fd, const std::string& reason ) {
 	// Delete Client
 	close( fd );
 	_clients.erase( fd );
+	client->clearBuffer();
 	delete client;
 
 	// Print disconnection message
@@ -534,8 +532,10 @@ void	Server::sendToClient( int fd, const std::string& message ) {
 			  << "CMD OUTPUT [" << fd << "]: " << message
 			  << RESET << std::endl;
 
-	std::string reply = message + "\r\n";
+	std::string reply = message;
 
+	if ( message.find("\r\n")  == std::string::npos )
+		reply += "\r\n";
 	if ( send( fd, reply.c_str(), reply.length(), 0 ) < 0 )
 		disconnectClient( fd, "Send error" );
 
