@@ -4,6 +4,11 @@
 #include <iostream>
 #include <vector>
 
+// #include "IServer.hpp"
+// #include "Server.hpp"
+class IServer;
+
+
 class IChannel
 {
 public:
@@ -13,7 +18,7 @@ public:
 	virtual bool getHasPassword() const = 0;
 	virtual std::string	getPassword() const = 0;
 	virtual size_t getUserLimit() const = 0;
-	virtual void addUser(const std::string& user) = 0;
+	virtual void addUser(const std::string& user, IServer& server) = 0;
 	virtual std::vector<std::string> getInvitedUsers() const = 0;
 	virtual bool getIsInviteOnly() const = 0;
 	virtual std::vector<std::string> getUsers() const = 0;

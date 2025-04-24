@@ -26,7 +26,8 @@ void printVec(const std::vector<std::string>& vec)
     }
 }
 
-void removeEntryFromVec(std::vector<std::string>& users, const std::string& userToRemove)
+void removeEntryFromVec(std::vector<std::string>& users, \
+	const std::string& userToRemove)
 {
 	auto it = std::find(users.begin(), users.end(), userToRemove);
 	if (it != users.end())

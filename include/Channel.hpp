@@ -6,6 +6,8 @@
 #include <algorithm>
 
 #include "IChannel.hpp"
+// #include "Server.hpp"
+class IServer;
 
 class Channel : public IChannel
 {
@@ -34,7 +36,7 @@ public:
 	void						setTopic(const std::string& topic) override;
 	std::vector<std::string> 	getUsers() const override;
 	std::vector<std::string> 	&getUsers();
-	void 						addUser(const std::string& user) override;
+	void 						addUser(const std::string& user, IServer& server) override;
 	void 						removeUser(const std::string& user) override;
 	std::vector<std::string> 	getOperators() const override;
 	void 						addOperator(const std::string& oper) override;

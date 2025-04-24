@@ -1,9 +1,13 @@
+#include <iostream>
+
 #include "../include/Server.hpp"
 #include "../include/ChannelCmds.hpp"
+#include "../include/IRCerror.hpp"
 
 void channelCmdHandler(IClient& client, IServer& server, \
 	std::vector<std::string>& args)
 {
+	std::string msg;
 	if (args[0] == "JOIN")
 	{
 		args.erase(args.begin());
@@ -35,5 +39,7 @@ void channelCmdHandler(IClient& client, IServer& server, \
 		ChannelCmds::modeChannelCmd(client, server, args);
 	}
 	else
-		std::cerr << "Error: command " << args[0] << "not found!" << std::endl;
+		msg = ":" + IRCname + " " + IRCerror::ERR_UNKNOWNCOMMAND + \
+		" " + client.getNickname() + " " +  args[0] + " :Unknown command";
+		server.sendToClient(client.getNickname(), msg);
 }

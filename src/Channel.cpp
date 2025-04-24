@@ -1,6 +1,7 @@
 #include "../include/Channel.hpp"
 #include "../include/IChannel.hpp"
 #include "../include/channelHelperFcts.hpp"
+#include "../include/Server.hpp"
 
 Channel::Channel()
 	:	_name(""), _topic(""), _isInviteOnly(false), \
@@ -44,20 +45,23 @@ std::vector<std::string> &Channel::getUsers()
 	return _users;
 }
 
-void Channel::addUser(const std::string& user)
+void Channel::addUser(const std::string& user, IServer& server)
 {
+	std::string msg;
 	auto it = std::find(_invitedUsers.begin(), _invitedUsers.end(), user);
 	if (_isInviteOnly && it == _invitedUsers.end())
     {
-        std::cerr << "User " << user << " is not invited to join " << \
-			_name << std::endl;
+		msg = ":" + IRCname + " " + IRCerror::ERR_INVITEONLYCHAN + \
+        " " + user + " " + _name + " :Cannot join channel (+i)";
+        server.sendToClient(user, msg);
         return;
     }
 	if (_userLimit == 0 || _users.size() < _userLimit)
         _users.push_back(user);
     else
-        std::cerr << "User limit reached, cannot add " << user \
-		<< " to channel " << _name << std::endl;
+		msg = ":" + IRCname + " " + IRCerror::ERR_CHANNELISFULL + \
+		" "  + user + " " + _name + " :Cannot join channel (+l)";
+        server.sendToClient(user, msg);
 }
 
 void Channel::removeUser(const std::string& user)
