@@ -10,6 +10,7 @@ struct IRCerror {
 	static constexpr const char* ERR_WASNOSUCHNICK = "406";		// There was no such nick
 	static constexpr const char* ERR_TOOMANYTARGETS = "407";	// Too many targets
 	static constexpr const char* ERR_NOORIGIN = "409";			// No origin specified
+	static constexpr const char* ERR_INVALIDCAPCMD = "410";		// Invalid or missing CAP subcommand
 	static constexpr const char* ERR_NORECIPIENT = "411";		// No recipient given
 	static constexpr const char* ERR_NOTEXTTOSEND = "412";		// No text to send
 	static constexpr const char* ERR_NOTOPLEVEL = "413";		// No top level domain

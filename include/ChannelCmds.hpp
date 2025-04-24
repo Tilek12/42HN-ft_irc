@@ -2,6 +2,7 @@
 #define CHANNELCMDS_HPP
 
 #include <vector>
+#include <algorithm>
 
 #include "IServer.hpp"
 #include "../include/IClient.hpp"

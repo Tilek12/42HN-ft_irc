@@ -6,7 +6,7 @@ RESET	= \033[0m
 # Compiler
 CXX = c++
 CXXFLAGS = -Wall -Wextra -Werror -std=c++17
-# CXXFLAGS = -std=c++17
+# LEAKS = -L../../../LeakSanitizer -llsan -lc++ -Wno-gnu-include-next -I ../../../LeakSanitizer
 
 # Directories
 OBJ_DIR = obj
@@ -18,14 +18,14 @@ NAME = ircserv
 TEST_CHANNEL = test_channel
 TEST_TILEK = test_tilek
 SRC =	$(SRC_DIR)/Server.cpp \
+		$(SRC_DIR)/serverCmdHandler.cpp \
+		$(SRC_DIR)/parse_cmds.cpp \
+		$(SRC_DIR)/Client.cpp \
+		$(SRC_DIR)/client_c_h.cpp \
+		$(SRC_DIR)/commands.cpp \
 		$(SRC_DIR)/Channel.cpp \
 		$(SRC_DIR)/ChannelCmds.cpp \
-		$(SRC_DIR)/Client.cpp \
 		$(SRC_DIR)/channelHelperFcts.cpp \
-		$(SRC_DIR)/client_c_h.cpp \
-		$(SRC_DIR)/parse_cmds.cpp \
-		$(SRC_DIR)/commands.cpp \
-		$(SRC_DIR)/serverCmdHandler.cpp \
 		$(SRC_DIR)/channelCmdsUtils.cpp \
 		$(SRC_DIR)/channelCmdsUserRole.cpp \
 		$(SRC_DIR)/channelCmdHandler.cpp \

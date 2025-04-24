@@ -153,9 +153,6 @@ void	Server::_processClientBuffer( Client* client ) {
 	size_t			pos;
 
 	while ( client && ( pos = buffer.find("\n") ) != std::string::npos ) {
-
-		std::cout << buffer << std::endl;
-
 		if ( buffer[pos - 1] == '\r' )
 			message = buffer.substr( 0, pos - 1 );
 		else
@@ -170,12 +167,10 @@ void	Server::_processClientBuffer( Client* client ) {
 			_arguments = _commandHandler->parseCommand( client, message );
 			if ( _arguments.size() > 1 )
 				_commandHandler->MainCommandHandller( client, _arguments );
-			else if ( _arguments.size() == 1 ) {
-				std::string errorMsg = client->getNickname() + " " + _arguments[0];
-				sendError( client->getSocketFd(), IRCerror::ERR_UNKNOWNCOMMAND, errorMsg );
-			} else {
+			else if ( _arguments.size() == 1 )
+				sendError( client->getSocketFd(), IRCerror::ERR_UNKNOWNCOMMAND, _arguments[0] );
+			else
 				return ;
-			}
 		}
 	}
 

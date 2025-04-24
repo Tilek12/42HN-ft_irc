@@ -19,7 +19,7 @@ std::vector<std::string> parseCommaString(std::string commaStr)
 
 void printVec(const std::vector<std::string>& vec)
 {
-	std::cout << "vec: " << std::endl; 
+	std::cout << "vec: " << std::endl;
     for (const auto& str : vec)
 	{
         std::cout << str << std::endl;

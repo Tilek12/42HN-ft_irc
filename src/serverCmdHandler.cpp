@@ -8,17 +8,20 @@ static void	handleCap( Server* server, int fd, const std::vector<std::string>& a
 	std::string subcmd = args[1];
 	int argsNum = args.size();
 
-	if ( subcmd == "END" )
+	if ( subcmd == "END" ) {
 		return;
-	else if ( subcmd == "LS" )
+	} else if ( subcmd == "LS" ) {
 		reply = "CAP * LS :multi-prefix away-notify extended-join";
-	else if ( subcmd == "REQ" ) {
+	} else if ( subcmd == "REQ" ) {
 		reply = "CAP * ACK ";
 		for ( int i = 2; i < argsNum; i++ ) {
 			reply += args[i];
 			if ( i != argsNum - 1 )
 			reply += " ";
 		}
+	} else {
+		server->sendError( fd, IRCerror::ERR_INVALIDCAPCMD, subcmd + ":Unknown CAP subcommand" );
+		return;
 	}
 
 	server->sendToClient( fd, reply );
@@ -50,6 +53,12 @@ static void	handlePass( Server* server, Client* client, const std::vector<std::s
 	// Check parameter exists
 	if ( args.size() < 2 ) {
 		server->sendError( fd, IRCerror::ERR_NEEDMOREPARAMS, "PASS :Not enough parameters" );
+		return;
+	}
+
+	// Check for more parameters
+	if ( args.size() > 2 ) {
+		server->sendError( fd, IRCerror::ERR_PASSWDMISMATCH, "PASS :Too many parameters" );
 		return;
 	}
 

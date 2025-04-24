@@ -3,6 +3,7 @@
 
 #include <iostream>
 #include <vector>
+#include <algorithm>
 
 #include "IChannel.hpp"
 
@@ -22,7 +23,7 @@ private:
 	std::string					_password;
 	size_t						_userLimit;
 	bool						_onlyOperatorCanChangeTopic;
-	
+
 public:
 	Channel();
 	Channel(const std::string& name);

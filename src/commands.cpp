@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   commands.cpp                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: llacsivy <llacsivy@student.42.fr>          +#+  +:+       +#+        */
+/*   By: tkubanyc <tkubanyc@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/04 19:18:33 by ryusupov          #+#    #+#             */
-/*   Updated: 2025/04/21 13:24:21 by llacsivy         ###   ########.fr       */
+/*   Updated: 2025/04/23 19:59:24 by tkubanyc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -68,11 +68,11 @@ bool CommandHandler::handlePrivMsgNotice(Client *client, std::istringstream &iss
 /*------Parsing NOTICE command*/
 bool CommandHandler::handleNotice(std::istringstream &iss, std::vector<std::string> &arguments) {
 	std::string lagcheck, msg, lagData;
-	bool found = false;
+	// bool found = false;
 
 	while (iss >> lagcheck) {
 		if (lagcheck == ":\001LAGCHECK") {
-			found = true;
+			// found = true;
 			//the case if there is no witespace between LAGCHECK and the rest of the msg
 			if (lagcheck.size() > 10) {
 				arguments.push_back(msg);
@@ -191,10 +191,10 @@ bool CommandHandler::handleSimpleCommands(Client *client, std::istringstream &is
 	arguments.push_back(arg3);
 
 	/*checking if there is no any additional arguments provided*/
-	if (iss.rdbuf()->in_avail() > 0) {
-		std::cerr << "Error: There are extra argument provided please check and type again!" << std::endl;
-		return false;
-	}
+	// if (iss.rdbuf()->in_avail() > 0) {
+	// 	std::cerr << "Error: There are extra argument provided please check and type again!" << std::endl;
+	// 	return false;
+	// }
 
 	return true;
 }
@@ -206,7 +206,7 @@ bool CommandHandler::handleKick(std::istringstream &iss, std::vector<std::string
 	if (!(iss >> channel) || std::string("#!&+").find(channel[0]) == std::string::npos)
 		return false;
 	arguments.push_back(channel);
-		
+
 		if (!(iss >> user))
 			return false;
 	arguments.push_back(user);
@@ -239,10 +239,10 @@ bool CommandHandler::handlePing(std::istringstream &iss, std::vector<std::string
 bool CommandHandler::handleCap(std::istringstream &iss, std::vector<std::string> &arguments) {
 	std::string arg1, arg2;
 
-	if (!(iss >> arg1)){
-		std::cerr << "No arg2 provided!" << std::endl;
-		return {};
-	}
+	// if (!(iss >> arg1)){
+	// 	std::cerr << "No arg2 provided!" << std::endl;
+	// 	return {};
+	// }
 	arguments.push_back(arg1);
 	if (iss.rdbuf()->in_avail() > 0) {
 		std::getline(iss, arg2);
