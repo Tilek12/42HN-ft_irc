@@ -6,7 +6,7 @@
 /*   By: llacsivy <llacsivy@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/22 16:37:19 by ryusupov          #+#    #+#             */
-/*   Updated: 2025/04/25 17:44:07 by llacsivy         ###   ########.fr       */
+/*   Updated: 2025/04/25 20:58:28 by llacsivy         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,6 +16,8 @@
 #include "../include/Client.hpp"
 #include "../include/ChannelCmds.hpp"
 #include "../include/IClient.hpp"
+
+//TODO::Check the letters and make everything in lowercase for channel names
 
 CommandHandler::CommandHandler(Server& srv) : server(srv) {
 	//
@@ -174,6 +176,7 @@ bool CommandHandler::handleNickname(Client *client, std::vector<std::string> &co
 		server.sendToClient(client->getNickname(), nickChangeMsg);
 	} else {
 		server.sendToClient(newNick, ":irc.server.com 001 " + newNick + " :Welcome to the IRC network, " + newNick);
+		client->setIsRegistered(true);
  		server.addClient(client);
 	}
 	return true;

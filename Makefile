@@ -37,6 +37,7 @@ OBJ = $(SRC:$(SRC_DIR)/%.cpp=$(OBJ_DIR)/%.o)
 all: $(OBJ_DIR) $(NAME)
 
 $(NAME): $(OBJ)
+# @$(CXX) $(CXXFLAGS) $(OBJ) $(SRC_DIR)/main.cpp /Users/llacsivy/LeakSanitizer/liblsan.dylib -o $(NAME) -g
 	@$(CXX) $(CXXFLAGS) $(OBJ) $(SRC_DIR)/main.cpp -o $(NAME)
 #> /dev/null 2>&1
 	@echo "$(GREEN)object files created.$(RESET)"
