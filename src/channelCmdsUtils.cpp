@@ -128,8 +128,7 @@ void processKickRequest(IClient& client, IServer& server, \
 		return;
     if (!isUserOnChannel(client, server, channel, userName))
 		return;
-    // TODO: delete the user from channel
-    server.removeChannel(client.getNickname());
+    channel->removeUser(userName);
     std::string reply;
     if (reason.empty())
         reply = ":" + client.getNickname() + " KICK " + channelName + \
@@ -139,6 +138,7 @@ void processKickRequest(IClient& client, IServer& server, \
             + userName + " :" + reason;
     server.broadcastMessage(realClient, channel->getName(), reply);
     server.sendToClient(client.getNickname(), reply);
+    server.sendToClient(userName, reply);
     if (channel->getUsers().size() == 0)
         server.removeChannel(channelName);
 }
