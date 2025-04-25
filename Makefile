@@ -11,7 +11,6 @@ CXXFLAGS = -Wall -Wextra -Werror -std=c++17
 # Directories
 OBJ_DIR = obj
 SRC_DIR = src
-TEST_DIR = tests
 
 # Variables
 NAME = ircserv
