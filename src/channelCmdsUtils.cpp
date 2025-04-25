@@ -128,6 +128,7 @@ void processKickRequest(IClient& client, IServer& server, \
 		return;
     if (!isUserOnChannel(client, server, channel, userName))
 		return;
+    // TODO: delete the user from channel
     server.removeChannel(client.getNickname());
     std::string reply;
     if (reason.empty())
@@ -192,12 +193,14 @@ void processSetTopicRequest(IClient& client, IServer& server, IChannel* channel,
 void processModeTwoArgsRequest(IClient& client, IServer& server, \
     IChannel* channel, std::string mode)
 {
+    bool validMode = true;
     if (mode == "b")
     {
         std::string reply = ":" + IRCname + IRCreply::RPL_ENDOFBANLIST + " " + \
             client.getNickname() + " " + channel->getName() + \
             " :End of Channel Ban List";
         server.sendToClient(client.getNickname(), reply);
+        validMode = false;
     }
     else if (mode == "+i")
         channel->setIsInviteOnly(true);
@@ -211,11 +214,11 @@ void processModeTwoArgsRequest(IClient& client, IServer& server, \
         channel->setUserLimit(0);
     else
     {
-        std::string errorMsg = ":" + IRCname + " " + IRCerror::ERR_UNKNOWNMODE + \
-            " " + client.getNickname() + " " + mode + " :Unknown channel mode";
-        server.sendToClient(client.getNickname(), errorMsg);
+        sendErrorMode(client, server, mode);
+        validMode = false;
     }
-    return;
+    if (validMode) 
+        sendModeTwoArgsMsg(client, server, channel, mode);
 }
 
 void processModeThreeArgsRequest(IClient& client, IServer& server, \
@@ -243,17 +246,9 @@ void processModeThreeArgsRequest(IClient& client, IServer& server, \
     }
     else
     {
-        std::string errorMsg = ":" + IRCname + " " + IRCerror::ERR_UNKNOWNMODE + \
-            " " + client.getNickname() + " " + mode + " :Unknown channel mode";
-        server.sendToClient(client.getNickname(), errorMsg);
+        sendErrorMode(client, server, mode);
         validMode = false;
     }
     if (validMode) 
-    {
-        std::string reply = ":" + client.getNickname() + " MODE " + \
-            channel->getName() + " " + mode + " " + modeParamIdx2;
-        server.broadcastMessage(dynamic_cast<Client*>(&client), \
-            channel->getName(), reply);
-        server.sendToClient(client.getNickname(), reply);
-    }
+        sendModeThreeArgsMsg(client, server, channel, mode, modeParamIdx2);
 }

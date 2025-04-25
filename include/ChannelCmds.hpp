@@ -50,4 +50,10 @@ void handleNewChannel(IServer& server, IChannel*& channel,
 	const std::string& channelName,
 	const std::string& password, IClient& client);
 void sendNameReplies(Client* client, IChannel* channel, IServer& server);
+void sendModeTwoArgsMsg(IClient& client, IServer& server, \
+    IChannel* channel, std::string mode);
+void sendModeThreeArgsMsg(IClient& client, IServer& server, \
+    IChannel* channel, std::string mode, std::string modeParamIdx2);
+void sendErrorMode(IClient& client, IServer& server, std::string mode);
+
 #endif

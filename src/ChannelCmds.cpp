@@ -170,6 +170,7 @@ void ChannelCmds::modeChannelCmd(IClient& client, IServer& server, \
         server.sendToClient(client.getNickname(), reply);
         return;
     }
+    //TODO: send back all active channel modes, use coorect reply
     if (!isOperatorOnChannel(client, server, channel))
         return;
     if (modeParams.size() >= 2) {

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   commands.cpp                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tkubanyc <tkubanyc@student.42.fr>          +#+  +:+       +#+        */
+/*   By: llacsivy <llacsivy@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/04 19:18:33 by ryusupov          #+#    #+#             */
-/*   Updated: 2025/04/23 19:59:24 by tkubanyc         ###   ########.fr       */
+/*   Updated: 2025/04/25 14:55:47 by llacsivy         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -239,10 +239,10 @@ bool CommandHandler::handlePing(std::istringstream &iss, std::vector<std::string
 bool CommandHandler::handleCap(std::istringstream &iss, std::vector<std::string> &arguments) {
 	std::string arg1, arg2;
 
-	// if (!(iss >> arg1)){
-	// 	std::cerr << "No arg2 provided!" << std::endl;
-	// 	return {};
-	// }
+	if (!(iss >> arg1)){
+		// std::cerr << "No arg2 provided!" << std::endl;
+		return true;
+	}
 	arguments.push_back(arg1);
 	if (iss.rdbuf()->in_avail() > 0) {
 		std::getline(iss, arg2);
