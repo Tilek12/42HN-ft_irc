@@ -55,5 +55,9 @@ void sendModeTwoArgsMsg(IClient& client, IServer& server, \
 void sendModeThreeArgsMsg(IClient& client, IServer& server, \
     IChannel* channel, std::string mode, std::string modeParamIdx2);
 void sendErrorMode(IClient& client, IServer& server, std::string mode);
+void sendNoChannelReply(IClient& client, IServer& server, \
+    std::string channelName);
+void processModeOneArgsRequest(IClient& client, IServer& server, \
+	IChannel* channel);
 
 #endif

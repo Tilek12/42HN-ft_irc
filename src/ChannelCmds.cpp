@@ -165,12 +165,15 @@ void ChannelCmds::modeChannelCmd(IClient& client, IServer& server, \
     Channel* channel = server.getChannel(channelName);
     if (!channel)
     {
-        std::string reply = ":" + IRCname + " " + IRCerror::ERR_NOCHANMODES + " " + \
-        client.getNickname() + " " + channelName + " :Channel does not exist";
-        server.sendToClient(client.getNickname(), reply);
+        sendNoChannelReply(client, server, channelName);
         return;
     }
-    //TODO: send back all active channel modes, use coorect reply
+    if (modeParams.size() == 1)
+    {
+        processModeOneArgsRequest(client, server, channel);
+        return;
+    }
+    
     if (!isOperatorOnChannel(client, server, channel))
         return;
     if (modeParams.size() >= 2) {

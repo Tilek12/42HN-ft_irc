@@ -29,4 +29,35 @@ void sendErrorMode(IClient& client, IServer& server, std::string mode)
         " " + client.getNickname() + " " + mode + " :Unknown channel mode";
     server.sendToClient(client.getNickname(), errorMsg);
 }
-     
+
+void sendNoChannelReply(IClient& client, IServer& server, \
+    std::string channelName)
+{
+    std::string reply = ":" + IRCname + " " + IRCerror::ERR_NOCHANMODES + " " + \
+        client.getNickname() + " " + channelName + " :Channel does not exist";
+    server.sendToClient(client.getNickname(), reply);
+}
+void processModeOneArgsRequest(IClient& client, IServer& server, \
+    IChannel* channel)
+{
+    std::string modes = "+";
+    std::string params;
+
+    if (channel->getIsInviteOnly())
+        modes += "i";
+    if (channel->getOnlyOperatorCanChangeTopic())
+        modes += "t";
+    if (channel->getUserLimit() > 0)
+    {
+        modes += "l";
+        params += " " + std::to_string(channel->getUserLimit());
+    }
+    if (channel->getHasPassword())
+    {
+        modes += "k";
+        params += " " + channel->getPassword();
+    }
+    std::string reply = ":" + IRCname + " " + IRCreply::RPL_CHANNELMODEIS + " " + \
+        client.getNickname() + " " + channel->getName() + " " + modes + params;
+    server.sendToClient(client.getNickname(), reply);
+}
