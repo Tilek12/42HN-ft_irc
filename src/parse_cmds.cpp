@@ -6,14 +6,12 @@
 /*   By: llacsivy <llacsivy@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/31 14:30:49 by ryusupov          #+#    #+#             */
-/*   Updated: 2025/04/20 19:26:05 by llacsivy         ###   ########.fr       */
+/*   Updated: 2025/04/25 17:47:47 by llacsivy         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../include/client_c_h.hpp"
 
-//TODO: Need to parse KICK commands too
-//FIXME: Needs attention
 std::vector<std::string>CommandHandler::parseSpecialCommands(Client *client, const std::string &command, const std::unordered_set<std::string> &setOfCmds) {
 	std::istringstream iss(command);
 	std::string cmd;
@@ -78,30 +76,3 @@ std::vector<std::string>CommandHandler::parseCommand(Client *client, const std::
 		return {};
 	return arguments;
 }
-
-//TODO::PART COMMAND
-
-// void testParseJoinCommand(const std::string& commandLine) {
-//     std::vector<std::string> parsed = parseCommand(commandLine);
-
-//     if (!parsed.empty()) {
-//         std::cout << "Command: " << parsed[0] << std::endl;
-//         std::cout << "Argument[1]: " << parsed[1] << std::endl;
-//         std::cout << "Argument[2]: " << parsed[2] << std::endl;
-//         // std::cout << "Argument[3]: " << parsed[3] << std::endl;
-//         // std::cout << "Passwords: " << parsed[4] << std::endl;
-//     } else {
-//         std::cout << "Invalid command!" << std::endl;
-//     }
-// }
-
-// int main() {
-//     // testParseJoinCommand("JOIN #chan1,#chan2,#chan3 pass1,pass2");
-//     testParseJoinCommand("asdf rustam :Hello");
-// 	// testParseJoinCommand("USER testuser 0 * :realname real");
-// 		// TOPIC #channel1 :block balbal
-// 		// MODE #channel +o/-o USER {o, k, i, l, t}
-// 		//PING iutuyt jjyty juuyt
-// 		// PONG :hfghf jghjg hjghjg
-//     return 0;
-// }

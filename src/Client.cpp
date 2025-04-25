@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Client.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tkubanyc <tkubanyc@student.42.fr>          +#+  +:+       +#+        */
+/*   By: llacsivy <llacsivy@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/19 17:44:20 by ryusupov          #+#    #+#             */
-/*   Updated: 2025/04/21 16:29:42 by tkubanyc         ###   ########.fr       */
+/*   Updated: 2025/04/25 17:45:27 by llacsivy         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -121,8 +121,10 @@ std::string Client::getNextMessage() {
     return message;
 }
 
-/////////////////////////  NEW FUNCTION  ///////////////////////////////
-bool	Client::getIsAuthenticated() const { return isAuthenticated; }
+bool	Client::getIsAuthenticated() const { 
+	return isAuthenticated; 
+}
 
-/////////////////////////  NEW FUNCTION  ///////////////////////////////
-void	Client::setIsAuthenticated(bool status) { isAuthenticated = status; }
+void	Client::setIsAuthenticated(bool status) {
+	isAuthenticated = status; 
+}

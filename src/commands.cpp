@@ -6,7 +6,7 @@
 /*   By: llacsivy <llacsivy@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/04 19:18:33 by ryusupov          #+#    #+#             */
-/*   Updated: 2025/04/25 14:55:47 by llacsivy         ###   ########.fr       */
+/*   Updated: 2025/04/25 17:44:50 by llacsivy         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -72,8 +72,6 @@ bool CommandHandler::handleNotice(std::istringstream &iss, std::vector<std::stri
 
 	while (iss >> lagcheck) {
 		if (lagcheck == ":\001LAGCHECK") {
-			// found = true;
-			//the case if there is no witespace between LAGCHECK and the rest of the msg
 			if (lagcheck.size() > 10) {
 				arguments.push_back(msg);
 				arguments.push_back(":LAGCHECK");
@@ -140,7 +138,6 @@ bool CommandHandler::handleTopic(Client *client, std::istringstream &iss, std::v
 
 		if (topic.empty() || topic[0] != ':')
 			return true;
-		// topic.erase(0, 1);
 
 		if (!topic.empty())
 			arguments.push_back(topic);
@@ -189,13 +186,6 @@ bool CommandHandler::handleSimpleCommands(Client *client, std::istringstream &is
 	if (!(iss >> arg3))
 		return true;
 	arguments.push_back(arg3);
-
-	/*checking if there is no any additional arguments provided*/
-	// if (iss.rdbuf()->in_avail() > 0) {
-	// 	std::cerr << "Error: There are extra argument provided please check and type again!" << std::endl;
-	// 	return false;
-	// }
-
 	return true;
 }
 
@@ -240,7 +230,6 @@ bool CommandHandler::handleCap(std::istringstream &iss, std::vector<std::string>
 	std::string arg1, arg2;
 
 	if (!(iss >> arg1)){
-		// std::cerr << "No arg2 provided!" << std::endl;
 		return true;
 	}
 	arguments.push_back(arg1);

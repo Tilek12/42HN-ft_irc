@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   client_c_h.cpp                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tkubanyc <tkubanyc@student.42.fr>          +#+  +:+       +#+        */
+/*   By: llacsivy <llacsivy@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/22 16:37:19 by ryusupov          #+#    #+#             */
-/*   Updated: 2025/04/22 20:04:31 by tkubanyc         ###   ########.fr       */
+/*   Updated: 2025/04/25 17:44:07 by llacsivy         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -173,11 +173,7 @@ bool CommandHandler::handleNickname(Client *client, std::vector<std::string> &co
 		server.broadcastMessage(client, "", nickChangeMsg);
 		server.sendToClient(client->getNickname(), nickChangeMsg);
 	} else {
-		// std::string nickChangeMsg = ":" + oldNick + "!" + client->getUsername() + "@" + client->getHostname() + " NICK :" + newNick;
-		// server.sendToClient(client->getNickname(), nickChangeMsg);
-		// client->setIsRegistered(true);
 		server.sendToClient(newNick, ":irc.server.com 001 " + newNick + " :Welcome to the IRC network, " + newNick);
- 		// client->setIsRegistered(true);
  		server.addClient(client);
 	}
 	return true;
@@ -197,15 +193,6 @@ void CommandHandler::updateNicknameInChannels(Client *client, const std::string 
 		}
 	}
 }
-
-// void CommandHandler::SendMessage(const std::string &msg){
-// 	std::cout << "New message: " << msg << std::endl;
-// }
-
-// void CommandHandler::SendError(const std::string &msg) {
-// 	std::string message = "Error" + msg;
-// 	SendMessage(message);
-// }
 
 bool CommandHandler::NickNameTaken(std::string &nickname) {
 
