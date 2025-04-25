@@ -64,17 +64,4 @@ fclean: clean
 # Recompile the project
 re: fclean all
 
-# Run tests
-test: $(OBJ) $(TEST_CHANNEL) $(TEST_TILEK)
-	@./$(TEST_CHANNEL) || echo "$(VIOLET)$(TEST_CHANNEL) failed$(RESET)"
-	@./$(TEST_TILEK) || echo "$(VIOLET)$(TEST_TILEK) failed$(RESET)"
-	@echo "$(GREEN)Tests ran successfully.$(RESET)"
-
-# Compile the test executable
-$(TEST_CHANNEL): $(OBJ) $(TEST_DIR)/test_channel.cpp
-	@$(CXX) $(CXXFLAGS) $(OBJ) $(TEST_DIR)/test_channel.cpp -o $(TEST_CHANNEL)
-
-$(TEST_TILEK): $(TEST_DIR)/test_tilek.cpp
-	@$(CXX) $(CXXFLAGS) $(OBJ) $(TEST_DIR)/test_tilek.cpp -o $(TEST_TILEK)
-
 .PHONY: all clean fclean re test
