@@ -6,7 +6,7 @@
 /*   By: ryusupov <ryusupov@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/19 14:03:06 by ryusupov          #+#    #+#             */
-/*   Updated: 2025/04/18 13:40:12 by ryusupov         ###   ########.fr       */
+/*   Updated: 2025/04/26 19:24:23 by ryusupov         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -72,32 +72,5 @@ class Client : public IClient{
 			/*Destructor*/
 			~Client();
 };
-
-// class Server {
-//     public:
-//         std::map<std::string, Client*> clients; // Map by nickname instead of int
-
-// 		void addClient(Client* client) {
-// 			if (!client->getNickname().empty()) {
-// 				clients[client->getNickname()] = client;
-// 			}
-// 		}
-
-// 		void printClients() {
-// 			std::cout << "Current Clients in Server:" << std::endl;
-// 			for (auto& c : clients) {
-// 				std::cout << "Nickname: " << c.first << " -> FD: " << c.second->getSockedFd() << std::endl;
-// 			}
-// 		}
-
-//         Client* findClient(const std::string& nickname) {
-// 			for (auto &nick : clients) {
-// 				if (nick.second->getNickname() == nickname) {
-// 					return nick.second;
-// 				}
-// 			}
-// 			return (nullptr);
-//         }
-//     };
 
 #endif
