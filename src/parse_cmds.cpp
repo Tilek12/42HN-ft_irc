@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   parse_cmds.cpp                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: llacsivy <llacsivy@student.42.fr>          +#+  +:+       +#+        */
+/*   By: ryusupov <ryusupov@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/31 14:30:49 by ryusupov          #+#    #+#             */
-/*   Updated: 2025/04/25 17:47:47 by llacsivy         ###   ########.fr       */
+/*   Updated: 2025/04/26 14:31:00 by ryusupov         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -61,8 +61,9 @@ std::vector<std::string>CommandHandler::parseCommand(Client *client, const std::
 	};
 	/*Checking for command if it is existing command and adding it to a vector*/
 	iss >> arg1;
-	if (setOfAllCmds.find(arg1) != setOfAllCmds.end())
+	if (setOfAllCmds.find(arg1) != setOfAllCmds.end()) {
 		arguments.push_back(arg1);
+	}
 	else if (setOfSpecialCmds.find(arg1) != setOfSpecialCmds.end()){
 		arguments.push_back(arg1);
 		arguments = parseSpecialCommands(client, command, setOfSpecialCmds);

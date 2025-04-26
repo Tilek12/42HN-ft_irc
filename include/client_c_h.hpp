@@ -6,7 +6,7 @@
 /*   By: ryusupov <ryusupov@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: Invalid date        by                   #+#    #+#             */
-/*   Updated: 2025/04/21 16:25:26 by ryusupov         ###   ########.fr       */
+/*   Updated: 2025/04/26 14:37:48 by ryusupov         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -56,6 +56,7 @@ class CommandHandler{
 		void	findTargetPrivmsg(Client *client, std::vector<std::string> &command);
 		void	handleWhoCmd(Client *client, std::vector<std::string> &command);
 		bool 	handleQuit(Client *client, std::istringstream &iss, std::vector<std::string> &args);
+		std::string	lowerCaseChannelName(std::string channelname);
 
 
 

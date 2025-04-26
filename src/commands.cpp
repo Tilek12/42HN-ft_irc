@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   commands.cpp                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: llacsivy <llacsivy@student.42.fr>          +#+  +:+       +#+        */
+/*   By: ryusupov <ryusupov@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/04 19:18:33 by ryusupov          #+#    #+#             */
-/*   Updated: 2025/04/25 17:44:50 by llacsivy         ###   ########.fr       */
+/*   Updated: 2025/04/26 14:55:31 by ryusupov         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,6 +34,8 @@ bool CommandHandler::handlePart(Client *client, std::istringstream &iss, std::ve
 			server.sendToClient(client->getNickname(), errorMsg);
 			return false;
 	}
+
+	channel = lowerCaseChannelName(channel);
 	args.push_back(channel);
 
 	std::getline(iss, reason);
@@ -131,6 +133,8 @@ bool CommandHandler::handleTopic(Client *client, std::istringstream &iss, std::v
 			server.sendToClient(client->getNickname(), errorMsg);
 			return false;
 		}
+
+		channel = lowerCaseChannelName(channel);
 		arguments.push_back(channel);
 
 		std::getline(iss, topic);
@@ -154,6 +158,7 @@ bool CommandHandler::handleMode(Client *client, std::istringstream &iss, std::ve
 			server.sendToClient(client->getNickname(), errorMsg);
 			return false;
 		}
+		channel = lowerCaseChannelName(channel);
 		arguments.push_back(channel);
 
 		if (iss >> flag) {
@@ -172,7 +177,7 @@ bool CommandHandler::handleMode(Client *client, std::istringstream &iss, std::ve
 
 /*------Parsing Simple commands------*/
 bool CommandHandler::handleSimpleCommands(Client *client, std::istringstream &iss, std::vector<std::string> &arguments) {
-	std::string arg2, arg3;
+	std::string arg2, arg3, new_arg2;
 
 	if (!(iss >> arg2)) {
 		std::string errorMsg = ":" + IRCname + " " + IRCerror::ERR_NEEDMOREPARAMS + \
@@ -180,6 +185,7 @@ bool CommandHandler::handleSimpleCommands(Client *client, std::istringstream &is
 		server.sendToClient(client->getNickname(), errorMsg);
 		return false;
 	}
+	arg2 = lowerCaseChannelName(arg2);
 	arguments.push_back(arg2);
 
 	/*checking for a password and adding them to a vector*/
@@ -189,12 +195,25 @@ bool CommandHandler::handleSimpleCommands(Client *client, std::istringstream &is
 	return true;
 }
 
+/*--------Function to change the format of the letters to the lowercase-----------*/
+std::string CommandHandler::lowerCaseChannelName(std::string channelname) {
+
+	if (channelname[0] == '#') {
+		for (char &c : channelname) {
+			c = std::tolower(c);
+		}
+	}
+	return channelname;
+}
+
 /*------Parsing KICK command------*/
 bool CommandHandler::handleKick(std::istringstream &iss, std::vector<std::string> &arguments) {
 	std::string channel, user, reason;
 
 	if (!(iss >> channel) || std::string("#!&+").find(channel[0]) == std::string::npos)
 		return false;
+
+	channel = lowerCaseChannelName(channel);
 	arguments.push_back(channel);
 
 		if (!(iss >> user))
