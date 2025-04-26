@@ -24,7 +24,7 @@ Server::Server( int port, const std::string& password ) :
 		throw std::runtime_error( "ERROR: Password must contain no less than 3 characters." );
 
 	// Set Server Creation time
-	_setCreationTime();
+	// _setCreationTime();
 
 	// Setup settings and run Server
 	_setupServer();
@@ -43,12 +43,12 @@ Server::~Server( void ) { stop(); }
 /*----------------------------*/
 /*  Set Server Creation Time  */
 /*----------------------------*/
-void	Server::_setCreationTime( void ) {
+// void	Server::_setCreationTime( void ) {
 
-	time_t now = time( nullptr );
-	_creationTime = ctime( &now );
+// 	time_t now = time( nullptr );
+// 	_creationTime = ctime( &now );
 
-}
+// }
 
 /*----------------*/
 /*  Setup Server  */
@@ -141,7 +141,7 @@ void	Server::_acceptNewConnection( void ) {
 /*----------------------------*/
 /*  Get Server Creation Time  */
 /*----------------------------*/
-const std::string& Server::getCreationTime( void ) const { return _creationTime; }
+// const std::string& Server::getCreationTime( void ) const { return _creationTime; }
 
 /*---------------------------------------*/
 /*  Define processClientBuffer function  */
@@ -478,8 +478,8 @@ void	Server::removeChannel( const std::string& name ) {
 		return;
 
 	// Delete Channel
-	_channels.erase( name );
 	Channel* channel = getChannel( name );
+	_channels.erase( name );
 	delete channel;
 
 }

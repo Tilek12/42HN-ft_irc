@@ -40,7 +40,7 @@ class Server : public IServer {
 
 private:
 
-	std::string						_creationTime;		// Server Creation time
+	// std::string						_creationTime;		// Server Creation time
 	std::string						_password;			// Password for Server
 	int								_serverFD;			// file descriptor for Server socket
 	struct sockaddr_in				_serverAddress;		// Server socket address
@@ -54,7 +54,7 @@ private:
 	Server( const Server& other ) = delete;
 	Server& operator=( const Server&  other ) = delete;
 
-	void	_setCreationTime( void );
+	// void	_setCreationTime( void );
 	void	_setupServer( void );
 	void	_handleConnections( void );
 	void	_acceptNewConnection( void );
@@ -71,7 +71,7 @@ private:
 	void						start( void ) override;
 	void						stop( void ) override;
 	bool						validatePassword( const std::string& pass ) const override;
-	const std::string& 			getCreationTime( void ) const override;
+	// const std::string& 			getCreationTime( void ) const override;
 	bool						getIsRunning( void ) override;
 	void						setIsRunning( bool value ) override;
 	std::vector<std::string>	getArguments( void ) override;

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   channelCmdsUtilsMode.cpp                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: llacsivy <llacsivy@student.42.fr>          +#+  +:+       +#+        */
+/*   By: tkubanyc <tkubanyc@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/26 17:46:30 by llacsivy          #+#    #+#             */
-/*   Updated: 2025/04/26 17:46:31 by llacsivy         ###   ########.fr       */
+/*   Updated: 2025/04/26 19:06:33 by tkubanyc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -64,7 +64,7 @@ void processModeOneArgsRequest(IClient& client, IServer& server, \
         modes += "l";
         params += " " + std::to_string(channel->getUserLimit());
     }
-    if (channel->getHasPassword())
+    if (channel->getHasPassword() && !channel->getPassword().empty())
     {
         modes += "k";
         params += " " + channel->getPassword();
