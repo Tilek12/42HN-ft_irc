@@ -15,7 +15,6 @@ public:
 	virtual void						start( void ) = 0;
 	virtual void						stop( void ) = 0;
 	virtual bool						validatePassword( const std::string& pass ) const = 0;
-	// virtual const std::string&			getCreationTime( void ) const = 0;
 	virtual bool						getIsRunning( void ) = 0;
 	virtual void						setIsRunning( bool value ) = 0;
 	virtual std::vector<std::string>	getArguments( void ) = 0;

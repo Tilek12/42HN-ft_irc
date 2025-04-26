@@ -23,9 +23,6 @@ Server::Server( int port, const std::string& password ) :
 	if ( password.empty() || password.size() < 3 )
 		throw std::runtime_error( "ERROR: Password must contain no less than 3 characters." );
 
-	// Set Server Creation time
-	// _setCreationTime();
-
 	// Setup settings and run Server
 	_setupServer();
 
@@ -39,16 +36,6 @@ Server::~Server( void ) { stop(); }
 ////////////////////////////////////////////////////////////////////////////////
 // ========================  Core Server operations  ======================== //
 ////////////////////////////////////////////////////////////////////////////////
-
-/*----------------------------*/
-/*  Set Server Creation Time  */
-/*----------------------------*/
-// void	Server::_setCreationTime( void ) {
-
-// 	time_t now = time( nullptr );
-// 	_creationTime = ctime( &now );
-
-// }
 
 /*----------------*/
 /*  Setup Server  */
@@ -137,11 +124,6 @@ void	Server::_acceptNewConnection( void ) {
 			  << RESET << std::endl;
 
 }
-
-/*----------------------------*/
-/*  Get Server Creation Time  */
-/*----------------------------*/
-// const std::string& Server::getCreationTime( void ) const { return _creationTime; }
 
 /*---------------------------------------*/
 /*  Define processClientBuffer function  */

@@ -6,7 +6,6 @@ RESET	= \033[0m
 # Compiler
 CXX = c++
 CXXFLAGS = -Wall -Wextra -Werror -std=c++17
-LEAKS = /Users/tkubanyc/Documents/Main42/LeakSanitizer/liblsan.dylib
 
 # Directories
 OBJ_DIR = obj
@@ -14,8 +13,6 @@ SRC_DIR = src
 
 # Variables
 NAME = ircserv
-TEST_CHANNEL = test_channel
-TEST_TILEK = test_tilek
 SRC =	$(SRC_DIR)/Server.cpp \
 		$(SRC_DIR)/serverCmdHandler.cpp \
 		$(SRC_DIR)/parse_cmds.cpp \
@@ -37,8 +34,7 @@ OBJ = $(SRC:$(SRC_DIR)/%.cpp=$(OBJ_DIR)/%.o)
 all: $(OBJ_DIR) $(NAME)
 
 $(NAME): $(OBJ)
-	@$(CXX) $(CXXFLAGS) $(OBJ) $(SRC_DIR)/main.cpp $(LEAKS) -o $(NAME) -g
-# @$(CXX) $(CXXFLAGS) $(OBJ) $(SRC_DIR)/main.cpp -o $(NAME)
+	@$(CXX) $(CXXFLAGS) $(OBJ) $(SRC_DIR)/main.cpp -o $(NAME)
 #> /dev/null 2>&1
 	@echo "$(GREEN)object files created.$(RESET)"
 	@echo "$(GREEN)$(NAME) created. $(RESET)"
