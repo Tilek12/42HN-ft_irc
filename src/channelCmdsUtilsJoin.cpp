@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   channelCmdsUtilsJoin.cpp                           :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: llacsivy <llacsivy@student.42.fr>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/04/26 17:46:23 by llacsivy          #+#    #+#             */
+/*   Updated: 2025/04/26 17:46:24 by llacsivy         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "../include/ChannelCmds.hpp"
 #include "../include/IRCreply.hpp"
 #include "../include/client_c_h.hpp"

@@ -12,3 +12,6 @@ test_tilek
 /test.dSYM/*
 ircserv.dSYM/*
 test_channel.dSYM/*
+KVIrc.app/*
+ircserv.dSYM/*
+.DS_Store

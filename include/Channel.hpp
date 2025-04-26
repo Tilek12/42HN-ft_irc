@@ -6,7 +6,7 @@
 #include <algorithm>
 
 #include "IChannel.hpp"
-// #include "Server.hpp"
+
 class IServer;
 
 class Channel : public IChannel
